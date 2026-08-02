@@ -1,18 +1,18 @@
 "use client";
 
+import FormSelect from "@/components/custom/form-select";
+import {
+  useCreateCategoryMutation,
+  useDeleteCategoryMutation,
+  useGetCategoriesQuery,
+  useUpdateCategoryMutation,
+} from "@/services/categoryApi";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2, Pencil, Plus, Trash2, X } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { Grid, Plus, Trash2, X, Loader2, Pencil } from "lucide-react";
-import {
-  useGetCategoriesQuery,
-  useCreateCategoryMutation,
-  useUpdateCategoryMutation,
-  useDeleteCategoryMutation,
-} from "../../../services/categoryApi";
 import { toast } from "sonner";
-import FormSelect from "../../../components/custom/form-select";
+import { z } from "zod";
 
 const categorySchema = z.object({
   name: z.string().min(1, "Category name is required"),
@@ -24,8 +24,10 @@ type CategoryFormValues = z.infer<typeof categorySchema>;
 
 export default function CategoriesPage() {
   const { data: categoriesData, isLoading } = useGetCategoriesQuery({});
-  const [createCategoryApi, { isLoading: isCreating }] = useCreateCategoryMutation();
-  const [updateCategoryApi, { isLoading: isUpdating }] = useUpdateCategoryMutation();
+  const [createCategoryApi, { isLoading: isCreating }] =
+    useCreateCategoryMutation();
+  const [updateCategoryApi, { isLoading: isUpdating }] =
+    useUpdateCategoryMutation();
   const [deleteCategoryApi] = useDeleteCategoryMutation();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -100,9 +102,7 @@ export default function CategoriesPage() {
   };
 
   const CategoryCard = ({ cat }: { cat: any }) => (
-    <div
-      className="p-3 rounded-2xl bg-secondary/50 border border-border flex items-center justify-between group hover:border-primary/50 transition-colors"
-    >
+    <div className="p-3 rounded-2xl bg-secondary/50 border border-border flex items-center justify-between group hover:border-primary/50 transition-colors">
       <div className="flex items-center gap-2 truncate">
         <div
           className="w-7 h-7 rounded-lg flex items-center justify-center text-white font-bold text-xs shrink-0"
@@ -110,7 +110,9 @@ export default function CategoriesPage() {
         >
           {cat.name.charAt(0)}
         </div>
-        <span className="text-xs font-semibold text-foreground truncate">{cat.name}</span>
+        <span className="text-xs font-semibold text-foreground truncate">
+          {cat.name}
+        </span>
         {cat.is_default && (
           <span className="text-[9px] px-1.5 py-0.5 rounded bg-primary/10 text-primary font-bold shrink-0">
             DEFAULT
@@ -142,8 +144,12 @@ export default function CategoriesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight">Category Manager</h1>
-          <p className="text-xs text-muted-foreground">Organize your income & expense classification hierarchy</p>
+          <h1 className="text-2xl font-extrabold tracking-tight">
+            Category Manager
+          </h1>
+          <p className="text-xs text-muted-foreground">
+            Organize your income & expense classification hierarchy
+          </p>
         </div>
 
         <button
@@ -161,9 +167,13 @@ export default function CategoriesPage() {
           <div className="flex items-center justify-between border-b border-border pb-3">
             <div className="flex items-center gap-2">
               <span className="w-3 h-3 rounded-full bg-rose-500" />
-              <h2 className="text-base font-bold text-foreground">Expense Categories</h2>
+              <h2 className="text-base font-bold text-foreground">
+                Expense Categories
+              </h2>
             </div>
-            <span className="text-xs font-semibold text-muted-foreground">{expenseCategories.length} Categories</span>
+            <span className="text-xs font-semibold text-muted-foreground">
+              {expenseCategories.length} Categories
+            </span>
           </div>
 
           {isLoading ? (
@@ -176,7 +186,9 @@ export default function CategoriesPage() {
                 <CategoryCard key={cat._id} cat={cat} />
               ))}
               {expenseCategories.length === 0 && (
-                <p className="col-span-2 text-xs text-muted-foreground text-center py-4">No expense categories yet.</p>
+                <p className="col-span-2 text-xs text-muted-foreground text-center py-4">
+                  No expense categories yet.
+                </p>
               )}
             </div>
           )}
@@ -187,9 +199,13 @@ export default function CategoriesPage() {
           <div className="flex items-center justify-between border-b border-border pb-3">
             <div className="flex items-center gap-2">
               <span className="w-3 h-3 rounded-full bg-emerald-500" />
-              <h2 className="text-base font-bold text-foreground">Income Categories</h2>
+              <h2 className="text-base font-bold text-foreground">
+                Income Categories
+              </h2>
             </div>
-            <span className="text-xs font-semibold text-muted-foreground">{incomeCategories.length} Categories</span>
+            <span className="text-xs font-semibold text-muted-foreground">
+              {incomeCategories.length} Categories
+            </span>
           </div>
 
           {isLoading ? (
@@ -202,7 +218,9 @@ export default function CategoriesPage() {
                 <CategoryCard key={cat._id} cat={cat} />
               ))}
               {incomeCategories.length === 0 && (
-                <p className="col-span-2 text-xs text-muted-foreground text-center py-4">No income categories yet.</p>
+                <p className="col-span-2 text-xs text-muted-foreground text-center py-4">
+                  No income categories yet.
+                </p>
               )}
             </div>
           )}
@@ -214,21 +232,32 @@ export default function CategoriesPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="w-full max-w-md bg-card border border-border p-6 rounded-3xl space-y-4 shadow-2xl">
             <div className="flex items-center justify-between border-b border-border pb-3">
-              <h3 className="text-base font-bold text-foreground">Add Custom Category</h3>
-              <button onClick={() => setIsOpen(false)} className="text-muted-foreground hover:text-foreground">
+              <h3 className="text-base font-bold text-foreground">
+                Add Custom Category
+              </h3>
+              <button
+                onClick={() => setIsOpen(false)}
+                className="text-muted-foreground hover:text-foreground"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">Category Name</label>
+                <label className="text-xs font-semibold text-foreground">
+                  Category Name
+                </label>
                 <input
                   {...register("name")}
                   placeholder="e.g. Subscriptions, Groceries"
                   className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                 />
-                {errors.name && <p className="text-[10px] text-destructive">{errors.name.message}</p>}
+                {errors.name && (
+                  <p className="text-[10px] text-destructive">
+                    {errors.name.message}
+                  </p>
+                )}
               </div>
 
               <div className="grid grid-cols-2 gap-3">
@@ -239,7 +268,7 @@ export default function CategoriesPage() {
                     control={control}
                     options={[
                       { label: "Expense", value: "expense" },
-                      { label: "Income", value: "income" }
+                      { label: "Income", value: "income" },
                     ]}
                     searchable={false}
                     clearErrors={clearErrors}
@@ -247,7 +276,9 @@ export default function CategoriesPage() {
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">Color</label>
+                  <label className="text-xs font-semibold text-foreground">
+                    Color
+                  </label>
                   <input
                     {...register("color")}
                     type="color"
@@ -261,7 +292,11 @@ export default function CategoriesPage() {
                 disabled={isCreating}
                 className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-xs shadow-md shadow-primary/20 hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
               >
-                {isCreating ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save Category"}
+                {isCreating ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  "Save Category"
+                )}
               </button>
             </form>
           </div>
@@ -273,20 +308,34 @@ export default function CategoriesPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="w-full max-w-md bg-card border border-border p-6 rounded-3xl space-y-4 shadow-2xl">
             <div className="flex items-center justify-between border-b border-border pb-3">
-              <h3 className="text-base font-bold text-foreground">Edit Category</h3>
-              <button onClick={() => setEditCategory(null)} className="text-muted-foreground hover:text-foreground">
+              <h3 className="text-base font-bold text-foreground">
+                Edit Category
+              </h3>
+              <button
+                onClick={() => setEditCategory(null)}
+                className="text-muted-foreground hover:text-foreground"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSubmitEdit(onEditSubmit)} className="space-y-3">
+            <form
+              onSubmit={handleSubmitEdit(onEditSubmit)}
+              className="space-y-3"
+            >
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">Category Name</label>
+                <label className="text-xs font-semibold text-foreground">
+                  Category Name
+                </label>
                 <input
                   {...registerEdit("name")}
                   className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                 />
-                {editErrors.name && <p className="text-[10px] text-destructive">{editErrors.name.message}</p>}
+                {editErrors.name && (
+                  <p className="text-[10px] text-destructive">
+                    {editErrors.name.message}
+                  </p>
+                )}
               </div>
 
               <div className="grid grid-cols-2 gap-3">
@@ -297,7 +346,7 @@ export default function CategoriesPage() {
                     control={controlEdit}
                     options={[
                       { label: "Expense", value: "expense" },
-                      { label: "Income", value: "income" }
+                      { label: "Income", value: "income" },
                     ]}
                     searchable={false}
                     clearErrors={clearErrorsEdit}
@@ -305,7 +354,9 @@ export default function CategoriesPage() {
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">Color</label>
+                  <label className="text-xs font-semibold text-foreground">
+                    Color
+                  </label>
                   <input
                     {...registerEdit("color")}
                     type="color"
@@ -319,7 +370,11 @@ export default function CategoriesPage() {
                 disabled={isUpdating}
                 className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-xs shadow-md shadow-primary/20 hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
               >
-                {isUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : "Update Category"}
+                {isUpdating ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  "Update Category"
+                )}
               </button>
             </form>
           </div>
