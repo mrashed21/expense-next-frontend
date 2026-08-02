@@ -1,16 +1,19 @@
 "use client";
 
+import FormSelect from "@/components/custom/form-select";
+import { useCurrency } from "@/hooks/useCurrency";
+import { formatDate } from "@/lib/utils";
+import { useGetAccountsQuery } from "@/services/accountApi";
+import {
+  useCreateTransferMutation,
+  useGetTransfersQuery,
+} from "@/services/transferApi";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ArrowRightLeft, Loader2, Plus, X } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { ArrowRightLeft, Plus, X, Loader2 } from "lucide-react";
-import { useGetTransfersQuery, useCreateTransferMutation } from "../../../services/transferApi";
-import { useGetAccountsQuery } from "../../../services/accountApi";
-import { formatDate } from "../../../lib/utils";
-import { useCurrency } from "../../../hooks/useCurrency";
 import { toast } from "sonner";
-import FormSelect from "../../../components/custom/form-select";
+import { z } from "zod";
 
 const transferSchema = z.object({
   from_account_id: z.string().min(1, "Select source account"),
@@ -26,7 +29,8 @@ export default function TransfersPage() {
   const { formatCurrency } = useCurrency();
   const { data: transfersData, isLoading } = useGetTransfersQuery({});
   const { data: accountsData } = useGetAccountsQuery({});
-  const [createTransferApi, { isLoading: isCreating }] = useCreateTransferMutation();
+  const [createTransferApi, { isLoading: isCreating }] =
+    useCreateTransferMutation();
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -56,16 +60,26 @@ export default function TransfersPage() {
     }
   };
 
-  const totalTransferred = transfers.reduce((sum: number, t: any) => sum + (t.amount || 0), 0);
-  const totalFees = transfers.reduce((sum: number, t: any) => sum + (t.fee || 0), 0);
+  const totalTransferred = transfers.reduce(
+    (sum: number, t: any) => sum + (t.amount || 0),
+    0,
+  );
+  const totalFees = transfers.reduce(
+    (sum: number, t: any) => sum + (t.fee || 0),
+    0,
+  );
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight">Fund Transfers</h1>
-          <p className="text-xs text-muted-foreground">Move money between your accounts with optional fee tracking</p>
+          <h1 className="text-2xl font-extrabold tracking-tight">
+            Fund Transfers
+          </h1>
+          <p className="text-xs text-muted-foreground">
+            Move money between your accounts with optional fee tracking
+          </p>
         </div>
 
         <button
@@ -80,24 +94,40 @@ export default function TransfersPage() {
       {/* Summary Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="glass-card p-5 rounded-2xl space-y-1">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Total Transfers</p>
-          <p className="text-2xl font-black text-foreground">{transfers.length}</p>
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            Total Transfers
+          </p>
+          <p className="text-2xl font-black text-foreground">
+            {transfers.length}
+          </p>
         </div>
         <div className="glass-card p-5 rounded-2xl space-y-1">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Total Transferred</p>
-          <p className="text-2xl font-black text-foreground">{formatCurrency(totalTransferred)}</p>
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            Total Transferred
+          </p>
+          <p className="text-2xl font-black text-foreground">
+            {formatCurrency(totalTransferred)}
+          </p>
         </div>
         <div className="glass-card p-5 rounded-2xl space-y-1">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Total Fees Paid</p>
-          <p className="text-2xl font-black text-rose-500">{formatCurrency(totalFees)}</p>
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            Total Fees Paid
+          </p>
+          <p className="text-2xl font-black text-rose-500">
+            {formatCurrency(totalFees)}
+          </p>
         </div>
       </div>
 
       {/* Transfers Log */}
       <div className="glass-card rounded-3xl overflow-hidden border border-border shadow-xl">
         <div className="p-5 border-b border-border">
-          <h2 className="text-base font-bold text-foreground">Transfer History</h2>
-          <p className="text-xs text-muted-foreground">All internal balance movements between your accounts</p>
+          <h2 className="text-base font-bold text-foreground">
+            Transfer History
+          </h2>
+          <p className="text-xs text-muted-foreground">
+            All internal balance movements between your accounts
+          </p>
         </div>
         <div className="divide-y divide-border">
           {isLoading ? (
@@ -106,14 +136,18 @@ export default function TransfersPage() {
             </div>
           ) : transfers.length > 0 ? (
             transfers.map((t: any) => (
-              <div key={t._id} className="p-4 flex items-center justify-between gap-3 hover:bg-secondary/30 transition-colors">
+              <div
+                key={t._id}
+                className="p-4 flex items-center justify-between gap-3 hover:bg-secondary/30 transition-colors"
+              >
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
                     <ArrowRightLeft className="w-4 h-4" />
                   </div>
                   <div>
                     <p className="text-xs font-bold text-foreground">
-                      {t.from_account_id?.name || "Account"} → {t.to_account_id?.name || "Account"}
+                      {t.from_account_id?.name || "Account"} →{" "}
+                      {t.to_account_id?.name || "Account"}
                     </p>
                     <p className="text-[11px] text-muted-foreground">
                       {formatDate(t.date)}
@@ -122,16 +156,21 @@ export default function TransfersPage() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-bold text-foreground">{formatCurrency(t.amount)}</p>
+                  <p className="text-sm font-bold text-foreground">
+                    {formatCurrency(t.amount)}
+                  </p>
                   {t.fee > 0 && (
-                    <p className="text-[10px] text-rose-500 font-semibold">Fee: {formatCurrency(t.fee)}</p>
+                    <p className="text-[10px] text-rose-500 font-semibold">
+                      Fee: {formatCurrency(t.fee)}
+                    </p>
                   )}
                 </div>
               </div>
             ))
           ) : (
             <div className="text-center py-12 text-xs text-muted-foreground">
-              No transfers yet. Click "New Transfer" to move funds between accounts.
+              No transfers yet. Click "New Transfer" to move funds between
+              accounts.
             </div>
           )}
         </div>
@@ -142,8 +181,13 @@ export default function TransfersPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="w-full max-w-md bg-card border border-border p-6 rounded-3xl space-y-4 shadow-2xl">
             <div className="flex items-center justify-between border-b border-border pb-3">
-              <h3 className="text-base font-bold text-foreground">Execute Balance Transfer</h3>
-              <button onClick={() => setIsOpen(false)} className="text-muted-foreground hover:text-foreground">
+              <h3 className="text-base font-bold text-foreground">
+                Execute Balance Transfer
+              </h3>
+              <button
+                onClick={() => setIsOpen(false)}
+                className="text-muted-foreground hover:text-foreground"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -156,7 +200,7 @@ export default function TransfersPage() {
                   control={control}
                   options={accounts.map((acc: any) => ({
                     label: `${acc.name} (${formatCurrency(acc.current_balance)})`,
-                    value: acc._id
+                    value: acc._id,
                   }))}
                   searchable={true}
                   clearErrors={clearErrors}
@@ -171,7 +215,7 @@ export default function TransfersPage() {
                   control={control}
                   options={accounts.map((acc: any) => ({
                     label: `${acc.name} (${formatCurrency(acc.current_balance)})`,
-                    value: acc._id
+                    value: acc._id,
                   }))}
                   searchable={true}
                   clearErrors={clearErrors}
@@ -181,7 +225,9 @@ export default function TransfersPage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">Transfer Amount</label>
+                  <label className="text-xs font-semibold text-foreground">
+                    Transfer Amount
+                  </label>
                   <input
                     {...register("amount", { valueAsNumber: true })}
                     type="number"
@@ -190,11 +236,15 @@ export default function TransfersPage() {
                     className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                   />
                   {errors.amount && (
-                    <p className="text-[10px] text-destructive">{errors.amount.message}</p>
+                    <p className="text-[10px] text-destructive">
+                      {errors.amount.message}
+                    </p>
                   )}
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">Fee (Optional)</label>
+                  <label className="text-xs font-semibold text-foreground">
+                    Fee (Optional)
+                  </label>
                   <input
                     {...register("fee", { valueAsNumber: true })}
                     type="number"
@@ -206,7 +256,9 @@ export default function TransfersPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">Notes (Optional)</label>
+                <label className="text-xs font-semibold text-foreground">
+                  Notes (Optional)
+                </label>
                 <input
                   {...register("notes")}
                   placeholder="e.g. Monthly savings transfer"
@@ -219,7 +271,11 @@ export default function TransfersPage() {
                 disabled={isCreating}
                 className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-xs shadow-md shadow-primary/20 hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
               >
-                {isCreating ? <Loader2 className="w-4 h-4 animate-spin" /> : "Confirm Transfer"}
+                {isCreating ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  "Confirm Transfer"
+                )}
               </button>
             </form>
           </div>

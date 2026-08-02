@@ -1,23 +1,23 @@
 "use client";
 
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { FileCheck, Plus, CheckCircle2, Clock, Trash2, X, Loader2, CreditCard } from "lucide-react";
-import { useGetBillsQuery, useCreateBillMutation, usePayBillMutation, useDeleteBillMutation } from "../../../services/billApi";
-import { useGetAccountsQuery } from "../../../services/accountApi";
-import { formatDate } from "../../../lib/utils";
-import { useCurrency } from "../../../hooks/useCurrency";
-import { toast } from "sonner";
-import FormSelect from "../../../components/custom/form-select";
+import FormSelect from "@/components/custom/form-select";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../../components/ui/select";
+} from "@/components/ui/select";
+import { useCurrency } from "@/hooks/useCurrency";
+import { formatDate } from "@/lib/utils";
+import { useGetAccountsQuery } from "@/services/accountApi";
+import { useCreateBillMutation, useDeleteBillMutation, useGetBillsQuery, usePayBillMutation } from "@/services/billApi";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { CheckCircle2, CreditCard, FileCheck, Loader2, Plus, Trash2, X } from "lucide-react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
 
 const billTypes = [
   "Electricity", "Internet", "Gas", "Water", "Rent", "Credit Card", "EMI", "Subscriptions"

@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
-import { useGetTransactionsQuery } from "../../../services/transactionApi";
-import { useCurrency } from "../../../hooks/useCurrency";
+import { useCurrency } from "@/hooks/useCurrency";
+import { useGetTransactionsQuery } from "@/services/transactionApi";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useMemo, useState } from "react";
 
 const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -43,7 +43,10 @@ export default function CalendarPage() {
 
   // Group transactions by day
   const txByDay = useMemo(() => {
-    const map: Record<number, { income: number; expense: number; count: number }> = {};
+    const map: Record<
+      number,
+      { income: number; expense: number; count: number }
+    > = {};
     transactions.forEach((tx: any) => {
       const d = new Date(tx.date);
       const day = d.getDate();
@@ -70,18 +73,31 @@ export default function CalendarPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight">Monthly Calendar View</h1>
-          <p className="text-xs text-muted-foreground">View day-by-day transaction timelines and cash flow activity</p>
+          <h1 className="text-2xl font-extrabold tracking-tight">
+            Monthly Calendar View
+          </h1>
+          <p className="text-xs text-muted-foreground">
+            View day-by-day transaction timelines and cash flow activity
+          </p>
         </div>
 
         <div className="flex items-center gap-1 bg-secondary p-1 rounded-xl border border-border">
-          <button onClick={prevMonth} className="p-1.5 rounded-lg hover:bg-card text-foreground transition-colors">
+          <button
+            onClick={prevMonth}
+            className="p-1.5 rounded-lg hover:bg-card text-foreground transition-colors"
+          >
             <ChevronLeft className="w-4 h-4" />
           </button>
           <span className="text-xs font-bold text-foreground px-3">
-            {currentDate.toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+            {currentDate.toLocaleDateString("en-US", {
+              month: "long",
+              year: "numeric",
+            })}
           </span>
-          <button onClick={nextMonth} className="p-1.5 rounded-lg hover:bg-card text-foreground transition-colors">
+          <button
+            onClick={nextMonth}
+            className="p-1.5 rounded-lg hover:bg-card text-foreground transition-colors"
+          >
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
@@ -90,16 +106,28 @@ export default function CalendarPage() {
       {/* Monthly Summary Stats */}
       <div className="grid grid-cols-3 gap-4">
         <div className="glass-card p-4 rounded-2xl space-y-1">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Monthly Income</p>
-          <p className="text-lg font-black text-emerald-500">{formatCurrency(monthlyIncome)}</p>
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            Monthly Income
+          </p>
+          <p className="text-lg font-black text-emerald-500">
+            {formatCurrency(monthlyIncome)}
+          </p>
         </div>
         <div className="glass-card p-4 rounded-2xl space-y-1">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Monthly Expense</p>
-          <p className="text-lg font-black text-rose-500">{formatCurrency(monthlyExpense)}</p>
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            Monthly Expense
+          </p>
+          <p className="text-lg font-black text-rose-500">
+            {formatCurrency(monthlyExpense)}
+          </p>
         </div>
         <div className="glass-card p-4 rounded-2xl space-y-1">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Total Transactions</p>
-          <p className="text-lg font-black text-foreground">{transactions.length}</p>
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            Total Transactions
+          </p>
+          <p className="text-lg font-black text-foreground">
+            {transactions.length}
+          </p>
         </div>
       </div>
 
@@ -108,7 +136,9 @@ export default function CalendarPage() {
         {/* Days Header */}
         <div className="grid grid-cols-7 text-center font-bold text-xs text-muted-foreground border-b border-border pb-2">
           {daysOfWeek.map((day) => (
-            <div key={day} className="uppercase tracking-wider">{day}</div>
+            <div key={day} className="uppercase tracking-wider">
+              {day}
+            </div>
           ))}
         </div>
 
@@ -116,7 +146,12 @@ export default function CalendarPage() {
         <div className="grid grid-cols-7 gap-2">
           {calendarDays.map((day, idx) => {
             if (!day) {
-              return <div key={`empty-${idx}`} className="h-24 sm:h-28 rounded-2xl bg-secondary/20 border border-transparent" />;
+              return (
+                <div
+                  key={`empty-${idx}`}
+                  className="h-24 sm:h-28 rounded-2xl bg-secondary/20 border border-transparent"
+                />
+              );
             }
 
             const isToday =

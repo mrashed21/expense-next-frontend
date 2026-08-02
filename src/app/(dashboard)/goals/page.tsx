@@ -1,18 +1,28 @@
 "use client";
 
+import FormSelect from "@/components/custom/form-select";
+import { useCurrency } from "@/hooks/useCurrency";
+import {
+  useCreateGoalMutation,
+  useDeleteGoalMutation,
+  useDepositToGoalMutation,
+  useGetGoalsQuery,
+} from "@/services/goalApi";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2, Plus, Target, Trash2, X } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { Target, Plus, PiggyBank, Trash2, X, Loader2, DollarSign } from "lucide-react";
-import { useGetGoalsQuery, useCreateGoalMutation, useDepositToGoalMutation, useDeleteGoalMutation } from "../../../services/goalApi";
-import { formatDate } from "../../../lib/utils";
-import { useCurrency } from "../../../hooks/useCurrency";
 import { toast } from "sonner";
-import FormSelect from "../../../components/custom/form-select";
+import { z } from "zod";
 
 const goalCategories = [
-  "Savings Goal", "Emergency Fund", "Vacation", "Car", "House", "Laptop", "Custom Goal"
+  "Savings Goal",
+  "Emergency Fund",
+  "Vacation",
+  "Car",
+  "House",
+  "Laptop",
+  "Custom Goal",
 ];
 
 const goalSchema = z.object({
@@ -64,7 +74,10 @@ export default function GoalsPage() {
     e.preventDefault();
     if (!depositGoalId || !depositAmount) return;
     try {
-      await depositApi({ id: depositGoalId, amount: Number(depositAmount) }).unwrap();
+      await depositApi({
+        id: depositGoalId,
+        amount: Number(depositAmount),
+      }).unwrap();
       toast.success("Funds added to goal!");
       setDepositGoalId(null);
       setDepositAmount("");
@@ -87,8 +100,13 @@ export default function GoalsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight">Savings & Target Goals</h1>
-          <p className="text-xs text-muted-foreground">Track financial milestones for emergency funds, vacations, car, house, or gadgets</p>
+          <h1 className="text-2xl font-extrabold tracking-tight">
+            Savings & Target Goals
+          </h1>
+          <p className="text-xs text-muted-foreground">
+            Track financial milestones for emergency funds, vacations, car,
+            house, or gadgets
+          </p>
         </div>
 
         <button
@@ -102,14 +120,19 @@ export default function GoalsPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {goals.map((g: any) => (
-          <div key={g._id} className="glass-card p-5 rounded-3xl space-y-4 relative group">
+          <div
+            key={g._id}
+            className="glass-card p-5 rounded-3xl space-y-4 relative group"
+          >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-2xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center font-bold">
                   <Target className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-foreground">{g.title}</h3>
+                  <h3 className="text-sm font-bold text-foreground">
+                    {g.title}
+                  </h3>
                   <span className="text-[10px] px-2 py-0.5 rounded-full bg-secondary border border-border text-muted-foreground font-semibold">
                     {g.category}
                   </span>
@@ -126,17 +149,23 @@ export default function GoalsPage() {
 
             <div className="space-y-1.5">
               <div className="flex items-center justify-between text-xs font-semibold">
-                <span className="text-muted-foreground">Saved: {formatCurrency(g.current_amount)}</span>
-                <span className="text-foreground font-bold">Target: {formatCurrency(g.target_amount)}</span>
+                <span className="text-muted-foreground">
+                  Saved: {formatCurrency(g.current_amount)}
+                </span>
+                <span className="text-foreground font-bold">
+                  Target: {formatCurrency(g.target_amount)}
+                </span>
               </div>
 
               <div className="w-full h-3 rounded-full bg-secondary overflow-hidden">
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-primary to-indigo-500 transition-all duration-500"
+                  className="h-full rounded-full bg-linear-to-r from-primary to-indigo-500 transition-all duration-500"
                   style={{ width: `${g.percentage}%` }}
                 />
               </div>
-              <p className="text-[11px] font-semibold text-right text-primary">{g.percentage}% Achieved</p>
+              <p className="text-[11px] font-semibold text-right text-primary">
+                {g.percentage}% Achieved
+              </p>
             </div>
 
             <button
@@ -155,15 +184,22 @@ export default function GoalsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="w-full max-w-md bg-card border border-border p-6 rounded-3xl space-y-4 shadow-2xl">
             <div className="flex items-center justify-between border-b border-border pb-3">
-              <h3 className="text-base font-bold text-foreground">Create Savings Goal</h3>
-              <button onClick={() => setIsAddOpen(false)} className="text-muted-foreground hover:text-foreground">
+              <h3 className="text-base font-bold text-foreground">
+                Create Savings Goal
+              </h3>
+              <button
+                onClick={() => setIsAddOpen(false)}
+                className="text-muted-foreground hover:text-foreground"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">Goal Title</label>
+                <label className="text-xs font-semibold text-foreground">
+                  Goal Title
+                </label>
                 <input
                   {...register("title")}
                   placeholder="e.g. New Macbook Pro, Emergency Fund 2026"
@@ -184,7 +220,9 @@ export default function GoalsPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">Target Amount</label>
+                <label className="text-xs font-semibold text-foreground">
+                  Target Amount
+                </label>
                 <input
                   {...register("target_amount", { valueAsNumber: true })}
                   type="number"
@@ -199,7 +237,11 @@ export default function GoalsPage() {
                 disabled={isCreating}
                 className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-xs shadow-md shadow-primary/20 hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
               >
-                {isCreating ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save Goal"}
+                {isCreating ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  "Save Goal"
+                )}
               </button>
             </form>
           </div>
@@ -211,15 +253,22 @@ export default function GoalsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="w-full max-w-sm bg-card border border-border p-6 rounded-3xl space-y-4 shadow-2xl">
             <div className="flex items-center justify-between border-b border-border pb-3">
-              <h3 className="text-base font-bold text-foreground">Deposit Funds to Goal</h3>
-              <button onClick={() => setDepositGoalId(null)} className="text-muted-foreground hover:text-foreground">
+              <h3 className="text-base font-bold text-foreground">
+                Deposit Funds to Goal
+              </h3>
+              <button
+                onClick={() => setDepositGoalId(null)}
+                className="text-muted-foreground hover:text-foreground"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <form onSubmit={handleDepositSubmit} className="space-y-3">
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">Deposit Amount</label>
+                <label className="text-xs font-semibold text-foreground">
+                  Deposit Amount
+                </label>
                 <input
                   type="number"
                   step="0.01"
@@ -235,7 +284,11 @@ export default function GoalsPage() {
                 disabled={isDepositing}
                 className="w-full py-2.5 rounded-xl bg-emerald-600 text-white font-semibold text-xs shadow-md shadow-emerald-600/20 hover:bg-emerald-700 transition-colors flex items-center justify-center gap-2"
               >
-                {isDepositing ? <Loader2 className="w-4 h-4 animate-spin" /> : "Confirm Deposit"}
+                {isDepositing ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  "Confirm Deposit"
+                )}
               </button>
             </form>
           </div>

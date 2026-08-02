@@ -5,6 +5,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Search } from "lucide-react";
 import { useState } from "react";
 import type {
@@ -16,12 +22,6 @@ import type {
   UseFormClearErrors,
 } from "react-hook-form";
 import { Controller } from "react-hook-form";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "../ui/tooltip";
 
 type SelectOption = {
   label: string;

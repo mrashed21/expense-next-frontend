@@ -1,26 +1,36 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { useTheme } from "next-themes";
-import { useDispatch } from "react-redux";
-import { logout } from "../../../redux/slices/authSlice";
-import { Settings, ShieldAlert, Download, Database, Sun, Moon, Monitor, Trash2, X, Loader2 } from "lucide-react";
-import { useDeleteAccountMutation } from "../../../services/userApi";
-import { toast } from "sonner";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../../components/ui/select";
+} from "@/components/ui/select";
+import { logout } from "@/redux/slices/authSlice";
+import { useDeleteAccountMutation } from "@/services/userApi";
+import {
+  Download,
+  Loader2,
+  Monitor,
+  Moon,
+  ShieldAlert,
+  Sun,
+  Trash2,
+  X,
+} from "lucide-react";
+import { useTheme } from "next-themes";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { toast } from "sonner";
 
 export default function SettingsPage() {
   const router = useRouter();
   const dispatch = useDispatch();
   const { theme, setTheme } = useTheme();
-  const [deleteAccountApi, { isLoading: isDeleting }] = useDeleteAccountMutation();
+  const [deleteAccountApi, { isLoading: isDeleting }] =
+    useDeleteAccountMutation();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const [currency, setCurrency] = useState("BDT");
@@ -44,17 +54,26 @@ export default function SettingsPage() {
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
       <div>
-        <h1 className="text-2xl font-extrabold tracking-tight">System Preferences & Settings</h1>
-        <p className="text-xs text-muted-foreground">Manage currency formats, app theme, data backups, and account termination</p>
+        <h1 className="text-2xl font-extrabold tracking-tight">
+          System Preferences & Settings
+        </h1>
+        <p className="text-xs text-muted-foreground">
+          Manage currency formats, app theme, data backups, and account
+          termination
+        </p>
       </div>
 
       {/* General Preferences */}
       <div className="glass-card p-6 rounded-3xl space-y-6">
-        <h2 className="text-base font-bold text-foreground border-b border-border pb-3">Regional & Theme Setup</h2>
+        <h2 className="text-base font-bold text-foreground border-b border-border pb-3">
+          Regional & Theme Setup
+        </h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-1">
-            <label className="mb-1 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Default Currency</label>
+            <label className="mb-1 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              Default Currency
+            </label>
             <Select value={currency} onValueChange={setCurrency}>
               <SelectTrigger className="w-full h-10 py-5!">
                 <SelectValue placeholder="Currency" />
@@ -70,7 +89,9 @@ export default function SettingsPage() {
           </div>
 
           <div className="space-y-1">
-            <label className="mb-1 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Language</label>
+            <label className="mb-1 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              Language
+            </label>
             <Select value={language} onValueChange={setLanguage}>
               <SelectTrigger className="w-full h-10 py-5!">
                 <SelectValue placeholder="Language" />
@@ -85,12 +106,16 @@ export default function SettingsPage() {
 
         {/* Theme Picker */}
         <div className="space-y-2 pt-2">
-          <label className="text-xs font-semibold text-foreground">Interface Appearance Theme</label>
+          <label className="text-xs font-semibold text-foreground">
+            Interface Appearance Theme
+          </label>
           <div className="grid grid-cols-3 gap-3">
             <button
               onClick={() => setTheme("light")}
               className={`p-4 rounded-2xl border flex flex-col items-center gap-2 transition-all ${
-                theme === "light" ? "border-primary bg-primary/10 text-primary font-bold" : "border-border bg-secondary/50 text-muted-foreground"
+                theme === "light"
+                  ? "border-primary bg-primary/10 text-primary font-bold"
+                  : "border-border bg-secondary/50 text-muted-foreground"
               }`}
             >
               <Sun className="w-5 h-5" />
@@ -100,7 +125,9 @@ export default function SettingsPage() {
             <button
               onClick={() => setTheme("dark")}
               className={`p-4 rounded-2xl border flex flex-col items-center gap-2 transition-all ${
-                theme === "dark" ? "border-primary bg-primary/10 text-primary font-bold" : "border-border bg-secondary/50 text-muted-foreground"
+                theme === "dark"
+                  ? "border-primary bg-primary/10 text-primary font-bold"
+                  : "border-border bg-secondary/50 text-muted-foreground"
               }`}
             >
               <Moon className="w-5 h-5" />
@@ -110,7 +137,9 @@ export default function SettingsPage() {
             <button
               onClick={() => setTheme("system")}
               className={`p-4 rounded-2xl border flex flex-col items-center gap-2 transition-all ${
-                theme === "system" ? "border-primary bg-primary/10 text-primary font-bold" : "border-border bg-secondary/50 text-muted-foreground"
+                theme === "system"
+                  ? "border-primary bg-primary/10 text-primary font-bold"
+                  : "border-border bg-secondary/50 text-muted-foreground"
               }`}
             >
               <Monitor className="w-5 h-5" />
@@ -122,11 +151,17 @@ export default function SettingsPage() {
 
       {/* Backup & Restore */}
       <div className="glass-card p-6 rounded-3xl space-y-4">
-        <h2 className="text-base font-bold text-foreground border-b border-border pb-3">Data Backup & Export</h2>
+        <h2 className="text-base font-bold text-foreground border-b border-border pb-3">
+          Data Backup & Export
+        </h2>
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-xs font-bold text-foreground">Download Data Snapshot</h3>
-            <p className="text-[11px] text-muted-foreground">Export your complete financial records, accounts, and budgets</p>
+            <h3 className="text-xs font-bold text-foreground">
+              Download Data Snapshot
+            </h3>
+            <p className="text-[11px] text-muted-foreground">
+              Export your complete financial records, accounts, and budgets
+            </p>
           </div>
           <button
             onClick={handleExportBackup}
@@ -140,11 +175,18 @@ export default function SettingsPage() {
 
       {/* Danger Zone: Account Deletion */}
       <div className="glass-card p-6 rounded-3xl space-y-4 border border-rose-500/30">
-        <h2 className="text-base font-bold text-rose-500 border-b border-rose-500/20 pb-3">Danger Zone</h2>
+        <h2 className="text-base font-bold text-rose-500 border-b border-rose-500/20 pb-3">
+          Danger Zone
+        </h2>
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-xs font-bold text-foreground">Delete Account Permanently</h3>
-            <p className="text-[11px] text-muted-foreground">Soft delete your account, archive all data, and terminate active subscriptions</p>
+            <h3 className="text-xs font-bold text-foreground">
+              Delete Account Permanently
+            </h3>
+            <p className="text-[11px] text-muted-foreground">
+              Soft delete your account, archive all data, and terminate active
+              subscriptions
+            </p>
           </div>
           <button
             onClick={() => setIsDeleteModalOpen(true)}
@@ -165,13 +207,17 @@ export default function SettingsPage() {
                 <ShieldAlert className="w-5 h-5" />
                 Confirm Account Termination
               </h3>
-              <button onClick={() => setIsDeleteModalOpen(false)} className="text-muted-foreground hover:text-foreground">
+              <button
+                onClick={() => setIsDeleteModalOpen(false)}
+                className="text-muted-foreground hover:text-foreground"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <p className="text-xs text-muted-foreground">
-              Are you sure you want to delete your account? This action will suspend your access and mark your records as deleted.
+              Are you sure you want to delete your account? This action will
+              suspend your access and mark your records as deleted.
             </p>
 
             <div className="flex items-center gap-3 pt-2">
@@ -186,7 +232,11 @@ export default function SettingsPage() {
                 disabled={isDeleting}
                 className="w-1/2 py-2.5 rounded-xl bg-rose-600 text-white font-semibold text-xs shadow-md hover:bg-rose-700 flex items-center justify-center gap-2"
               >
-                {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Confirm Delete"}
+                {isDeleting ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  "Confirm Delete"
+                )}
               </button>
             </div>
           </div>

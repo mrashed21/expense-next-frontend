@@ -1,25 +1,7 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../redux/store";
-import { logout } from "../../redux/slices/authSlice";
-import { useLogoutMutation, useLogoutAllDevicesMutation } from "../../services/authApi";
-import { ThemeToggle } from "./ThemeToggle";
-import {
-  Search,
-  Plus,
-  Bell,
-  User,
-  Settings,
-  LogOut,
-  ShieldAlert,
-  TrendingUp,
-} from "lucide-react";
-import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,6 +10,27 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { logout } from "@/redux/slices/authSlice";
+import { RootState } from "@/redux/store";
+import {
+  useLogoutAllDevicesMutation,
+  useLogoutMutation,
+} from "@/services/authApi";
+import {
+  Bell,
+  LogOut,
+  Plus,
+  Search,
+  Settings,
+  ShieldAlert,
+  TrendingUp,
+  User,
+} from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "sonner";
+import { ThemeToggle } from "./ThemeToggle";
 
 export function Header() {
   const router = useRouter();
@@ -60,7 +63,12 @@ export function Header() {
   };
 
   const userInitials = user?.user_name
-    ? user.user_name.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2)
+    ? user.user_name
+        .split(" ")
+        .map((n: string) => n[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2)
     : "U";
 
   return (
@@ -101,7 +109,12 @@ export function Header() {
         </Button>
 
         {/* Notifications */}
-        <Button variant="ghost" size="icon" asChild className="h-8 w-8 relative text-muted-foreground">
+        <Button
+          variant="ghost"
+          size="icon"
+          asChild
+          className="h-8 w-8 relative text-muted-foreground"
+        >
           <Link href="/notifications">
             <Bell className="w-4 h-4" />
             <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-primary" />
@@ -114,14 +127,20 @@ export function Header() {
         {/* User Menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 px-1.5 gap-2 hover:bg-secondary">
+            <Button
+              variant="ghost"
+              className="h-8 px-1.5 gap-2 hover:bg-secondary"
+            >
               <Avatar className="h-6 w-6">
-                <AvatarImage src={user?.user_profile_image} alt={user?.user_name || "User"} />
+                <AvatarImage
+                  src={user?.user_profile_image}
+                  alt={user?.user_name || "User"}
+                />
                 <AvatarFallback className="text-[10px] font-semibold bg-primary/10 text-primary border border-primary/20">
                   {userInitials}
                 </AvatarFallback>
               </Avatar>
-              <span className="hidden md:inline-block text-xs font-medium text-foreground max-w-[90px] truncate">
+              <span className="hidden md:inline-block text-xs font-medium text-foreground max-w-22.5 truncate">
                 {user?.user_name || "Account"}
               </span>
             </Button>
@@ -129,8 +148,12 @@ export function Header() {
 
           <DropdownMenuContent align="end" className="w-52">
             <DropdownMenuLabel className="px-3 py-2">
-              <p className="text-xs font-semibold text-foreground truncate">{user?.user_name || "Account"}</p>
-              <p className="text-[11px] text-muted-foreground font-normal truncate mt-0.5">{user?.user_email || ""}</p>
+              <p className="text-xs font-semibold text-foreground truncate">
+                {user?.user_name || "Account"}
+              </p>
+              <p className="text-[11px] text-muted-foreground font-normal truncate mt-0.5">
+                {user?.user_email || ""}
+              </p>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
 

@@ -1,7 +1,7 @@
 "use client";
 
+import { Monitor, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
-import { Sun, Moon, Monitor } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export function ThemeToggle() {
@@ -19,7 +19,9 @@ export function ThemeToggle() {
       <button
         onClick={() => setTheme("light")}
         className={`p-1.5 rounded-md transition-colors ${
-          theme === "light" ? "bg-card text-primary shadow-sm" : "text-muted-foreground hover:text-foreground"
+          theme === "light"
+            ? "bg-card text-primary shadow-sm"
+            : "text-muted-foreground hover:text-foreground"
         }`}
         title="Light Mode"
       >
@@ -28,7 +30,9 @@ export function ThemeToggle() {
       <button
         onClick={() => setTheme("dark")}
         className={`p-1.5 rounded-md transition-colors ${
-          theme === "dark" ? "bg-card text-primary shadow-sm" : "text-muted-foreground hover:text-foreground"
+          theme === "dark"
+            ? "bg-card text-primary shadow-sm"
+            : "text-muted-foreground hover:text-foreground"
         }`}
         title="Dark Mode"
       >
@@ -37,7 +41,9 @@ export function ThemeToggle() {
       <button
         onClick={() => setTheme("system")}
         className={`p-1.5 rounded-md transition-colors ${
-          theme === "system" ? "bg-card text-primary shadow-sm" : "text-muted-foreground hover:text-foreground"
+          theme === "system"
+            ? "bg-card text-primary shadow-sm"
+            : "text-muted-foreground hover:text-foreground"
         }`}
         title="System Preference"
       >

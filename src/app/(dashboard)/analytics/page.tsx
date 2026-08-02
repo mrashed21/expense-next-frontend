@@ -1,31 +1,52 @@
 "use client";
 
+import { useCurrency } from "@/hooks/useCurrency";
+import { useGetAccountsQuery } from "@/services/accountApi";
+import { useGetTransactionsQuery } from "@/services/transactionApi";
+import { BarChart3, Loader2, PieChart as PieIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 import {
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  BarChart,
+  Area,
+  AreaChart,
   Bar,
+  BarChart,
+  Cell,
+  Legend,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  Tooltip,
-  Legend,
-  AreaChart,
-  Area,
 } from "recharts";
-import { BarChart3, TrendingUp, TrendingDown, PieChart as PieIcon, Loader2 } from "lucide-react";
-import { useCurrency } from "../../../hooks/useCurrency";
-import { useGetTransactionsQuery } from "../../../services/transactionApi";
-import { useGetAccountsQuery } from "../../../services/accountApi";
 
 const CHART_COLORS = [
-  "#6366F1", "#10B981", "#F59E0B", "#EF4444", "#EC4899",
-  "#3B82F6", "#8B5CF6", "#14B8A6", "#F97316", "#94A3B8",
+  "#6366F1",
+  "#10B981",
+  "#F59E0B",
+  "#EF4444",
+  "#EC4899",
+  "#3B82F6",
+  "#8B5CF6",
+  "#14B8A6",
+  "#F97316",
+  "#94A3B8",
 ];
 
-const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const MONTH_NAMES = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
 
 export default function AnalyticsPage() {
   const [year] = useState(new Date().getFullYear());
@@ -70,7 +91,10 @@ export default function AnalyticsPage() {
 
   // Compute category spending breakdown
   const categoryBreakdown = useMemo(() => {
-    const catMap: Record<string, { name: string; value: number; color: string }> = {};
+    const catMap: Record<
+      string,
+      { name: string; value: number; color: string }
+    > = {};
 
     transactions
       .filter((tx: any) => tx.type === "expense")
@@ -84,7 +108,10 @@ export default function AnalyticsPage() {
       });
 
     return Object.values(catMap)
-      .map((c, i) => ({ ...c, color: c.color || CHART_COLORS[i % CHART_COLORS.length] }))
+      .map((c, i) => ({
+        ...c,
+        color: c.color || CHART_COLORS[i % CHART_COLORS.length],
+      }))
       .sort((a, b) => b.value - a.value)
       .slice(0, 8);
   }, [transactions]);
@@ -97,17 +124,23 @@ export default function AnalyticsPage() {
     .filter((tx: any) => tx.type === "expense")
     .reduce((sum: number, tx: any) => sum + (tx.amount || 0), 0);
   const netSavings = totalIncome - totalExpense;
-  const savingsRate = totalIncome > 0 ? Math.round((netSavings / totalIncome) * 100) : 0;
+  const savingsRate =
+    totalIncome > 0 ? Math.round((netSavings / totalIncome) * 100) : 0;
 
   // Net worth from accounts
-  const netWorth = accounts.reduce((sum: number, acc: any) => sum + (acc.current_balance || 0), 0);
+  const netWorth = accounts.reduce(
+    (sum: number, acc: any) => sum + (acc.current_balance || 0),
+    0,
+  );
 
   // Account balance distribution
-  const accountDistribution = accounts.map((acc: any, i: number) => ({
-    name: acc.name,
-    value: Math.max(0, acc.current_balance || 0),
-    color: acc.color || CHART_COLORS[i % CHART_COLORS.length],
-  })).filter((a: any) => a.value > 0);
+  const accountDistribution = accounts
+    .map((acc: any, i: number) => ({
+      name: acc.name,
+      value: Math.max(0, acc.current_balance || 0),
+      color: acc.color || CHART_COLORS[i % CHART_COLORS.length],
+    }))
+    .filter((a: any) => a.value > 0);
 
   // Recent 30-day cash flow trend (last 30 days of transactions, cumulative)
   const cashFlowTrend = useMemo(() => {
@@ -162,27 +195,48 @@ export default function AnalyticsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-extrabold tracking-tight">Financial Analytics & Insights</h1>
-        <p className="text-xs text-muted-foreground">Real-time multi-dimensional charts for spending patterns and cash flow trends</p>
+        <h1 className="text-2xl font-extrabold tracking-tight">
+          Financial Analytics & Insights
+        </h1>
+        <p className="text-xs text-muted-foreground">
+          Real-time multi-dimensional charts for spending patterns and cash flow
+          trends
+        </p>
       </div>
 
       {/* KPI Summary Row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="glass-card p-5 rounded-2xl space-y-1">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Net Worth</p>
-          <p className="text-xl font-black text-foreground">{formatCurrency(netWorth)}</p>
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            Net Worth
+          </p>
+          <p className="text-xl font-black text-foreground">
+            {formatCurrency(netWorth)}
+          </p>
         </div>
         <div className="glass-card p-5 rounded-2xl space-y-1">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Total Income ({year})</p>
-          <p className="text-xl font-black text-emerald-500">{formatCurrency(totalIncome)}</p>
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            Total Income ({year})
+          </p>
+          <p className="text-xl font-black text-emerald-500">
+            {formatCurrency(totalIncome)}
+          </p>
         </div>
         <div className="glass-card p-5 rounded-2xl space-y-1">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Total Expense ({year})</p>
-          <p className="text-xl font-black text-rose-500">{formatCurrency(totalExpense)}</p>
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            Total Expense ({year})
+          </p>
+          <p className="text-xl font-black text-rose-500">
+            {formatCurrency(totalExpense)}
+          </p>
         </div>
         <div className="glass-card p-5 rounded-2xl space-y-1">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Savings Rate</p>
-          <p className={`text-xl font-black ${savingsRate >= 0 ? "text-emerald-500" : "text-rose-500"}`}>
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            Savings Rate
+          </p>
+          <p
+            className={`text-xl font-black ${savingsRate >= 0 ? "text-emerald-500" : "text-rose-500"}`}
+          >
             {savingsRate}%
           </p>
         </div>
@@ -195,9 +249,13 @@ export default function AnalyticsPage() {
           <div className="flex items-center justify-between border-b border-border pb-3">
             <div className="flex items-center gap-2">
               <BarChart3 className="w-5 h-5 text-primary" />
-              <h2 className="text-base font-bold text-foreground">Monthly Income vs Expense</h2>
+              <h2 className="text-base font-bold text-foreground">
+                Monthly Income vs Expense
+              </h2>
             </div>
-            <span className="text-xs font-semibold text-muted-foreground">Year {year}</span>
+            <span className="text-xs font-semibold text-muted-foreground">
+              Year {year}
+            </span>
           </div>
 
           {transactions.length === 0 ? (
@@ -209,7 +267,11 @@ export default function AnalyticsPage() {
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={monthlyComparison}>
                   <XAxis dataKey="month" stroke="#888888" fontSize={11} />
-                  <YAxis stroke="#888888" fontSize={11} tickFormatter={(v) => `$${v}`} />
+                  <YAxis
+                    stroke="#888888"
+                    fontSize={11}
+                    tickFormatter={(v) => `$${v}`}
+                  />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: "#111827",
@@ -234,7 +296,9 @@ export default function AnalyticsPage() {
           <div className="flex items-center justify-between border-b border-border pb-3">
             <div className="flex items-center gap-2">
               <PieIcon className="w-5 h-5 text-primary" />
-              <h2 className="text-base font-bold text-foreground">Category Spend Share</h2>
+              <h2 className="text-base font-bold text-foreground">
+                Category Spend Share
+              </h2>
             </div>
           </div>
 
@@ -276,9 +340,17 @@ export default function AnalyticsPage() {
 
               <div className="grid grid-cols-2 gap-1.5 text-[11px]">
                 {categoryBreakdown.map((c) => (
-                  <div key={c.name} className="flex items-center gap-1.5 truncate">
-                    <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: c.color }} />
-                    <span className="text-muted-foreground truncate">{c.name}</span>
+                  <div
+                    key={c.name}
+                    className="flex items-center gap-1.5 truncate"
+                  >
+                    <span
+                      className="w-2.5 h-2.5 rounded-full shrink-0"
+                      style={{ backgroundColor: c.color }}
+                    />
+                    <span className="text-muted-foreground truncate">
+                      {c.name}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -291,20 +363,35 @@ export default function AnalyticsPage() {
       {accountDistribution.length > 0 && (
         <div className="glass-card p-6 rounded-3xl space-y-4">
           <div className="flex items-center justify-between border-b border-border pb-3">
-            <h2 className="text-base font-bold text-foreground">Account Balance Distribution</h2>
-            <span className="text-xs font-semibold text-muted-foreground">Net Worth: {formatCurrency(netWorth)}</span>
+            <h2 className="text-base font-bold text-foreground">
+              Account Balance Distribution
+            </h2>
+            <span className="text-xs font-semibold text-muted-foreground">
+              Net Worth: {formatCurrency(netWorth)}
+            </span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {accountDistribution.map((acc: any) => {
-              const pct = netWorth > 0 ? Math.round((acc.value / netWorth) * 100) : 0;
+              const pct =
+                netWorth > 0 ? Math.round((acc.value / netWorth) * 100) : 0;
               return (
-                <div key={acc.name} className="p-3 rounded-2xl bg-secondary/50 border border-border space-y-2">
+                <div
+                  key={acc.name}
+                  className="p-3 rounded-2xl bg-secondary/50 border border-border space-y-2"
+                >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <span className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: acc.color }} />
-                      <span className="text-xs font-semibold text-foreground truncate">{acc.name}</span>
+                      <span
+                        className="w-3 h-3 rounded-full shrink-0"
+                        style={{ backgroundColor: acc.color }}
+                      />
+                      <span className="text-xs font-semibold text-foreground truncate">
+                        {acc.name}
+                      </span>
                     </div>
-                    <span className="text-xs font-bold text-muted-foreground">{pct}%</span>
+                    <span className="text-xs font-bold text-muted-foreground">
+                      {pct}%
+                    </span>
                   </div>
                   <div className="w-full h-2 rounded-full bg-secondary overflow-hidden">
                     <div
@@ -312,7 +399,9 @@ export default function AnalyticsPage() {
                       style={{ width: `${pct}%`, backgroundColor: acc.color }}
                     />
                   </div>
-                  <p className="text-xs font-bold text-foreground text-right">{formatCurrency(acc.value)}</p>
+                  <p className="text-xs font-bold text-foreground text-right">
+                    {formatCurrency(acc.value)}
+                  </p>
                 </div>
               );
             })}
@@ -323,7 +412,9 @@ export default function AnalyticsPage() {
       {/* Cash Flow Balance Trend Area Chart */}
       <div className="glass-card p-6 rounded-3xl space-y-4">
         <div className="flex items-center justify-between border-b border-border pb-3">
-          <h2 className="text-base font-bold text-foreground">30-Day Net Worth & Cash Growth Curve</h2>
+          <h2 className="text-base font-bold text-foreground">
+            30-Day Net Worth & Cash Growth Curve
+          </h2>
         </div>
 
         {cashFlowTrend.length === 0 ? (
@@ -341,7 +432,11 @@ export default function AnalyticsPage() {
                   </linearGradient>
                 </defs>
                 <XAxis dataKey="date" stroke="#888888" fontSize={10} />
-                <YAxis stroke="#888888" fontSize={10} tickFormatter={(v) => `$${v}`} />
+                <YAxis
+                  stroke="#888888"
+                  fontSize={10}
+                  tickFormatter={(v) => `$${v}`}
+                />
                 <Tooltip
                   contentStyle={{
                     backgroundColor: "#111827",
@@ -352,7 +447,14 @@ export default function AnalyticsPage() {
                   }}
                   formatter={(val: any) => formatCurrency(val)}
                 />
-                <Area type="monotone" dataKey="balance" stroke="#4F46E5" strokeWidth={3} fillOpacity={1} fill="url(#balanceGrad)" />
+                <Area
+                  type="monotone"
+                  dataKey="balance"
+                  stroke="#4F46E5"
+                  strokeWidth={3}
+                  fillOpacity={1}
+                  fill="url(#balanceGrad)"
+                />
               </AreaChart>
             </ResponsiveContainer>
           </div>

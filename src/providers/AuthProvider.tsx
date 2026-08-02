@@ -1,10 +1,14 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { usePathname } from "next/navigation";
-import { setCredentials, logout, setAuthLoading } from "../redux/slices/authSlice";
-import { useLazyGetMeQuery, useLazyGetAdminMeQuery } from "../services/authApi";
+import {
+  logout,
+  setAuthLoading,
+  setCredentials,
+} from "../redux/slices/authSlice";
+import { useLazyGetAdminMeQuery, useLazyGetMeQuery } from "../services/authApi";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const dispatch = useDispatch();
@@ -15,8 +19,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        const isAdminRoute = pathname?.startsWith("/admin") || pathname?.startsWith("/admin-login");
-        
+        const isAdminRoute =
+          pathname?.startsWith("/admin") ||
+          pathname?.startsWith("/admin-login");
+
         let response;
         if (isAdminRoute) {
           response = await triggerGetAdminMe(undefined, false).unwrap();
@@ -25,21 +31,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
 
         if (response?.success) {
-          const userObj = isAdminRoute ? response?.data?.admin : response?.data?.user;
+          const userObj = isAdminRoute
+            ? response?.data?.admin
+            : response?.data?.user;
           if (userObj) {
             // Normalize admin object to match user structure in redux
             let normalizedUser = { ...userObj };
-            
+
             if (isAdminRoute) {
-               normalizedUser.user_name = userObj.admin_name;
-               normalizedUser.user_email = userObj.admin_email;
-               normalizedUser.user_role = userObj.admin_role;
-               normalizedUser.isAdmin = true;
+              normalizedUser.user_name = userObj.admin_name;
+              normalizedUser.user_email = userObj.admin_email;
+              normalizedUser.user_role = userObj.admin_role;
+              normalizedUser.isAdmin = true;
             }
             dispatch(
               setCredentials({
                 user: normalizedUser as any,
-              })
+              }),
             );
           } else {
             dispatch(logout());

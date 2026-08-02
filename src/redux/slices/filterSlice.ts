@@ -2,7 +2,15 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export interface FilterState {
   searchQuery: string;
-  dateRange: "today" | "yesterday" | "last7days" | "last30days" | "thisMonth" | "prevMonth" | "thisYear" | "custom";
+  dateRange:
+    | "today"
+    | "yesterday"
+    | "last7days"
+    | "last30days"
+    | "thisMonth"
+    | "prevMonth"
+    | "thisYear"
+    | "custom";
   customStartDate?: string;
   customEndDate?: string;
   type?: "all" | "income" | "expense" | "transfer";
@@ -26,7 +34,10 @@ const filterSlice = createSlice({
     setDateRange: (state, action: PayloadAction<FilterState["dateRange"]>) => {
       state.dateRange = action.payload;
     },
-    setCustomDateRange: (state, action: PayloadAction<{ startDate: string; endDate: string }>) => {
+    setCustomDateRange: (
+      state,
+      action: PayloadAction<{ startDate: string; endDate: string }>,
+    ) => {
       state.dateRange = "custom";
       state.customStartDate = action.payload.startDate;
       state.customEndDate = action.payload.endDate;

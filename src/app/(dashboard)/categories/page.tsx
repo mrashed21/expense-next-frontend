@@ -17,7 +17,7 @@ import FormSelect from "../../../components/custom/form-select";
 const categorySchema = z.object({
   name: z.string().min(1, "Category name is required"),
   type: z.enum(["income", "expense"]),
-  color: z.string().default("#6366F1"),
+  color: z.string(),
 });
 
 type CategoryFormValues = z.infer<typeof categorySchema>;

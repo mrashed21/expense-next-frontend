@@ -8,6 +8,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import {
+  Activity,
   ArrowRightLeft,
   BarChart3,
   Bell,
@@ -26,7 +27,6 @@ import {
   User,
   Users,
   Wallet,
-  Activity,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -73,7 +73,8 @@ export function Sidebar() {
   }: {
     item: { name: string; href: string; icon: React.ElementType };
   }) => {
-    const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+    const isActive =
+      pathname === item.href || pathname.startsWith(`${item.href}/`);
     const Icon = item.icon;
 
     const link = (
@@ -83,13 +84,15 @@ export function Sidebar() {
           "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 group",
           isActive
             ? "bg-primary text-primary-foreground"
-            : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+            : "text-muted-foreground hover:text-foreground hover:bg-secondary",
         )}
       >
         <Icon
           className={cn(
             "w-4 h-4 shrink-0",
-            isActive ? "text-primary-foreground" : "text-muted-foreground group-hover:text-foreground"
+            isActive
+              ? "text-primary-foreground"
+              : "text-muted-foreground group-hover:text-foreground",
           )}
         />
         {!sidebarCollapsed && <span className="truncate">{item.name}</span>}
@@ -115,18 +118,25 @@ export function Sidebar() {
       <aside
         className={cn(
           "hidden md:flex flex-col border-r border-border bg-card transition-all duration-300 z-30 sticky top-0 h-screen",
-          sidebarCollapsed ? "w-[60px]" : "w-60"
+          sidebarCollapsed ? "w-15" : "w-60",
         )}
       >
         {/* Brand Header */}
-        <div className={cn(
-          "flex items-center h-14 border-b border-border shrink-0",
-          sidebarCollapsed ? "justify-center px-0" : "justify-between px-4"
-        )}>
+        <div
+          className={cn(
+            "flex items-center h-14 border-b border-border shrink-0",
+            sidebarCollapsed ? "justify-center px-0" : "justify-between px-4",
+          )}
+        >
           {!sidebarCollapsed && (
-            <Link href="/dashboard" className="flex items-center gap-2.5 min-w-0">
+            <Link
+              href="/dashboard"
+              className="flex items-center gap-2.5 min-w-0"
+            >
               <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center shrink-0">
-                <span className="text-primary-foreground font-bold text-sm">E</span>
+                <span className="text-primary-foreground font-bold text-sm">
+                  E
+                </span>
               </div>
               <div className="flex flex-col min-w-0">
                 <span className="font-semibold text-sm tracking-tight text-foreground truncate">

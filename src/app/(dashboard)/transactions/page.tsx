@@ -1,41 +1,39 @@
 "use client";
 
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import {
-  Receipt,
-  Plus,
-  Search,
-  Filter,
-  Trash2,
-  X,
-  Loader2,
-  Calendar,
-  Tag,
-  MapPin,
-  FileText,
-} from "lucide-react";
-import { useGetTransactionsQuery, useCreateTransactionMutation, useDeleteTransactionMutation } from "../../../services/transactionApi";
-import { useGetAccountsQuery } from "../../../services/accountApi";
-import { useGetCategoriesQuery } from "../../../services/categoryApi";
-import { formatDate } from "../../../lib/utils";
-import { useCurrency } from "../../../hooks/useCurrency";
-import { toast } from "sonner";
+import FormSelect from "@/components/custom/form-select";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../../components/ui/select";
-import FormSelect from "../../../components/custom/form-select";
+} from "@/components/ui/select";
+import { useCurrency } from "@/hooks/useCurrency";
+import { formatDate } from "@/lib/utils";
+import { useGetAccountsQuery } from "@/services/accountApi";
+import { useGetCategoriesQuery } from "@/services/categoryApi";
+import {
+  useCreateTransactionMutation,
+  useDeleteTransactionMutation,
+  useGetTransactionsQuery,
+} from "@/services/transactionApi";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2, Plus, Search, Trash2, X } from "lucide-react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
 
 const transactionSchema = z.object({
   account_id: z.string().min(1, "Select an account"),
   category_id: z.string().optional(),
-  type: z.enum(["income", "expense", "refund", "adjustment", "opening_balance"]),
+  type: z.enum([
+    "income",
+    "expense",
+    "refund",
+    "adjustment",
+    "opening_balance",
+  ]),
   amount: z.number().positive("Amount must be positive"),
   date: z.string().optional(),
   payment_method: z.string().optional(),
@@ -62,7 +60,8 @@ export default function TransactionsPage() {
   const { data: accountsData } = useGetAccountsQuery({});
   const { data: categoriesData } = useGetCategoriesQuery({});
 
-  const [createTransactionApi, { isLoading: isCreating }] = useCreateTransactionMutation();
+  const [createTransactionApi, { isLoading: isCreating }] =
+    useCreateTransactionMutation();
   const [deleteTransactionApi] = useDeleteTransactionMutation();
 
   const transactions = transactionsData?.data || [];
@@ -107,8 +106,12 @@ export default function TransactionsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight">Transactions Log</h1>
-          <p className="text-xs text-muted-foreground">Search, filter, and audit all recorded financial transactions</p>
+          <h1 className="text-2xl font-extrabold tracking-tight">
+            Transactions Log
+          </h1>
+          <p className="text-xs text-muted-foreground">
+            Search, filter, and audit all recorded financial transactions
+          </p>
         </div>
 
         <button
@@ -137,7 +140,7 @@ export default function TransactionsPage() {
         {/* Date & Type Filters */}
         <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
           <Select value={dateRange} onValueChange={setDateRange}>
-            <SelectTrigger className="w-[140px] px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground font-medium outline-none">
+            <SelectTrigger className="w-35 px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground font-medium outline-none">
               <SelectValue placeholder="Date Range" />
             </SelectTrigger>
             <SelectContent>
@@ -150,7 +153,7 @@ export default function TransactionsPage() {
           </Select>
 
           <Select value={typeFilter} onValueChange={setTypeFilter}>
-            <SelectTrigger className="w-[140px] px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground font-medium outline-none">
+            <SelectTrigger className="w-35 px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground font-medium outline-none">
               <SelectValue placeholder="All Types" />
             </SelectTrigger>
             <SelectContent>
@@ -180,7 +183,10 @@ export default function TransactionsPage() {
             <tbody className="divide-y divide-border text-xs font-medium">
               {transactions.length > 0 ? (
                 transactions.map((tx: any) => (
-                  <tr key={tx._id} className="hover:bg-secondary/30 transition-colors">
+                  <tr
+                    key={tx._id}
+                    className="hover:bg-secondary/30 transition-colors"
+                  >
                     <td className="p-4 whitespace-nowrap text-muted-foreground font-semibold">
                       {formatDate(tx.date)}
                     </td>
@@ -213,10 +219,13 @@ export default function TransactionsPage() {
                     </td>
                     <td
                       className={`p-4 text-right whitespace-nowrap font-black text-sm ${
-                        tx.type === "income" ? "text-emerald-500" : "text-rose-500"
+                        tx.type === "income"
+                          ? "text-emerald-500"
+                          : "text-rose-500"
                       }`}
                     >
-                      {tx.type === "income" ? "+" : "-"}{formatCurrency(tx.amount)}
+                      {tx.type === "income" ? "+" : "-"}
+                      {formatCurrency(tx.amount)}
                     </td>
                     <td className="p-4 text-center whitespace-nowrap">
                       <button
@@ -231,7 +240,10 @@ export default function TransactionsPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={7} className="text-center py-10 text-muted-foreground">
+                  <td
+                    colSpan={7}
+                    className="text-center py-10 text-muted-foreground"
+                  >
                     No transactions match your search or filter options.
                   </td>
                 </tr>
@@ -246,8 +258,13 @@ export default function TransactionsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="w-full max-w-md bg-card border border-border p-6 rounded-3xl space-y-4 shadow-2xl">
             <div className="flex items-center justify-between border-b border-border pb-3">
-              <h3 className="text-base font-bold text-foreground">Record New Transaction</h3>
-              <button onClick={() => setIsAddOpen(false)} className="text-muted-foreground hover:text-foreground">
+              <h3 className="text-base font-bold text-foreground">
+                Record New Transaction
+              </h3>
+              <button
+                onClick={() => setIsAddOpen(false)}
+                className="text-muted-foreground hover:text-foreground"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -262,7 +279,7 @@ export default function TransactionsPage() {
                     options={[
                       { label: "Expense", value: "expense" },
                       { label: "Income", value: "income" },
-                      { label: "Refund", value: "refund" }
+                      { label: "Refund", value: "refund" },
                     ]}
                     searchable={false}
                     clearErrors={clearErrors}
@@ -270,7 +287,9 @@ export default function TransactionsPage() {
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">Amount</label>
+                  <label className="text-xs font-semibold text-foreground">
+                    Amount
+                  </label>
                   <input
                     {...register("amount", { valueAsNumber: true })}
                     type="number"
@@ -288,7 +307,7 @@ export default function TransactionsPage() {
                   control={control}
                   options={accounts.map((acc: any) => ({
                     label: `${acc.name} (${formatCurrency(acc.current_balance)})`,
-                    value: acc._id
+                    value: acc._id,
                   }))}
                   searchable={true}
                   clearErrors={clearErrors}
@@ -303,7 +322,7 @@ export default function TransactionsPage() {
                   control={control}
                   options={categories.map((cat: any) => ({
                     label: `${cat.name} (${cat.type})`,
-                    value: cat._id
+                    value: cat._id,
                   }))}
                   searchable={true}
                   clearErrors={clearErrors}
@@ -312,7 +331,9 @@ export default function TransactionsPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">Notes / Description</label>
+                <label className="text-xs font-semibold text-foreground">
+                  Notes / Description
+                </label>
                 <input
                   {...register("notes")}
                   placeholder="e.g. Grocery shopping at Supermarket"
@@ -325,7 +346,11 @@ export default function TransactionsPage() {
                 disabled={isCreating}
                 className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-xs shadow-md shadow-primary/20 hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
               >
-                {isCreating ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save Transaction"}
+                {isCreating ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  "Save Transaction"
+                )}
               </button>
             </form>
           </div>

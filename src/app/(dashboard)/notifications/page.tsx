@@ -1,8 +1,20 @@
 "use client";
 
-import { Bell, CheckCheck, AlertTriangle, FileCheck, Target, Info, Loader2 } from "lucide-react";
-import { useGetNotificationsQuery, useMarkAsReadMutation, useMarkAllAsReadMutation } from "../../../services/notificationApi";
-import { formatDate } from "../../../lib/utils";
+import { formatDate } from "@/lib/utils";
+import {
+  useGetNotificationsQuery,
+  useMarkAllAsReadMutation,
+  useMarkAsReadMutation,
+} from "@/services/notificationApi";
+import {
+  AlertTriangle,
+  Bell,
+  CheckCheck,
+  FileCheck,
+  Info,
+  Loader2,
+  Target,
+} from "lucide-react";
 import { toast } from "sonner";
 
 export default function NotificationsPage() {
@@ -30,9 +42,12 @@ export default function NotificationsPage() {
   };
 
   const getIcon = (type: string) => {
-    if (type === "budget_alert") return <AlertTriangle className="w-5 h-5 text-amber-500" />;
-    if (type === "bill_reminder") return <FileCheck className="w-5 h-5 text-blue-500" />;
-    if (type === "goal_milestone") return <Target className="w-5 h-5 text-emerald-500" />;
+    if (type === "budget_alert")
+      return <AlertTriangle className="w-5 h-5 text-amber-500" />;
+    if (type === "bill_reminder")
+      return <FileCheck className="w-5 h-5 text-blue-500" />;
+    if (type === "goal_milestone")
+      return <Target className="w-5 h-5 text-emerald-500" />;
     return <Info className="w-5 h-5 text-primary" />;
   };
 
@@ -40,9 +55,12 @@ export default function NotificationsPage() {
     <div className="space-y-6 max-w-4xl mx-auto">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight">Notifications Center</h1>
+          <h1 className="text-2xl font-extrabold tracking-tight">
+            Notifications Center
+          </h1>
           <p className="text-xs text-muted-foreground">
-            In-app alerts for budget thresholds, bill due dates, and milestone progress
+            In-app alerts for budget thresholds, bill due dates, and milestone
+            progress
           </p>
         </div>
 
@@ -74,9 +92,12 @@ export default function NotificationsPage() {
               <Bell className="w-7 h-7 text-muted-foreground" />
             </div>
             <div className="text-center">
-              <p className="text-sm font-semibold text-foreground">No Notifications</p>
+              <p className="text-sm font-semibold text-foreground">
+                No Notifications
+              </p>
               <p className="text-xs text-muted-foreground mt-1">
-                You're all caught up! Notifications will appear here when budget alerts or bill reminders are triggered.
+                You're all caught up! Notifications will appear here when budget
+                alerts or bill reminders are triggered.
               </p>
             </div>
           </div>
@@ -97,7 +118,9 @@ export default function NotificationsPage() {
 
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2">
-                  <h3 className="text-xs font-bold text-foreground">{n.title}</h3>
+                  <h3 className="text-xs font-bold text-foreground">
+                    {n.title}
+                  </h3>
                   <div className="flex items-center gap-2 shrink-0">
                     {!n.is_read && (
                       <span className="w-2 h-2 rounded-full bg-primary shrink-0" />
@@ -107,17 +130,21 @@ export default function NotificationsPage() {
                     </span>
                   </div>
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">{n.message}</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {n.message}
+                </p>
                 {n.type && (
-                  <span className={`mt-1.5 inline-block text-[10px] px-2 py-0.5 rounded-full font-semibold ${
-                    n.type === "budget_alert"
-                      ? "bg-amber-500/10 text-amber-500 border border-amber-500/20"
-                      : n.type === "bill_reminder"
-                      ? "bg-blue-500/10 text-blue-500 border border-blue-500/20"
-                      : n.type === "goal_milestone"
-                      ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
-                      : "bg-primary/10 text-primary border border-primary/20"
-                  }`}>
+                  <span
+                    className={`mt-1.5 inline-block text-[10px] px-2 py-0.5 rounded-full font-semibold ${
+                      n.type === "budget_alert"
+                        ? "bg-amber-500/10 text-amber-500 border border-amber-500/20"
+                        : n.type === "bill_reminder"
+                          ? "bg-blue-500/10 text-blue-500 border border-blue-500/20"
+                          : n.type === "goal_milestone"
+                            ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
+                            : "bg-primary/10 text-primary border border-primary/20"
+                    }`}
+                  >
                     {n.type.replace(/_/g, " ")}
                   </span>
                 )}

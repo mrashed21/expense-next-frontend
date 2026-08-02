@@ -1,18 +1,28 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { useVerifyOtpMutation, useResendOtpMutation } from "../../../services/authApi";
-import { toast } from "sonner";
-import { KeyRound, CheckCircle, RefreshCw, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { CheckCircle, KeyRound, Loader2, RefreshCw } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
+import {
+  useResendOtpMutation,
+  useVerifyOtpMutation,
+} from "../../../services/authApi";
 
 const otpSchema = z.object({
   otp_code: z.string().length(6, "OTP must be exactly 6 digits"),
@@ -85,16 +95,22 @@ function VerifyOtpContent() {
           <div className="w-11 h-11 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-4">
             <KeyRound className="w-5 h-5 text-primary" />
           </div>
-          <h1 className="text-xl font-semibold tracking-tight text-foreground">Check your email</h1>
-          <p className="text-sm text-muted-foreground mt-1 max-w-[240px]">
+          <h1 className="text-xl font-semibold tracking-tight text-foreground">
+            Check your email
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1 max-w-60`">
             We sent a 6-digit code to{" "}
-            <span className="font-medium text-foreground">{email || "your email"}</span>
+            <span className="font-medium text-foreground">
+              {email || "your email"}
+            </span>
           </p>
         </div>
 
         <Card className="border-border/60 shadow-xl shadow-black/5">
           <CardHeader className="pb-4">
-            <CardTitle className="text-base font-semibold">Verify your email</CardTitle>
+            <CardTitle className="text-base font-semibold">
+              Verify your email
+            </CardTitle>
             <CardDescription className="text-xs">
               Enter the OTP code sent to your inbox
             </CardDescription>
@@ -103,7 +119,10 @@ function VerifyOtpContent() {
           <CardContent>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div className="space-y-1.5">
-                <Label htmlFor="otp" className="text-xs font-medium text-foreground">
+                <Label
+                  htmlFor="otp"
+                  className="text-xs font-medium text-foreground"
+                >
                   Verification code
                 </Label>
                 <Input
@@ -115,7 +134,9 @@ function VerifyOtpContent() {
                   className="text-center tracking-[0.5em] text-lg font-semibold h-11 bg-secondary/40 border-border/60"
                 />
                 {errors.otp_code && (
-                  <p className="text-[11px] text-destructive text-center">{errors.otp_code.message}</p>
+                  <p className="text-[11px] text-destructive text-center">
+                    {errors.otp_code.message}
+                  </p>
                 )}
               </div>
 
@@ -139,7 +160,9 @@ function VerifyOtpContent() {
           <CardFooter className="flex-col gap-0 pt-0 pb-5 px-6">
             <Separator className="mb-4" />
             <div className="flex flex-col items-center gap-1.5">
-              <p className="text-xs text-muted-foreground">Didn&apos;t receive the code?</p>
+              <p className="text-xs text-muted-foreground">
+                Didn&apos;t receive the code?
+              </p>
               <button
                 type="button"
                 onClick={handleResendOtp}
@@ -163,11 +186,13 @@ function VerifyOtpContent() {
 
 export default function VerifyOtpPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+        </div>
+      }
+    >
       <VerifyOtpContent />
     </Suspense>
   );

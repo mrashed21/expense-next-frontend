@@ -27,4 +27,8 @@ export const budgetApi = apiSlice.injectEndpoints({
   }),
 });
 
-export const { useGetBudgetsQuery, useCreateBudgetMutation, useDeleteBudgetMutation } = budgetApi;
+export const {
+  useGetBudgetsQuery,
+  useCreateBudgetMutation,
+  useDeleteBudgetMutation,
+} = budgetApi;

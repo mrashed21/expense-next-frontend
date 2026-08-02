@@ -1,31 +1,46 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { useSelector } from "react-redux";
-import { RootState } from "../../../redux/store";
-import { useRegisterMutation } from "../../../services/authApi";
-import { toast } from "sonner";
-import { User, Mail, Lock, Phone, ArrowRight, Loader2, TrendingUp, Eye, EyeOff } from "lucide-react";
+import PhonesInput from "@/components/custom/phone-input";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Controller } from "react-hook-form";
-import PhonesInput from "../../../components/custom/phone-input";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../../components/ui/select";
-import { bangladeshCities, cityAreas } from "../../../lib/locationData";
+} from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import { bangladeshCities, cityAreas } from "@/lib/locationData";
+import { RootState } from "@/redux/store";
+import { useRegisterMutation } from "@/services/authApi";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  ArrowRight,
+  Eye,
+  EyeOff,
+  Loader2,
+  Lock,
+  Mail,
+  TrendingUp,
+  User,
+} from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { useSelector } from "react-redux";
+import { toast } from "sonner";
+import { z } from "zod";
 
 const registerSchema = z.object({
   user_name: z.string().min(2, "Name must be at least 2 characters"),
@@ -34,14 +49,16 @@ const registerSchema = z.object({
   user_phone: z.string().optional(),
   user_city: z.string().optional(),
   user_area: z.string().optional(),
-  user_country: z.string().default("Bangladesh"),
+  user_country: z.string().optional(),
 });
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { isAuthenticated, isLoading: authLoading } = useSelector((state: RootState) => state.auth);
+  const { isAuthenticated, isLoading: authLoading } = useSelector(
+    (state: RootState) => state.auth,
+  );
   const [registerApi, { isLoading }] = useRegisterMutation();
   const [showPassword, setShowPassword] = useState(false);
 
@@ -84,13 +101,19 @@ export default function RegisterPage() {
           <div className="w-11 h-11 rounded-xl bg-primary flex items-center justify-center mb-4 shadow-lg shadow-primary/20">
             <TrendingUp className="w-5 h-5 text-primary-foreground" />
           </div>
-          <h1 className="text-xl font-semibold tracking-tight text-foreground">ExpenseVault</h1>
-          <p className="text-sm text-muted-foreground mt-1">Create your free account</p>
+          <h1 className="text-xl font-semibold tracking-tight text-foreground">
+            ExpenseVault
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Create your free account
+          </p>
         </div>
 
         <Card className="border-border/60 shadow-xl shadow-black/5">
           <CardHeader className="pb-4">
-            <CardTitle className="text-base font-semibold">Get started</CardTitle>
+            <CardTitle className="text-base font-semibold">
+              Get started
+            </CardTitle>
             <CardDescription className="text-xs">
               Fill in your details to create an account
             </CardDescription>
@@ -100,7 +123,10 @@ export default function RegisterPage() {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-3.5">
               {/* Full Name */}
               <div className="space-y-1.5">
-                <Label htmlFor="name" className="text-xs font-medium text-foreground">
+                <Label
+                  htmlFor="name"
+                  className="text-xs font-medium text-foreground"
+                >
                   Full name
                 </Label>
                 <div className="relative">
@@ -114,13 +140,18 @@ export default function RegisterPage() {
                   />
                 </div>
                 {errors.user_name && (
-                  <p className="text-[11px] text-destructive">{errors.user_name.message}</p>
+                  <p className="text-[11px] text-destructive">
+                    {errors.user_name.message}
+                  </p>
                 )}
               </div>
 
               {/* Email */}
               <div className="space-y-1.5">
-                <Label htmlFor="email" className="text-xs font-medium text-foreground">
+                <Label
+                  htmlFor="email"
+                  className="text-xs font-medium text-foreground"
+                >
                   Email address
                 </Label>
                 <div className="relative">
@@ -134,13 +165,18 @@ export default function RegisterPage() {
                   />
                 </div>
                 {errors.user_email && (
-                  <p className="text-[11px] text-destructive">{errors.user_email.message}</p>
+                  <p className="text-[11px] text-destructive">
+                    {errors.user_email.message}
+                  </p>
                 )}
               </div>
 
               {/* Password */}
               <div className="space-y-1.5">
-                <Label htmlFor="password" className="text-xs font-medium text-foreground">
+                <Label
+                  htmlFor="password"
+                  className="text-xs font-medium text-foreground"
+                >
                   Password
                 </Label>
                 <div className="relative">
@@ -165,15 +201,22 @@ export default function RegisterPage() {
                   </button>
                 </div>
                 {errors.user_password && (
-                  <p className="text-[11px] text-destructive">{errors.user_password.message}</p>
+                  <p className="text-[11px] text-destructive">
+                    {errors.user_password.message}
+                  </p>
                 )}
               </div>
 
               {/* Phone (Optional) */}
               <div className="space-y-1.5">
-                <Label htmlFor="phone" className="text-xs font-medium text-foreground">
+                <Label
+                  htmlFor="phone"
+                  className="text-xs font-medium text-foreground"
+                >
                   Phone{" "}
-                  <span className="text-muted-foreground font-normal">(optional)</span>
+                  <span className="text-muted-foreground font-normal">
+                    (optional)
+                  </span>
                 </Label>
                 <div className="relative">
                   <Controller
@@ -192,7 +235,9 @@ export default function RegisterPage() {
               {/* City & Area */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-medium text-foreground">City (Bangladesh)</Label>
+                  <Label className="text-xs font-medium text-foreground">
+                    City (Bangladesh)
+                  </Label>
                   <Controller
                     name="user_city"
                     control={control}
@@ -217,19 +262,24 @@ export default function RegisterPage() {
                     )}
                   />
                 </div>
-                
+
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-medium text-foreground">Area</Label>
+                  <Label className="text-xs font-medium text-foreground">
+                    Area
+                  </Label>
                   <Controller
                     name="user_area"
                     control={control}
                     render={({ field }) => {
-                      // Using getValues from form is better, but since we are not passing it, 
+                      // Using getValues from form is better, but since we are not passing it,
                       // we can rely on react-hook-form 'watch' if we want it strictly dynamic.
                       // Alternatively, we just use control._formValues.user_city
                       const selectedCity = control._formValues.user_city;
-                      const availableAreas = selectedCity && cityAreas[selectedCity] ? cityAreas[selectedCity] : [];
-                      
+                      const availableAreas =
+                        selectedCity && cityAreas[selectedCity]
+                          ? cityAreas[selectedCity]
+                          : [];
+
                       return (
                         <Select
                           onValueChange={field.onChange}
@@ -237,7 +287,13 @@ export default function RegisterPage() {
                           disabled={!selectedCity}
                         >
                           <SelectTrigger className="h-9 text-sm bg-secondary/40 border-border/60">
-                            <SelectValue placeholder={selectedCity ? "Select Area" : "Select City first"} />
+                            <SelectValue
+                              placeholder={
+                                selectedCity
+                                  ? "Select Area"
+                                  : "Select City first"
+                              }
+                            />
                           </SelectTrigger>
                           <SelectContent>
                             {availableAreas.map((area) => (
@@ -274,7 +330,10 @@ export default function RegisterPage() {
             <Separator className="mb-4" />
             <p className="text-xs text-muted-foreground text-center">
               Already have an account?{" "}
-              <Link href="/login" className="font-medium text-primary hover:underline underline-offset-4">
+              <Link
+                href="/login"
+                className="font-medium text-primary hover:underline underline-offset-4"
+              >
                 Sign in
               </Link>
             </p>

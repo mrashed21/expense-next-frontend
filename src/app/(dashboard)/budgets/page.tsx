@@ -1,20 +1,31 @@
 "use client";
 
+import FormSelect from "@/components/custom/form-select";
+import { useCurrency } from "@/hooks/useCurrency";
+import {
+  useCreateBudgetMutation,
+  useDeleteBudgetMutation,
+  useGetBudgetsQuery,
+} from "@/services/budgetApi";
+import { useGetCategoriesQuery } from "@/services/categoryApi";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  AlertTriangle,
+  CheckCircle,
+  Loader2,
+  Plus,
+  Trash2,
+  X,
+} from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { PiggyBank, Plus, AlertTriangle, CheckCircle, Trash2, X, Loader2 } from "lucide-react";
-import { useGetBudgetsQuery, useCreateBudgetMutation, useDeleteBudgetMutation } from "../../../services/budgetApi";
-import { useGetCategoriesQuery } from "../../../services/categoryApi";
-import { useCurrency } from "../../../hooks/useCurrency";
 import { toast } from "sonner";
-import FormSelect from "../../../components/custom/form-select";
+import { z } from "zod";
 
 const budgetSchema = z.object({
   category_id: z.string().min(1, "Select a category"),
   amount: z.number().positive("Amount must be positive"),
-  warning_threshold: z.number().default(80),
+  warning_threshold: z.number(),
 });
 
 type BudgetFormValues = z.infer<typeof budgetSchema>;
@@ -23,7 +34,8 @@ export default function BudgetsPage() {
   const { formatCurrency } = useCurrency();
   const { data: budgetsData } = useGetBudgetsQuery(undefined);
   const { data: categoriesData } = useGetCategoriesQuery({});
-  const [createBudgetApi, { isLoading: isCreating }] = useCreateBudgetMutation();
+  const [createBudgetApi, { isLoading: isCreating }] =
+    useCreateBudgetMutation();
   const [deleteBudgetApi] = useDeleteBudgetMutation();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -67,8 +79,12 @@ export default function BudgetsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight">Monthly Category Budgets</h1>
-          <p className="text-xs text-muted-foreground">Monitor expenditure limits with automated warning thresholds</p>
+          <h1 className="text-2xl font-extrabold tracking-tight">
+            Monthly Category Budgets
+          </h1>
+          <p className="text-xs text-muted-foreground">
+            Monitor expenditure limits with automated warning thresholds
+          </p>
         </div>
 
         <button
@@ -87,18 +103,27 @@ export default function BudgetsPage() {
           const isOver = b.percentage >= 100;
 
           return (
-            <div key={b._id} className="glass-card p-5 rounded-3xl space-y-3 relative group">
+            <div
+              key={b._id}
+              className="glass-card p-5 rounded-3xl space-y-3 relative group"
+            >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div
                     className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm"
-                    style={{ backgroundColor: b.category_id?.color || "#4F46E5" }}
+                    style={{
+                      backgroundColor: b.category_id?.color || "#4F46E5",
+                    }}
                   >
                     {b.category_id?.name?.charAt(0) || "B"}
                   </div>
                   <div>
-                    <h3 className="text-sm font-bold text-foreground">{b.category_id?.name || "Category"}</h3>
-                    <span className="text-[10px] text-muted-foreground font-semibold">Limit: {formatCurrency(b.amount)}</span>
+                    <h3 className="text-sm font-bold text-foreground">
+                      {b.category_id?.name || "Category"}
+                    </h3>
+                    <span className="text-[10px] text-muted-foreground font-semibold">
+                      Limit: {formatCurrency(b.amount)}
+                    </span>
                   </div>
                 </div>
 
@@ -109,7 +134,8 @@ export default function BudgetsPage() {
                     </span>
                   ) : isWarning ? (
                     <span className="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-500 text-[10px] font-bold border border-amber-amber/20 flex items-center gap-1">
-                      <AlertTriangle className="w-3 h-3" /> Warning ({b.percentage}%)
+                      <AlertTriangle className="w-3 h-3" /> Warning (
+                      {b.percentage}%)
                     </span>
                   ) : (
                     <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] font-bold border border-emerald-500/20 flex items-center gap-1">
@@ -129,14 +155,22 @@ export default function BudgetsPage() {
               {/* Progress Bar */}
               <div className="space-y-1">
                 <div className="flex items-center justify-between text-xs font-semibold">
-                  <span className="text-muted-foreground">Spent: {formatCurrency(b.spent_amount)}</span>
-                  <span className="text-foreground">Remaining: {formatCurrency(b.remaining_amount)}</span>
+                  <span className="text-muted-foreground">
+                    Spent: {formatCurrency(b.spent_amount)}
+                  </span>
+                  <span className="text-foreground">
+                    Remaining: {formatCurrency(b.remaining_amount)}
+                  </span>
                 </div>
 
                 <div className="w-full h-3 rounded-full bg-secondary overflow-hidden">
                   <div
                     className={`h-full rounded-full transition-all duration-500 ${
-                      isOver ? "bg-rose-500" : isWarning ? "bg-amber-500" : "bg-primary"
+                      isOver
+                        ? "bg-rose-500"
+                        : isWarning
+                          ? "bg-amber-500"
+                          : "bg-primary"
                     }`}
                     style={{ width: `${Math.min(100, b.percentage)}%` }}
                   />
@@ -152,8 +186,13 @@ export default function BudgetsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="w-full max-w-md bg-card border border-border p-6 rounded-3xl space-y-4 shadow-2xl">
             <div className="flex items-center justify-between border-b border-border pb-3">
-              <h3 className="text-base font-bold text-foreground">Configure Category Budget</h3>
-              <button onClick={() => setIsOpen(false)} className="text-muted-foreground hover:text-foreground">
+              <h3 className="text-base font-bold text-foreground">
+                Configure Category Budget
+              </h3>
+              <button
+                onClick={() => setIsOpen(false)}
+                className="text-muted-foreground hover:text-foreground"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -166,7 +205,7 @@ export default function BudgetsPage() {
                   control={control}
                   options={categories.map((c: any) => ({
                     label: `${c.name} (${c.type})`,
-                    value: c._id
+                    value: c._id,
                   }))}
                   searchable={true}
                   clearErrors={clearErrors}
@@ -175,7 +214,9 @@ export default function BudgetsPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">Monthly Budget Limit</label>
+                <label className="text-xs font-semibold text-foreground">
+                  Monthly Budget Limit
+                </label>
                 <input
                   {...register("amount", { valueAsNumber: true })}
                   type="number"
@@ -195,7 +236,7 @@ export default function BudgetsPage() {
                     { label: "75% of budget limit", value: "75" },
                     { label: "80% of budget limit", value: "80" },
                     { label: "90% of budget limit", value: "90" },
-                    { label: "100% (Strict Max)", value: "100" }
+                    { label: "100% (Strict Max)", value: "100" },
                   ]}
                   searchable={false}
                   clearErrors={clearErrors}
@@ -208,7 +249,11 @@ export default function BudgetsPage() {
                 disabled={isCreating}
                 className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-xs shadow-md shadow-primary/20 hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
               >
-                {isCreating ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save Budget"}
+                {isCreating ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  "Save Budget"
+                )}
               </button>
             </form>
           </div>

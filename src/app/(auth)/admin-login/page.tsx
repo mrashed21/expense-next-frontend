@@ -1,21 +1,34 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
-import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../../redux/store";
-import { setCredentials } from "../../../redux/slices/authSlice";
-import { useAdminLoginMutation } from "../../../services/authApi";
-import { toast } from "sonner";
-import { Lock, Mail, ArrowRight, Loader2, ShieldCheck, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { setCredentials } from "@/redux/slices/authSlice";
+import { RootState } from "@/redux/store";
+import { useAdminLoginMutation } from "@/services/authApi";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  ArrowRight,
+  Eye,
+  EyeOff,
+  Loader2,
+  Lock,
+  Mail,
+  ShieldCheck,
+} from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "sonner";
+import { z } from "zod";
 
 const loginSchema = z.object({
   admin_email: z.string().email("Please enter a valid email address"),
@@ -28,7 +41,11 @@ function AdminLoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const dispatch = useDispatch();
-  const { isAuthenticated, isLoading: authLoading, user } = useSelector((state: RootState) => state.auth);
+  const {
+    isAuthenticated,
+    isLoading: authLoading,
+    user,
+  } = useSelector((state: RootState) => state.auth);
   const [adminLoginApi, { isLoading }] = useAdminLoginMutation();
   const [showPassword, setShowPassword] = useState(false);
 
@@ -64,13 +81,15 @@ function AdminLoginContent() {
         dispatch(
           setCredentials({
             user: userObj as any,
-          })
+          }),
         );
         toast.success("Admin login successful.");
         router.push(redirectUrl);
       }
     } catch (err: any) {
-      toast.error(err?.data?.message || "Failed to log in. Please check credentials.");
+      toast.error(
+        err?.data?.message || "Failed to log in. Please check credentials.",
+      );
     }
   };
 
@@ -83,13 +102,19 @@ function AdminLoginContent() {
           <div className="w-11 h-11 rounded-xl bg-destructive flex items-center justify-center mb-4 shadow-lg shadow-destructive/20">
             <ShieldCheck className="w-5 h-5 text-destructive-foreground" />
           </div>
-          <h1 className="text-xl font-semibold tracking-tight text-foreground">Admin Portal</h1>
-          <p className="text-sm text-muted-foreground mt-1">Sign in with administrator access</p>
+          <h1 className="text-xl font-semibold tracking-tight text-foreground">
+            Admin Portal
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Sign in with administrator access
+          </p>
         </div>
 
         <Card className="border-border/60 shadow-xl shadow-black/5">
           <CardHeader className="pb-4">
-            <CardTitle className="text-base font-semibold">Admin Login</CardTitle>
+            <CardTitle className="text-base font-semibold">
+              Admin Login
+            </CardTitle>
             <CardDescription className="text-xs">
               Restricted area. Authorized personnel only.
             </CardDescription>
@@ -98,7 +123,10 @@ function AdminLoginContent() {
           <CardContent>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div className="space-y-1.5">
-                <Label htmlFor="email" className="text-xs font-medium text-foreground">
+                <Label
+                  htmlFor="email"
+                  className="text-xs font-medium text-foreground"
+                >
                   Admin Email
                 </Label>
                 <div className="relative">
@@ -112,13 +140,18 @@ function AdminLoginContent() {
                   />
                 </div>
                 {errors.admin_email && (
-                  <p className="text-[11px] text-destructive">{errors.admin_email.message}</p>
+                  <p className="text-[11px] text-destructive">
+                    {errors.admin_email.message}
+                  </p>
                 )}
               </div>
 
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="password" className="text-xs font-medium text-foreground">
+                  <Label
+                    htmlFor="password"
+                    className="text-xs font-medium text-foreground"
+                  >
                     Password
                   </Label>
                 </div>
@@ -144,7 +177,9 @@ function AdminLoginContent() {
                   </button>
                 </div>
                 {errors.admin_password && (
-                  <p className="text-[11px] text-destructive">{errors.admin_password.message}</p>
+                  <p className="text-[11px] text-destructive">
+                    {errors.admin_password.message}
+                  </p>
                 )}
               </div>
 
@@ -172,11 +207,13 @@ function AdminLoginContent() {
 
 export default function AdminLoginPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+        </div>
+      }
+    >
       <AdminLoginContent />
     </Suspense>
   );

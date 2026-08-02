@@ -1,13 +1,24 @@
 "use client";
 
-import { useGetUsersQuery, useGetSystemHealthQuery, useGetActivityQuery } from "../../../services/adminApi";
-import { useSelector } from "react-redux";
-import { RootState } from "../../../redux/store";
+import { Card } from "@/components/ui/card";
+import { RootState } from "@/redux/store";
+import {
+  useGetActivityQuery,
+  useGetSystemHealthQuery,
+  useGetUsersQuery,
+} from "@/services/adminApi";
+import {
+  Activity,
+  Cpu,
+  Database,
+  Loader2,
+  ShieldAlert,
+  Users,
+} from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { Loader2, Users, Activity, ShieldAlert, Cpu, Database } from "lucide-react";
-import { Card } from "../../../components/ui/card";
-import Link from "next/link";
+import { useSelector } from "react-redux";
 
 export default function AdminDashboardPage() {
   const router = useRouter();
@@ -20,22 +31,26 @@ export default function AdminDashboardPage() {
   }, [user, router]);
 
   const { data: usersData, isLoading: usersLoading } = useGetUsersQuery({});
-  const { data: healthData, isLoading: healthLoading } = useGetSystemHealthQuery({});
-  const { data: activityData, isLoading: activityLoading } = useGetActivityQuery({});
-  
+  const { data: healthData, isLoading: healthLoading } =
+    useGetSystemHealthQuery({});
+  const { data: activityData, isLoading: activityLoading } =
+    useGetActivityQuery({});
+
   if (!user || !user.isAdmin) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
         <ShieldAlert className="w-16 h-16 text-destructive" />
         <h1 className="text-2xl font-bold text-foreground">Access Denied</h1>
-        <p className="text-muted-foreground">You do not have permission to view this page.</p>
+        <p className="text-muted-foreground">
+          You do not have permission to view this page.
+        </p>
       </div>
     );
   }
 
   const usersCount = usersData?.data?.length || 0;
   const activitiesCount = activityData?.data?.length || 0;
-  
+
   // Format uptime
   const uptimeSeconds = healthData?.data?.uptime || 0;
   const days = Math.floor(uptimeSeconds / (3600 * 24));
@@ -45,7 +60,9 @@ export default function AdminDashboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">Admin Overview</h1>
+        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+          Admin Overview
+        </h1>
         <p className="text-xs sm:text-sm text-muted-foreground mt-1">
           Welcome back, {user.user_name}. Here's a quick look at the platform.
         </p>
@@ -54,46 +71,68 @@ export default function AdminDashboardPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="p-5 flex flex-col gap-2 relative overflow-hidden group">
           <div className="flex justify-between items-start">
-            <p className="text-sm font-medium text-muted-foreground">Total Users</p>
+            <p className="text-sm font-medium text-muted-foreground">
+              Total Users
+            </p>
             <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
               <Users className="w-4 h-4 text-primary" />
             </div>
           </div>
           <div>
-            {usersLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <p className="text-2xl font-bold">{usersCount}</p>}
+            {usersLoading ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <p className="text-2xl font-bold">{usersCount}</p>
+            )}
           </div>
           <Link href="/admin/users" className="absolute inset-0" />
         </Card>
 
         <Card className="p-5 flex flex-col gap-2 relative overflow-hidden group">
           <div className="flex justify-between items-start">
-            <p className="text-sm font-medium text-muted-foreground">Recent Activities</p>
+            <p className="text-sm font-medium text-muted-foreground">
+              Recent Activities
+            </p>
             <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
               <Activity className="w-4 h-4 text-emerald-500" />
             </div>
           </div>
           <div>
-            {activityLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <p className="text-2xl font-bold">{activitiesCount}</p>}
+            {activityLoading ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <p className="text-2xl font-bold">{activitiesCount}</p>
+            )}
           </div>
           <Link href="/admin/activity" className="absolute inset-0" />
         </Card>
 
         <Card className="p-5 flex flex-col gap-2 relative overflow-hidden group">
           <div className="flex justify-between items-start">
-            <p className="text-sm font-medium text-muted-foreground">Server Uptime</p>
+            <p className="text-sm font-medium text-muted-foreground">
+              Server Uptime
+            </p>
             <div className="w-8 h-8 rounded-lg bg-indigo-500/10 flex items-center justify-center">
               <Cpu className="w-4 h-4 text-indigo-500" />
             </div>
           </div>
           <div>
-            {healthLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <p className="text-2xl font-bold">{days}d {hours}h {minutes}m</p>}
+            {healthLoading ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <p className="text-2xl font-bold">
+                {days}d {hours}h {minutes}m
+              </p>
+            )}
           </div>
           <Link href="/admin/system-health" className="absolute inset-0" />
         </Card>
 
         <Card className="p-5 flex flex-col gap-2 relative overflow-hidden group">
           <div className="flex justify-between items-start">
-            <p className="text-sm font-medium text-muted-foreground">Memory Usage</p>
+            <p className="text-sm font-medium text-muted-foreground">
+              Memory Usage
+            </p>
             <div className="w-8 h-8 rounded-lg bg-rose-500/10 flex items-center justify-center">
               <Database className="w-4 h-4 text-rose-500" />
             </div>
@@ -103,9 +142,16 @@ export default function AdminDashboardPage() {
               <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
               <p className="text-2xl font-bold">
-                {healthData?.data?.totalMemory ? 
-                  ((healthData.data.totalMemory - healthData.data.freeMemory) / 1024 / 1024 / 1024).toFixed(2) 
-                  : '0.00'} GB
+                {healthData?.data?.totalMemory
+                  ? (
+                      (healthData.data.totalMemory -
+                        healthData.data.freeMemory) /
+                      1024 /
+                      1024 /
+                      1024
+                    ).toFixed(2)
+                  : "0.00"}{" "}
+                GB
               </p>
             )}
           </div>
@@ -120,7 +166,10 @@ export default function AdminDashboardPage() {
               <Users className="w-6 h-6 text-primary group-hover:scale-110 transition-transform" />
             </div>
             <h3 className="font-bold text-lg mb-1">User Management</h3>
-            <p className="text-sm text-muted-foreground">View, suspend, or activate user accounts and assign administrators.</p>
+            <p className="text-sm text-muted-foreground">
+              View, suspend, or activate user accounts and assign
+              administrators.
+            </p>
           </Card>
         </Link>
 
@@ -130,7 +179,9 @@ export default function AdminDashboardPage() {
               <Activity className="w-6 h-6 text-emerald-500 group-hover:scale-110 transition-transform" />
             </div>
             <h3 className="font-bold text-lg mb-1">Platform Activity</h3>
-            <p className="text-sm text-muted-foreground">Track financial records added globally across all active users.</p>
+            <p className="text-sm text-muted-foreground">
+              Track financial records added globally across all active users.
+            </p>
           </Card>
         </Link>
 
@@ -140,7 +191,10 @@ export default function AdminDashboardPage() {
               <ShieldAlert className="w-6 h-6 text-indigo-500 group-hover:scale-110 transition-transform" />
             </div>
             <h3 className="font-bold text-lg mb-1">System Health</h3>
-            <p className="text-sm text-muted-foreground">Check server vital signs, memory utilization, and real-time connections.</p>
+            <p className="text-sm text-muted-foreground">
+              Check server vital signs, memory utilization, and real-time
+              connections.
+            </p>
           </Card>
         </Link>
       </div>

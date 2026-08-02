@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { Inter, Poppins, Roboto } from "next/font/google";
 import "./globals.css";
-import { ReduxProvider } from "../providers/ReduxProvider";
-import { AuthProvider } from "../providers/AuthProvider";
-import { ThemeProvider } from "../providers/ThemeProvider";
-import { ToastProvider } from "../providers/ToastProvider";
+import { ReduxProvider } from "@/providers/ReduxProvider";
+import { AuthProvider } from "@/providers/AuthProvider";
+import { ThemeProvider } from "@/providers/ThemeProvider";
+import { ToastProvider } from "@/providers/ToastProvider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -25,7 +25,8 @@ const roboto = Roboto({
 
 export const metadata: Metadata = {
   title: "ExpenseVault - Mobile-First SaaS Expense Tracker",
-  description: "Production-ready, secure, scalable expense tracking and financial analytics application.",
+  description:
+    "Production-ready, secure, scalable expense tracking and financial analytics application.",
 };
 
 export default function RootLayout({
@@ -35,10 +36,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} ${poppins.variable} ${roboto.variable} font-sans antialiased selection:bg-primary/20 selection:text-primary`}>
+      <body
+        className={`${inter.variable} ${poppins.variable} ${roboto.variable} font-sans antialiased selection:bg-primary/20 selection:text-primary`}
+      >
         <ReduxProvider>
           <AuthProvider>
-            <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
               {children}
               <ToastProvider />
             </ThemeProvider>

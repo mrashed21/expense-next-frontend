@@ -14,7 +14,7 @@ export function cn(...inputs: ClassValue[]) {
 export function formatCurrency(
   amount: number,
   currency = "BDT",
-  locale = "en-US"
+  locale = "en-US",
 ): string {
   return new Intl.NumberFormat(locale, {
     style: "currency",
@@ -37,7 +37,7 @@ export function formatDate(
     month: "short",
     day: "numeric",
   },
-  locale = "en-US"
+  locale = "en-US",
 ): string {
   return new Intl.DateTimeFormat(locale, options).format(new Date(date));
 }

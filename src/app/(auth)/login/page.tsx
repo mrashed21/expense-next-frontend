@@ -1,22 +1,37 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
-import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../../redux/store";
-import { setCredentials } from "../../../redux/slices/authSlice";
-import { useLoginMutation } from "../../../services/authApi";
-import { toast } from "sonner";
-import { Lock, Mail, ArrowRight, Loader2, TrendingUp, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { setCredentials } from "@/redux/slices/authSlice";
+import { RootState } from "@/redux/store";
+import { useLoginMutation } from "@/services/authApi";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  ArrowRight,
+  Eye,
+  EyeOff,
+  Loader2,
+  Lock,
+  Mail,
+  TrendingUp,
+} from "lucide-react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "sonner";
+import { z } from "zod";
 
 const loginSchema = z.object({
   user_email: z.string().email("Please enter a valid email address"),
@@ -29,7 +44,9 @@ function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const dispatch = useDispatch();
-  const { isAuthenticated, isLoading: authLoading } = useSelector((state: RootState) => state.auth);
+  const { isAuthenticated, isLoading: authLoading } = useSelector(
+    (state: RootState) => state.auth,
+  );
   const [loginApi, { isLoading }] = useLoginMutation();
   const [showPassword, setShowPassword] = useState(false);
 
@@ -56,14 +73,15 @@ function LoginContent() {
         dispatch(
           setCredentials({
             user: response.data.user,
-            accessToken: response.data.accessToken,
-          })
+          }),
         );
         toast.success("Welcome back! Login successful.");
         router.push(redirectUrl);
       }
     } catch (err: any) {
-      toast.error(err?.data?.message || "Failed to log in. Please check credentials.");
+      toast.error(
+        err?.data?.message || "Failed to log in. Please check credentials.",
+      );
     }
   };
 
@@ -78,13 +96,19 @@ function LoginContent() {
           <div className="w-11 h-11 rounded-xl bg-primary flex items-center justify-center mb-4 shadow-lg shadow-primary/20">
             <TrendingUp className="w-5 h-5 text-primary-foreground" />
           </div>
-          <h1 className="text-xl font-semibold tracking-tight text-foreground">ExpenseVault</h1>
-          <p className="text-sm text-muted-foreground mt-1">Sign in to your account</p>
+          <h1 className="text-xl font-semibold tracking-tight text-foreground">
+            ExpenseVault
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Sign in to your account
+          </p>
         </div>
 
         <Card className="border-border/60 shadow-xl shadow-black/5">
           <CardHeader className="pb-4">
-            <CardTitle className="text-base font-semibold">Welcome back</CardTitle>
+            <CardTitle className="text-base font-semibold">
+              Welcome back
+            </CardTitle>
             <CardDescription className="text-xs">
               Enter your credentials to continue
             </CardDescription>
@@ -94,7 +118,10 @@ function LoginContent() {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               {/* Email */}
               <div className="space-y-1.5">
-                <Label htmlFor="email" className="text-xs font-medium text-foreground">
+                <Label
+                  htmlFor="email"
+                  className="text-xs font-medium text-foreground"
+                >
                   Email address
                 </Label>
                 <div className="relative">
@@ -108,14 +135,19 @@ function LoginContent() {
                   />
                 </div>
                 {errors.user_email && (
-                  <p className="text-[11px] text-destructive">{errors.user_email.message}</p>
+                  <p className="text-[11px] text-destructive">
+                    {errors.user_email.message}
+                  </p>
                 )}
               </div>
 
               {/* Password */}
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="password" className="text-xs font-medium text-foreground">
+                  <Label
+                    htmlFor="password"
+                    className="text-xs font-medium text-foreground"
+                  >
                     Password
                   </Label>
                   <Link
@@ -147,7 +179,9 @@ function LoginContent() {
                   </button>
                 </div>
                 {errors.user_password && (
-                  <p className="text-[11px] text-destructive">{errors.user_password.message}</p>
+                  <p className="text-[11px] text-destructive">
+                    {errors.user_password.message}
+                  </p>
                 )}
               </div>
 
@@ -172,7 +206,10 @@ function LoginContent() {
             <Separator className="mb-4" />
             <p className="text-xs text-muted-foreground text-center">
               Don&apos;t have an account?{" "}
-              <Link href="/register" className="font-medium text-primary hover:underline underline-offset-4">
+              <Link
+                href="/register"
+                className="font-medium text-primary hover:underline underline-offset-4"
+              >
                 Create account
               </Link>
             </p>
@@ -185,11 +222,13 @@ function LoginContent() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+        </div>
+      }
+    >
       <LoginContent />
     </Suspense>
   );

@@ -34,5 +34,11 @@ const layoutSlice = createSlice({
   },
 });
 
-export const { toggleSidebar, setSidebarCollapsed, toggleMobileMenu, setMobileMenuOpen, setActiveTab } = layoutSlice.actions;
+export const {
+  toggleSidebar,
+  setSidebarCollapsed,
+  toggleMobileMenu,
+  setMobileMenuOpen,
+  setActiveTab,
+} = layoutSlice.actions;
 export default layoutSlice.reducer;

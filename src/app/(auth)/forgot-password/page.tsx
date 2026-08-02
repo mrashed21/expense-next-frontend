@@ -1,18 +1,25 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { useForgotPasswordMutation } from "@/services/authApi";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ArrowLeft, ArrowRight, Loader2, Mail } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { useForgotPasswordMutation } from "../../../services/authApi";
 import { toast } from "sonner";
-import { Mail, ArrowRight, Loader2, ArrowLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+import { z } from "zod";
 
 const forgotSchema = z.object({
   user_email: z.string().email("Please enter a valid email address"),
@@ -37,7 +44,9 @@ export default function ForgotPasswordPage() {
       const response: any = await forgotPasswordApi(data).unwrap();
       if (response.success) {
         toast.success("Password reset code sent to your email!");
-        router.push(`/reset-password?email=${encodeURIComponent(data.user_email)}`);
+        router.push(
+          `/reset-password?email=${encodeURIComponent(data.user_email)}`,
+        );
       }
     } catch (err: any) {
       toast.error(err?.data?.message || "Failed to process request.");
@@ -54,15 +63,19 @@ export default function ForgotPasswordPage() {
           <div className="w-11 h-11 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-4">
             <Mail className="w-5 h-5 text-primary" />
           </div>
-          <h1 className="text-xl font-semibold tracking-tight text-foreground">Forgot password?</h1>
-          <p className="text-sm text-muted-foreground mt-1 max-w-[240px]">
+          <h1 className="text-xl font-semibold tracking-tight text-foreground">
+            Forgot password?
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1 max-w-60">
             No worries, we&apos;ll send you reset instructions
           </p>
         </div>
 
         <Card className="border-border/60 shadow-xl shadow-black/5">
           <CardHeader className="pb-4">
-            <CardTitle className="text-base font-semibold">Reset your password</CardTitle>
+            <CardTitle className="text-base font-semibold">
+              Reset your password
+            </CardTitle>
             <CardDescription className="text-xs">
               Enter the email address associated with your account
             </CardDescription>
@@ -71,7 +84,10 @@ export default function ForgotPasswordPage() {
           <CardContent>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div className="space-y-1.5">
-                <Label htmlFor="email" className="text-xs font-medium text-foreground">
+                <Label
+                  htmlFor="email"
+                  className="text-xs font-medium text-foreground"
+                >
                   Email address
                 </Label>
                 <div className="relative">
@@ -85,7 +101,9 @@ export default function ForgotPasswordPage() {
                   />
                 </div>
                 {errors.user_email && (
-                  <p className="text-[11px] text-destructive">{errors.user_email.message}</p>
+                  <p className="text-[11px] text-destructive">
+                    {errors.user_email.message}
+                  </p>
                 )}
               </div>
 

@@ -1,35 +1,45 @@
 "use client";
 
+import FormSelect from "@/components/custom/form-select";
+import { useCurrency } from "@/hooks/useCurrency";
+import { formatDate } from "@/lib/utils";
+import {
+  useCreateAccountMutation,
+  useDeleteAccountMutation,
+  useGetAccountsQuery,
+  useUpdateAccountMutation,
+} from "@/services/accountApi";
+import {
+  useCreateTransferMutation,
+  useGetTransfersQuery,
+} from "@/services/transferApi";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ArrowRightLeft, Loader2, Pencil, Plus, Trash2, X } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import {
-  Wallet,
-  Plus,
-  ArrowRightLeft,
-  Trash2,
-  Pencil,
-  Loader2,
-  X,
-  CheckCircle2,
-} from "lucide-react";
-import { useGetAccountsQuery, useCreateAccountMutation, useUpdateAccountMutation, useDeleteAccountMutation } from "../../../services/accountApi";
-import { useGetTransfersQuery, useCreateTransferMutation } from "../../../services/transferApi";
-import { formatDate } from "../../../lib/utils";
-import { useCurrency } from "../../../hooks/useCurrency";
 import { toast } from "sonner";
-import FormSelect from "../../../components/custom/form-select";
+import { z } from "zod";
 
 const accountTypes = [
-  "Cash", "Wallet", "Bank", "Bkash", "Nagad", "Rocket", "Upay",
-  "Visa Card", "Master Card", "PayPal", "Wise", "Crypto Wallet", "Custom"
+  "Cash",
+  "Wallet",
+  "Bank",
+  "Bkash",
+  "Nagad",
+  "Rocket",
+  "Upay",
+  "Visa Card",
+  "Master Card",
+  "PayPal",
+  "Wise",
+  "Crypto Wallet",
+  "Custom",
 ];
 
 const accountSchema = z.object({
   name: z.string().min(1, "Account name is required"),
   type: z.string().min(1, "Account type is required"),
-  opening_balance: z.number().default(0),
+  opening_balance: z.number().default(0).catch(0),
   color: z.string().default("#4F46E5"),
   description: z.string().optional(),
 });
@@ -47,12 +57,16 @@ type TransferFormValues = z.infer<typeof transferSchema>;
 
 export default function AccountsPage() {
   const { formatCurrency } = useCurrency();
-  const { data: accountsData, isLoading: accountsLoading } = useGetAccountsQuery({});
+  const { data: accountsData, isLoading: accountsLoading } =
+    useGetAccountsQuery({});
   const { data: transfersData } = useGetTransfersQuery({});
-  const [createAccountApi, { isLoading: isCreatingAccount }] = useCreateAccountMutation();
-  const [updateAccountApi, { isLoading: isUpdatingAccount }] = useUpdateAccountMutation();
+  const [createAccountApi, { isLoading: isCreatingAccount }] =
+    useCreateAccountMutation();
+  const [updateAccountApi, { isLoading: isUpdatingAccount }] =
+    useUpdateAccountMutation();
   const [deleteAccountApi] = useDeleteAccountMutation();
-  const [createTransferApi, { isLoading: isCreatingTransfer }] = useCreateTransferMutation();
+  const [createTransferApi, { isLoading: isCreatingTransfer }] =
+    useCreateTransferMutation();
 
   const [isAddAccountOpen, setIsAddAccountOpen] = useState(false);
   const [isTransferOpen, setIsTransferOpen] = useState(false);
@@ -70,7 +84,7 @@ export default function AccountsPage() {
     formState: { errors: accountErrors },
   } = useForm<AccountFormValues>({
     resolver: zodResolver(accountSchema),
-    defaultValues: { opening_balance: "" as any, color: "#4F46E5" },
+    defaultValues: { opening_balance: 0, color: "#4F46E5", name: "", type: "" },
   });
 
   const {
@@ -82,6 +96,7 @@ export default function AccountsPage() {
     formState: { errors: editErrors },
   } = useForm<AccountFormValues>({
     resolver: zodResolver(accountSchema),
+    defaultValues: { opening_balance: 0, color: "#4F46E5", name: "", type: "" },
   });
 
   const {
@@ -93,7 +108,13 @@ export default function AccountsPage() {
     formState: { errors: transferErrors },
   } = useForm<TransferFormValues>({
     resolver: zodResolver(transferSchema),
-    defaultValues: { fee: "" as any },
+    defaultValues: {
+      from_account_id: "",
+      to_account_id: "",
+      amount: 0,
+      fee: 0,
+      notes: "",
+    },
   });
 
   const onAddAccountSubmit = async (data: AccountFormValues) => {
@@ -150,15 +171,22 @@ export default function AccountsPage() {
     }
   };
 
-  const totalBalance = accounts.reduce((sum: number, acc: any) => sum + (acc.current_balance || 0), 0);
+  const totalBalance = accounts.reduce(
+    (sum: number, acc: any) => sum + (acc.current_balance || 0),
+    0,
+  );
 
   return (
     <div className="space-y-6">
       {/* Header Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight">Account Management</h1>
-          <p className="text-xs text-muted-foreground">Manage your cash, bank accounts, digital wallets, and cards</p>
+          <h1 className="text-2xl font-extrabold tracking-tight">
+            Account Management
+          </h1>
+          <p className="text-xs text-muted-foreground">
+            Manage your cash, bank accounts, digital wallets, and cards
+          </p>
         </div>
 
         <div className="flex items-center gap-3">
@@ -181,10 +209,16 @@ export default function AccountsPage() {
 
       {/* Total Balance Summary */}
       {accounts.length > 0 && (
-        <div className="p-5 rounded-2xl bg-gradient-to-r from-primary/10 to-indigo-500/10 border border-primary/20">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Total Net Balance Across All Accounts</p>
-          <p className="text-3xl font-black text-foreground mt-1">{formatCurrency(totalBalance)}</p>
-          <p className="text-[11px] text-muted-foreground mt-1">{accounts.length} active account{accounts.length !== 1 ? "s" : ""}</p>
+        <div className="p-5 rounded-2xl bg-linear-to-r from-primary/10 to-indigo-500/10 border border-primary/20">
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            Total Net Balance Across All Accounts
+          </p>
+          <p className="text-3xl font-black text-foreground mt-1">
+            {formatCurrency(totalBalance)}
+          </p>
+          <p className="text-[11px] text-muted-foreground mt-1">
+            {accounts.length} active account{accounts.length !== 1 ? "s" : ""}
+          </p>
         </div>
       )}
 
@@ -213,7 +247,9 @@ export default function AccountsPage() {
                     {acc.name.charAt(0)}
                   </div>
                   <div>
-                    <h3 className="text-sm font-bold text-foreground">{acc.name}</h3>
+                    <h3 className="text-sm font-bold text-foreground">
+                      {acc.name}
+                    </h3>
                     <span className="text-[10px] px-2 py-0.5 rounded-full bg-secondary border border-border font-semibold uppercase text-muted-foreground">
                       {acc.type}
                     </span>
@@ -240,14 +276,22 @@ export default function AccountsPage() {
 
               <div className="pt-2 border-t border-border flex items-end justify-between">
                 <div>
-                  <span className="text-[10px] font-semibold text-muted-foreground uppercase">Current Balance</span>
-                  <p className="text-xl font-black text-foreground">{formatCurrency(acc.current_balance)}</p>
+                  <span className="text-[10px] font-semibold text-muted-foreground uppercase">
+                    Current Balance
+                  </span>
+                  <p className="text-xl font-black text-foreground">
+                    {formatCurrency(acc.current_balance)}
+                  </p>
                 </div>
-                <span className="text-[11px] text-muted-foreground font-medium">Opening: {formatCurrency(acc.opening_balance)}</span>
+                <span className="text-[11px] text-muted-foreground font-medium">
+                  Opening: {formatCurrency(acc.opening_balance)}
+                </span>
               </div>
 
               {acc.description && (
-                <p className="text-[10px] text-muted-foreground border-t border-border pt-2">{acc.description}</p>
+                <p className="text-[10px] text-muted-foreground border-t border-border pt-2">
+                  {acc.description}
+                </p>
               )}
             </div>
           ))
@@ -256,30 +300,46 @@ export default function AccountsPage() {
 
       {/* Money Transfer History Log */}
       <div className="glass-card p-6 rounded-3xl space-y-4">
-        <h2 className="text-base font-bold text-foreground">Transfer History Log</h2>
+        <h2 className="text-base font-bold text-foreground">
+          Transfer History Log
+        </h2>
         <div className="divide-y divide-border">
           {transfers.length > 0 ? (
             transfers.map((t: any) => (
-              <div key={t._id} className="py-3 flex items-center justify-between">
+              <div
+                key={t._id}
+                className="py-3 flex items-center justify-between"
+              >
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold">
                     <ArrowRightLeft className="w-4 h-4" />
                   </div>
                   <div>
                     <p className="text-xs font-bold text-foreground">
-                      {t.from_account_id?.name || "Account"} → {t.to_account_id?.name || "Account"}
+                      {t.from_account_id?.name || "Account"} →{" "}
+                      {t.to_account_id?.name || "Account"}
                     </p>
-                    <p className="text-[11px] text-muted-foreground">{formatDate(t.date)} {t.notes ? `• ${t.notes}` : ""}</p>
+                    <p className="text-[11px] text-muted-foreground">
+                      {formatDate(t.date)} {t.notes ? `• ${t.notes}` : ""}
+                    </p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <span className="text-xs font-bold text-foreground">{formatCurrency(t.amount)}</span>
-                  {t.fee > 0 && <p className="text-[10px] text-muted-foreground">Fee: {formatCurrency(t.fee)}</p>}
+                  <span className="text-xs font-bold text-foreground">
+                    {formatCurrency(t.amount)}
+                  </span>
+                  {t.fee > 0 && (
+                    <p className="text-[10px] text-muted-foreground">
+                      Fee: {formatCurrency(t.fee)}
+                    </p>
+                  )}
                 </div>
               </div>
             ))
           ) : (
-            <p className="text-center py-6 text-xs text-muted-foreground">No balance transfers executed yet.</p>
+            <p className="text-center py-6 text-xs text-muted-foreground">
+              No balance transfers executed yet.
+            </p>
           )}
         </div>
       </div>
@@ -289,21 +349,35 @@ export default function AccountsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="w-full max-w-md bg-card border border-border p-6 rounded-3xl space-y-4 shadow-2xl">
             <div className="flex items-center justify-between border-b border-border pb-3">
-              <h3 className="text-base font-bold text-foreground">Create Financial Account</h3>
-              <button onClick={() => setIsAddAccountOpen(false)} className="text-muted-foreground hover:text-foreground">
+              <h3 className="text-base font-bold text-foreground">
+                Create Financial Account
+              </h3>
+              <button
+                onClick={() => setIsAddAccountOpen(false)}
+                className="text-muted-foreground hover:text-foreground"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSubmitAccount(onAddAccountSubmit)} className="space-y-3">
+            <form
+              onSubmit={handleSubmitAccount(onAddAccountSubmit)}
+              className="space-y-3"
+            >
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">Account Name</label>
+                <label className="text-xs font-semibold text-foreground">
+                  Account Name
+                </label>
                 <input
                   {...registerAccount("name")}
                   placeholder="e.g. Main Bank Account, Bkash Personal"
                   className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                 />
-                {accountErrors.name && <p className="text-[10px] text-destructive">{accountErrors.name.message}</p>}
+                {accountErrors.name && (
+                  <p className="text-[10px] text-destructive">
+                    {accountErrors.name.message}
+                  </p>
+                )}
               </div>
 
               <div className="space-y-1">
@@ -320,16 +394,22 @@ export default function AccountsPage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">Opening Balance</label>
+                  <label className="text-xs font-semibold text-foreground">
+                    Opening Balance
+                  </label>
                   <input
-                    {...registerAccount("opening_balance", { valueAsNumber: true })}
+                    {...registerAccount("opening_balance", {
+                      valueAsNumber: true,
+                    })}
                     type="number"
                     step="0.01"
                     className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">Color</label>
+                  <label className="text-xs font-semibold text-foreground">
+                    Color
+                  </label>
                   <input
                     {...registerAccount("color")}
                     type="color"
@@ -339,7 +419,9 @@ export default function AccountsPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">Description (Optional)</label>
+                <label className="text-xs font-semibold text-foreground">
+                  Description (Optional)
+                </label>
                 <input
                   {...registerAccount("description")}
                   placeholder="e.g. Primary checking account"
@@ -352,7 +434,11 @@ export default function AccountsPage() {
                 disabled={isCreatingAccount}
                 className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-xs shadow-md shadow-primary/20 hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
               >
-                {isCreatingAccount ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save Account"}
+                {isCreatingAccount ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  "Save Account"
+                )}
               </button>
             </form>
           </div>
@@ -364,20 +450,34 @@ export default function AccountsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="w-full max-w-md bg-card border border-border p-6 rounded-3xl space-y-4 shadow-2xl">
             <div className="flex items-center justify-between border-b border-border pb-3">
-              <h3 className="text-base font-bold text-foreground">Edit Account</h3>
-              <button onClick={() => setEditAccount(null)} className="text-muted-foreground hover:text-foreground">
+              <h3 className="text-base font-bold text-foreground">
+                Edit Account
+              </h3>
+              <button
+                onClick={() => setEditAccount(null)}
+                className="text-muted-foreground hover:text-foreground"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSubmitEdit(onEditAccountSubmit)} className="space-y-3">
+            <form
+              onSubmit={handleSubmitEdit(onEditAccountSubmit)}
+              className="space-y-3"
+            >
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">Account Name</label>
+                <label className="text-xs font-semibold text-foreground">
+                  Account Name
+                </label>
                 <input
                   {...registerEdit("name")}
                   className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                 />
-                {editErrors.name && <p className="text-[10px] text-destructive">{editErrors.name.message}</p>}
+                {editErrors.name && (
+                  <p className="text-[10px] text-destructive">
+                    {editErrors.name.message}
+                  </p>
+                )}
               </div>
 
               <div className="space-y-1">
@@ -394,16 +494,22 @@ export default function AccountsPage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">Opening Balance</label>
+                  <label className="text-xs font-semibold text-foreground">
+                    Opening Balance
+                  </label>
                   <input
-                    {...registerEdit("opening_balance", { valueAsNumber: true })}
+                    {...registerEdit("opening_balance", {
+                      valueAsNumber: true,
+                    })}
                     type="number"
                     step="0.01"
                     className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">Color</label>
+                  <label className="text-xs font-semibold text-foreground">
+                    Color
+                  </label>
                   <input
                     {...registerEdit("color")}
                     type="color"
@@ -413,7 +519,9 @@ export default function AccountsPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">Description (Optional)</label>
+                <label className="text-xs font-semibold text-foreground">
+                  Description (Optional)
+                </label>
                 <input
                   {...registerEdit("description")}
                   className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
@@ -425,7 +533,11 @@ export default function AccountsPage() {
                 disabled={isUpdatingAccount}
                 className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-xs shadow-md shadow-primary/20 hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
               >
-                {isUpdatingAccount ? <Loader2 className="w-4 h-4 animate-spin" /> : "Update Account"}
+                {isUpdatingAccount ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  "Update Account"
+                )}
               </button>
             </form>
           </div>
@@ -437,13 +549,21 @@ export default function AccountsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="w-full max-w-md bg-card border border-border p-6 rounded-3xl space-y-4 shadow-2xl">
             <div className="flex items-center justify-between border-b border-border pb-3">
-              <h3 className="text-base font-bold text-foreground">Execute Balance Transfer</h3>
-              <button onClick={() => setIsTransferOpen(false)} className="text-muted-foreground hover:text-foreground">
+              <h3 className="text-base font-bold text-foreground">
+                Execute Balance Transfer
+              </h3>
+              <button
+                onClick={() => setIsTransferOpen(false)}
+                className="text-muted-foreground hover:text-foreground"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSubmitTransfer(onTransferSubmit)} className="space-y-3">
+            <form
+              onSubmit={handleSubmitTransfer(onTransferSubmit)}
+              className="space-y-3"
+            >
               <div className="space-y-1">
                 <FormSelect
                   label="From Account (Source)"
@@ -451,7 +571,7 @@ export default function AccountsPage() {
                   control={controlTransfer}
                   options={accounts.map((acc: any) => ({
                     label: `${acc.name} (${formatCurrency(acc.current_balance)})`,
-                    value: acc._id
+                    value: acc._id,
                   }))}
                   searchable={true}
                   clearErrors={clearErrorsTransfer}
@@ -466,7 +586,7 @@ export default function AccountsPage() {
                   control={controlTransfer}
                   options={accounts.map((acc: any) => ({
                     label: `${acc.name} (${formatCurrency(acc.current_balance)})`,
-                    value: acc._id
+                    value: acc._id,
                   }))}
                   searchable={true}
                   clearErrors={clearErrorsTransfer}
@@ -476,7 +596,9 @@ export default function AccountsPage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">Transfer Amount</label>
+                  <label className="text-xs font-semibold text-foreground">
+                    Transfer Amount
+                  </label>
                   <input
                     {...registerTransfer("amount", { valueAsNumber: true })}
                     type="number"
@@ -485,7 +607,9 @@ export default function AccountsPage() {
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">Fee (Optional)</label>
+                  <label className="text-xs font-semibold text-foreground">
+                    Fee (Optional)
+                  </label>
                   <input
                     {...registerTransfer("fee", { valueAsNumber: true })}
                     type="number"
@@ -500,7 +624,11 @@ export default function AccountsPage() {
                 disabled={isCreatingTransfer}
                 className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-xs shadow-md shadow-primary/20 hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
               >
-                {isCreatingTransfer ? <Loader2 className="w-4 h-4 animate-spin" /> : "Confirm Transfer"}
+                {isCreatingTransfer ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  "Confirm Transfer"
+                )}
               </button>
             </form>
           </div>

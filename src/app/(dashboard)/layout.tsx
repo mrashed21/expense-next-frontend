@@ -1,9 +1,13 @@
-import { ProtectedRoute } from "../../components/auth/ProtectedRoute";
-import { Header } from "../../components/layout/Header";
-import { MobileNav } from "../../components/layout/MobileNav";
-import { Sidebar } from "../../components/layout/Sidebar";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { Header } from "@/components/layout/Header";
+import { MobileNav } from "@/components/layout/MobileNav";
+import { Sidebar } from "@/components/layout/Sidebar";
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <ProtectedRoute>
       <div className="min-h-screen flex bg-background text-foreground">
@@ -16,9 +20,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <Header />
 
           {/* Page Content */}
-          <main className="flex-1 p-4 md:p-6 w-full space-y-6">
-            {children}
-          </main>
+          <main className="flex-1 p-4 md:p-6 w-full space-y-6">{children}</main>
         </div>
 
         {/* Mobile Bottom Navigation */}

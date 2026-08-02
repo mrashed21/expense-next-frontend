@@ -1,19 +1,26 @@
-import { createApi, fetchBaseQuery, BaseQueryFn, FetchArgs, FetchBaseQueryError } from "@reduxjs/toolkit/query/react";
-import { RootState } from "../redux/store";
-import { logout, setCredentials } from "../redux/slices/authSlice";
+import { logout, setCredentials } from "@/redux/slices/authSlice";
+import { RootState } from "@/redux/store";
+import {
+  BaseQueryFn,
+  createApi,
+  FetchArgs,
+  fetchBaseQuery,
+  FetchBaseQueryError,
+} from "@reduxjs/toolkit/query/react";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5005/api/v1";
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5005/api/v1";
 
 const baseQuery = fetchBaseQuery({
   baseUrl: API_BASE_URL,
   credentials: "include", // For HttpOnly refresh and access cookies
 });
 
-const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> = async (
-  args,
-  api,
-  extraOptions
-) => {
+const baseQueryWithReauth: BaseQueryFn<
+  string | FetchArgs,
+  unknown,
+  FetchBaseQueryError
+> = async (args, api, extraOptions) => {
   let result = await baseQuery(args, api, extraOptions);
 
   if (result.error && result.error.status === 401) {
@@ -24,11 +31,12 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
         method: "POST",
       },
       api,
-      extraOptions
+      extraOptions,
     );
 
     if (refreshResult.data && refreshResult.data.success) {
-      const user = refreshResult.data.data.user || (api.getState() as RootState).auth.user;
+      const user =
+        refreshResult.data.data.user || (api.getState() as RootState).auth.user;
       if (user) {
         api.dispatch(setCredentials({ user }));
       }
