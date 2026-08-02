@@ -19,7 +19,7 @@ const transferSchema = z.object({
   from_account_id: z.string().min(1, "Select source account"),
   to_account_id: z.string().min(1, "Select destination account"),
   amount: z.number().positive("Amount must be positive"),
-  fee: z.number().min(0).default(0),
+  fee: z.number().min(0).optional(),
   notes: z.string().optional(),
 });
 
