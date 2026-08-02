@@ -1,7 +1,7 @@
-import { Sidebar } from "../../components/layout/Sidebar";
+import { ProtectedRoute } from "../../components/auth/ProtectedRoute";
 import { Header } from "../../components/layout/Header";
 import { MobileNav } from "../../components/layout/MobileNav";
-import { ProtectedRoute } from "../../components/auth/ProtectedRoute";
+import { Sidebar } from "../../components/layout/Sidebar";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (

@@ -13,14 +13,12 @@ export interface UserState {
 
 interface AuthState {
   user: UserState | null;
-  accessToken: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
 }
 
 const initialState: AuthState = {
   user: null,
-  accessToken: null,
   isAuthenticated: false,
   isLoading: true,
 };
@@ -31,15 +29,11 @@ const authSlice = createSlice({
   reducers: {
     setCredentials: (
       state,
-      action: PayloadAction<{ user: UserState; accessToken: string }>
+      action: PayloadAction<{ user: UserState }>
     ) => {
       state.user = action.payload.user;
-      state.accessToken = action.payload.accessToken;
       state.isAuthenticated = true;
       state.isLoading = false;
-      if (typeof window !== "undefined") {
-        localStorage.setItem("accessToken", action.payload.accessToken);
-      }
     },
     updateUser: (state, action: PayloadAction<Partial<UserState>>) => {
       if (state.user) {
@@ -48,7 +42,6 @@ const authSlice = createSlice({
     },
     logout: (state) => {
       state.user = null;
-      state.accessToken = null;
       state.isAuthenticated = false;
       state.isLoading = false;
       if (typeof window !== "undefined") {

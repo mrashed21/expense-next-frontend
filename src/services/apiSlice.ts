@@ -6,14 +6,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5005/a
 
 const baseQuery = fetchBaseQuery({
   baseUrl: API_BASE_URL,
-  credentials: "include", // For HttpOnly refresh cookie
-  prepareHeaders: (headers, { getState }) => {
-    const token = (getState() as RootState).auth.accessToken;
-    if (token) {
-      headers.set("authorization", `Bearer ${token}`);
-    }
-    return headers;
-  },
+  credentials: "include", // For HttpOnly refresh and access cookies
 });
 
 const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQueryError> = async (
@@ -35,20 +28,13 @@ const baseQueryWithReauth: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQue
     );
 
     if (refreshResult.data && refreshResult.data.success) {
-      const newAccessToken = refreshResult.data.data.accessToken;
       const user = refreshResult.data.data.user || (api.getState() as RootState).auth.user;
-      if (user && newAccessToken) {
-        if (typeof window !== "undefined") {
-          localStorage.setItem("accessToken", newAccessToken);
-        }
-        api.dispatch(setCredentials({ user, accessToken: newAccessToken }));
+      if (user) {
+        api.dispatch(setCredentials({ user }));
       }
       // Retry original request with new token
       result = await baseQuery(args, api, extraOptions);
     } else {
-      if (typeof window !== "undefined") {
-        localStorage.removeItem("accessToken");
-      }
       api.dispatch(logout());
     }
   }

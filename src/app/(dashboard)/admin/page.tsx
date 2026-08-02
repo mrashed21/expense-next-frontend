@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import { Loader2, Server, Users, Activity, HardDrive, Cpu, ShieldAlert } from "lucide-react";
 import { Card } from "../../../components/ui/card";
 import { formatDate } from "../../../lib/utils";
+import { SystemHealthChart } from "../../../components/admin/SystemHealthChart";
 
 export default function AdminDashboardPage() {
   const router = useRouter();
@@ -15,7 +16,7 @@ export default function AdminDashboardPage() {
 
   // Security check for client side routing
   useEffect(() => {
-    if (user && user.user_role !== "ADMIN") {
+    if (user && user.user_role !== "admin" && user.user_role !== "super_admin") {
       router.replace("/dashboard");
     }
   }, [user, router]);
@@ -24,7 +25,7 @@ export default function AdminDashboardPage() {
   const { data: healthData, isLoading: healthLoading } = useGetSystemHealthQuery({});
   const { data: activityData, isLoading: activityLoading } = useGetActivityQuery({});
 
-  if (!user || user.user_role !== "ADMIN") {
+  if (!user || (user.user_role !== "admin" && user.user_role !== "super_admin")) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
         <ShieldAlert className="w-16 h-16 text-destructive" />
@@ -47,44 +48,9 @@ export default function AdminDashboardPage() {
         </p>
       </div>
 
-      {/* System Health Section */}
-      <h2 className="text-lg font-bold flex items-center gap-2">
-        <Server className="w-5 h-5 text-primary" /> System Health
-      </h2>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card className="p-5 space-y-2">
-          <div className="text-xs font-semibold text-muted-foreground uppercase">Platform</div>
-          {healthLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : (
-            <p className="text-xl font-bold">{health?.platform?.toUpperCase()}</p>
-          )}
-        </Card>
-        <Card className="p-5 space-y-2">
-          <div className="text-xs font-semibold text-muted-foreground uppercase flex items-center gap-1">
-            <Cpu className="w-3.5 h-3.5" /> CPU Cores
-          </div>
-          {healthLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : (
-            <p className="text-xl font-bold">{health?.cpus}</p>
-          )}
-        </Card>
-        <Card className="p-5 space-y-2">
-          <div className="text-xs font-semibold text-muted-foreground uppercase flex items-center gap-1">
-            <HardDrive className="w-3.5 h-3.5" /> Memory Free
-          </div>
-          {healthLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : (
-            <p className="text-xl font-bold">
-              {health?.freeMemory ? (health.freeMemory / 1024 / 1024 / 1024).toFixed(2) : 0} GB
-            </p>
-          )}
-        </Card>
-        <Card className="p-5 space-y-2">
-          <div className="text-xs font-semibold text-muted-foreground uppercase">Uptime</div>
-          {healthLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : (
-            <p className="text-xl font-bold">
-              {health?.uptime ? Math.floor(health.uptime / 3600) : 0} Hours
-            </p>
-          )}
-        </Card>
-      </div>
+      {/* Real-time System Health Section */}
+      <SystemHealthChart />
+
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Users List */}

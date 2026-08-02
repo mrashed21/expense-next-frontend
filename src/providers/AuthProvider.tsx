@@ -11,7 +11,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const initializeAuth = async () => {
-      const storedToken = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
 
       try {
         const response = await triggerGetMe(undefined, false).unwrap();
@@ -19,7 +18,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           dispatch(
             setCredentials({
               user: response.data.user,
-              accessToken: storedToken || "",
             })
           );
         } else {

@@ -1,30 +1,5 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../redux/store";
-import { toggleSidebar } from "../../redux/slices/layoutSlice";
-import {
-  LayoutDashboard,
-  Receipt,
-  Wallet,
-  Grid,
-  PiggyBank,
-  Target,
-  FileCheck,
-  BarChart3,
-  FileText,
-  Calendar,
-  Bell,
-  Settings,
-  User,
-  ChevronLeft,
-  ChevronRight,
-  ArrowRightLeft,
-  ShieldAlert,
-} from "lucide-react";
-import { cn } from "../../lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
@@ -32,7 +7,31 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Separator } from "@/components/ui/separator";
+import {
+  ArrowRightLeft,
+  BarChart3,
+  Bell,
+  Calendar,
+  ChevronLeft,
+  ChevronRight,
+  FileCheck,
+  FileText,
+  Grid,
+  LayoutDashboard,
+  PiggyBank,
+  Receipt,
+  Settings,
+  ShieldAlert,
+  Target,
+  User,
+  Wallet,
+} from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useDispatch, useSelector } from "react-redux";
+import { cn } from "../../lib/utils";
+import { toggleSidebar } from "../../redux/slices/layoutSlice";
+import { RootState } from "../../redux/store";
 
 const navigationItems = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -157,7 +156,7 @@ export function Sidebar() {
           {navigationItems.map((item) => (
             <NavItem key={item.name} item={item} />
           ))}
-          {user?.user_role === "ADMIN" && (
+          {(user?.user_role === "admin" || user?.user_role === "super_admin") && (
             <>
               <div className="my-2 px-3 text-[10px] font-bold uppercase text-muted-foreground tracking-wider">
                 {!sidebarCollapsed && "Administration"}
