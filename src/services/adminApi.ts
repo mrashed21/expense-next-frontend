@@ -10,6 +10,37 @@ export const adminApi = apiSlice.injectEndpoints({
       }),
       providesTags: ["AdminUsers"] as any,
     }),
+    updateUserStatus: builder.mutation({
+      query: ({ id, status }) => ({
+        url: `/admin/users/${id}/status`,
+        method: "PATCH",
+        body: { status },
+      }),
+      invalidatesTags: ["AdminUsers"] as any,
+    }),
+    getAdmins: builder.query({
+      query: () => ({
+        url: "/admin/admins",
+        method: "GET",
+      }),
+      providesTags: ["AdminUsers"] as any,
+    }),
+    createAdmin: builder.mutation({
+      query: (data) => ({
+        url: "/admin/admins",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["AdminUsers"] as any,
+    }),
+    updateAdminStatus: builder.mutation({
+      query: ({ id, status }) => ({
+        url: `/admin/admins/${id}/status`,
+        method: "PATCH",
+        body: { status },
+      }),
+      invalidatesTags: ["AdminUsers"] as any,
+    }),
     getSystemHealth: builder.query({
       query: () => ({
         url: "/admin/system-health",
@@ -29,6 +60,10 @@ export const adminApi = apiSlice.injectEndpoints({
 
 export const {
   useGetUsersQuery,
+  useUpdateUserStatusMutation,
+  useGetAdminsQuery,
+  useCreateAdminMutation,
+  useUpdateAdminStatusMutation,
   useGetSystemHealthQuery,
   useGetActivityQuery,
 } = adminApi;

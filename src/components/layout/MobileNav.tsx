@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Receipt, Wallet, BarChart3, User } from "lucide-react";
+import { LayoutDashboard, Receipt, Wallet, BarChart3, User, Users, Activity, ShieldAlert } from "lucide-react";
 import { cn } from "../../lib/utils";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
 
 const mobileItems = [
   { name: "Home", href: "/dashboard", icon: LayoutDashboard },
@@ -13,12 +15,22 @@ const mobileItems = [
   { name: "Profile", href: "/profile", icon: User },
 ];
 
+const adminMobileItems = [
+  { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
+  { name: "Users", href: "/admin/users", icon: Users },
+  { name: "Activity", href: "/admin/activity", icon: Activity },
+  { name: "Health", href: "/admin/system-health", icon: ShieldAlert },
+];
+
 export function MobileNav() {
   const pathname = usePathname();
+  const { user } = useSelector((state: RootState) => state.auth);
+
+  const itemsToRender = user?.isAdmin ? adminMobileItems : mobileItems;
 
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-card border-t border-border z-40 flex items-center px-2 shadow-2xl shadow-black/10">
-      {mobileItems.map((item) => {
+      {itemsToRender.map((item) => {
         const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
         const Icon = item.icon;
 

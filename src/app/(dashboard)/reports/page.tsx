@@ -6,8 +6,7 @@ import { useGetTransactionsQuery } from "../../../services/transactionApi";
 import { formatDate } from "../../../lib/utils";
 import { useCurrency } from "../../../hooks/useCurrency";
 import { toast } from "sonner";
-import { pdf } from '@react-pdf/renderer';
-import { PdfReportDocument } from "../../../components/custom/pdf-report";
+
 import {
   Select,
   SelectContent,
@@ -89,16 +88,24 @@ export default function ReportsPage() {
 
   const handleExportPDF = async () => {
     try {
-      const doc = <PdfReportDocument 
-        transactions={transactions}
-        periodLabel={periodLabel[dateRange]}
-        totalIncome={formatCurrency(totalIncome)}
-        totalExpense={formatCurrency(totalExpense)}
-        netBalance={formatCurrency(netBalance)}
-        netBalanceRaw={netBalance}
-        formatDate={formatDate}
-        formatCurrency={formatCurrency}
-      />;
+      toast.info("Generating PDF report...");
+      
+      // Dynamic imports to avoid SSR issues with @react-pdf/renderer
+      const [{ pdf }, { PdfReportDocument }] = await Promise.all([
+        import('@react-pdf/renderer'),
+        import('../../../components/custom/pdf-report'),
+      ]);
+
+      const doc = PdfReportDocument({
+        transactions,
+        periodLabel: periodLabel[dateRange],
+        totalIncome: formatCurrency(totalIncome),
+        totalExpense: formatCurrency(totalExpense),
+        netBalance: formatCurrency(netBalance),
+        netBalanceRaw: netBalance,
+        formatDate,
+        formatCurrency,
+      });
 
       const blob = await pdf(doc).toBlob();
       

@@ -9,6 +9,7 @@ export interface UserState {
   user_profile_image?: string;
   currency: "BDT" | string;
   theme: "light" | "dark" | "system";
+  isAdmin?: boolean;
 }
 
 interface AuthState {

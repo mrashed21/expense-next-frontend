@@ -24,7 +24,9 @@ import {
   ShieldAlert,
   Target,
   User,
+  Users,
   Wallet,
+  Activity,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -46,6 +48,13 @@ const navigationItems = [
   { name: "Reports", href: "/reports", icon: FileText },
   { name: "Calendar", href: "/calendar", icon: Calendar },
   { name: "Notifications", href: "/notifications", icon: Bell },
+];
+
+const adminItems = [
+  { name: "Admin Dashboard", href: "/admin", icon: LayoutDashboard },
+  { name: "User Management", href: "/admin/users", icon: Users },
+  { name: "Activity", href: "/admin/activity", icon: Activity },
+  { name: "System Health", href: "/admin/system-health", icon: ShieldAlert },
 ];
 
 const bottomItems = [
@@ -153,15 +162,20 @@ export function Sidebar() {
 
         {/* Main Nav */}
         <div className="flex-1 overflow-y-auto py-3 px-2 space-y-0.5">
-          {navigationItems.map((item) => (
-            <NavItem key={item.name} item={item} />
-          ))}
-          {(user?.user_role === "admin" || user?.user_role === "super_admin") && (
+          {user?.isAdmin ? (
             <>
               <div className="my-2 px-3 text-[10px] font-bold uppercase text-muted-foreground tracking-wider">
                 {!sidebarCollapsed && "Administration"}
               </div>
-              <NavItem item={{ name: "Admin Panel", href: "/admin", icon: ShieldAlert }} />
+              {adminItems.map((item) => (
+                <NavItem key={item.name} item={item} />
+              ))}
+            </>
+          ) : (
+            <>
+              {navigationItems.map((item) => (
+                <NavItem key={item.name} item={item} />
+              ))}
             </>
           )}
         </div>

@@ -31,8 +31,20 @@ export const authApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["User"],
     }),
+    adminLogin: builder.mutation({
+      query: (credentials) => ({
+        url: "/admin/auth/login",
+        method: "POST",
+        body: credentials,
+      }),
+      invalidatesTags: ["User"],
+    }),
     getMe: builder.query({
       query: () => "/auth/me",
+      providesTags: ["User"],
+    }),
+    getAdminMe: builder.query({
+      query: () => "/admin/auth/me",
       providesTags: ["User"],
     }),
     logout: builder.mutation({
@@ -71,8 +83,11 @@ export const {
   useVerifyOtpMutation,
   useResendOtpMutation,
   useLoginMutation,
+  useAdminLoginMutation,
   useGetMeQuery,
   useLazyGetMeQuery,
+  useGetAdminMeQuery,
+  useLazyGetAdminMeQuery,
   useLogoutMutation,
   useLogoutAllDevicesMutation,
   useForgotPasswordMutation,
