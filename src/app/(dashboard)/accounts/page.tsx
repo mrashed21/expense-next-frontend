@@ -39,16 +39,16 @@ const accountTypes = [
 const accountSchema = z.object({
   name: z.string().min(1, "Account name is required"),
   type: z.string().min(1, "Account type is required"),
-  opening_balance: z.number().default(0).catch(0),
-  color: z.string().default("#4F46E5"),
+  opening_balance: z.coerce.number(),
+  color: z.string(),
   description: z.string().optional(),
 });
 
 const transferSchema = z.object({
   from_account_id: z.string().min(1, "Select source account"),
   to_account_id: z.string().min(1, "Select destination account"),
-  amount: z.number().positive("Amount must be positive"),
-  fee: z.number().min(0).default(0),
+  amount: z.coerce.number().positive("Amount must be positive"),
+  fee: z.coerce.number().min(0),
   notes: z.string().optional(),
 });
 
