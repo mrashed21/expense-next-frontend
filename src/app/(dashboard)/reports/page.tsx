@@ -1,15 +1,54 @@
 "use client";
 
-import { useState } from "react";
-import { FileText, Download, Printer, FileSpreadsheet, FileCheck, Calendar, Filter } from "lucide-react";
+import { useState, useMemo } from "react";
+import { FileText, Download, Printer, FileSpreadsheet } from "lucide-react";
 import { useGetTransactionsQuery } from "../../../services/transactionApi";
-import { formatCurrency, formatDate } from "../../../lib/utils";
+import { formatDate } from "../../../lib/utils";
+import { useCurrency } from "../../../hooks/useCurrency";
 import { toast } from "sonner";
+import { pdf } from '@react-pdf/renderer';
+import { PdfReportDocument } from "../../../components/custom/pdf-report";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../components/ui/select";
+
+const REPORT_DATE_RANGES: Record<string, string> = {
+  today: "today",
+  yesterday: "yesterday",
+  last7days: "last7days",
+  thisMonth: "thisMonth",
+  last30days: "last30days",
+  thisYear: "thisYear",
+};
 
 export default function ReportsPage() {
-  const [reportType, setReportType] = useState("monthly");
-  const { data: transactionsData } = useGetTransactionsQuery({ dateRange: "thisMonth" });
+  const { formatCurrency } = useCurrency();
+  const [dateRange, setDateRange] = useState("thisMonth");
+  const { data: transactionsData, isLoading } = useGetTransactionsQuery({
+    dateRange: REPORT_DATE_RANGES[dateRange],
+    limit: 1000,
+  });
   const transactions = transactionsData?.data || [];
+
+  const totalIncome = useMemo(() =>
+    transactions
+      .filter((tx: any) => tx.type === "income" || tx.type === "refund")
+      .reduce((sum: number, tx: any) => sum + (tx.amount || 0), 0),
+    [transactions]
+  );
+
+  const totalExpense = useMemo(() =>
+    transactions
+      .filter((tx: any) => tx.type === "expense")
+      .reduce((sum: number, tx: any) => sum + (tx.amount || 0), 0),
+    [transactions]
+  );
+
+  const netBalance = totalIncome - totalExpense;
 
   const handleExportCSV = () => {
     if (transactions.length === 0) {
@@ -27,14 +66,19 @@ export default function ReportsPage() {
       t.amount,
     ]);
 
-    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map((e: any) => e.join(","))].join("\n");
-    const encodedUri = encodeURI(csvContent);
+    const csvData = [headers.join(","), ...rows.map((e: any) => e.join(","))].join("\n");
+    const blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `Expense_Report_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute("href", url);
+    link.setAttribute(
+      "download",
+      `ExpenseVault_Report_${dateRange}_${new Date().toISOString().slice(0, 10)}.csv`
+    );
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(url);
 
     toast.success("CSV report downloaded successfully!");
   };
@@ -43,12 +87,54 @@ export default function ReportsPage() {
     window.print();
   };
 
+  const handleExportPDF = async () => {
+    try {
+      const doc = <PdfReportDocument 
+        transactions={transactions}
+        periodLabel={periodLabel[dateRange]}
+        totalIncome={formatCurrency(totalIncome)}
+        totalExpense={formatCurrency(totalExpense)}
+        netBalance={formatCurrency(netBalance)}
+        netBalanceRaw={netBalance}
+        formatDate={formatDate}
+        formatCurrency={formatCurrency}
+      />;
+
+      const blob = await pdf(doc).toBlob();
+      
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `ExpenseVault_Report_${dateRange}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
+      toast.success("PDF Report downloaded successfully");
+    } catch (error) {
+      console.error("PDF Export Error", error);
+      toast.error("Failed to generate PDF report");
+    }
+  };
+
+  const periodLabel: Record<string, string> = {
+    today: "Today",
+    yesterday: "Yesterday",
+    last7days: "Last 7 Days",
+    thisMonth: new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" }),
+    last30days: "Last 30 Days",
+    thisYear: `Year ${new Date().getFullYear()}`,
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-extrabold tracking-tight">Report Generator & Exporter</h1>
-          <p className="text-xs text-muted-foreground">Generate comprehensive financial audit reports in PDF, CSV, Excel, or Print formats</p>
+          <p className="text-xs text-muted-foreground">
+            Generate comprehensive financial audit reports in CSV or Print format
+          </p>
         </div>
 
         <div className="flex items-center gap-2">
@@ -60,32 +146,50 @@ export default function ReportsPage() {
             <span>Export CSV</span>
           </button>
           <button
+            onClick={handleExportPDF}
+            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-primary text-primary-foreground font-semibold text-xs shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all"
+          >
+            <Download className="w-4 h-4" />
+            <span>Download PDF</span>
+          </button>
+          
+          <button
             onClick={handlePrint}
             className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-secondary border border-border text-foreground font-semibold text-xs hover:bg-secondary/80 transition-colors"
           >
             <Printer className="w-4 h-4 text-primary" />
-            <span>Print Report</span>
+            <span>Print</span>
           </button>
         </div>
       </div>
 
-      {/* Options Bar */}
+      {/* Filter & Stats Bar */}
       <div className="glass-card p-4 rounded-3xl flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-bold text-foreground">Report Scope:</span>
-          <select
-            value={reportType}
-            onChange={(e) => setReportType(e.target.value)}
-            className="px-3 py-1.5 rounded-xl bg-secondary border border-border text-xs text-foreground font-semibold outline-none"
-          >
-            <option value="daily">Daily Report</option>
-            <option value="weekly">Weekly Report</option>
-            <option value="monthly">Monthly Report</option>
-            <option value="yearly">Yearly Report</option>
-          </select>
+        <div className="flex items-center gap-3">
+          <span className="text-xs font-bold text-foreground">Date Range:</span>
+          <Select value={dateRange} onValueChange={setDateRange}>
+            <SelectTrigger className="w-[140px] px-3 py-1.5 rounded-xl bg-secondary border border-border text-xs text-foreground font-semibold outline-none h-8">
+              <SelectValue placeholder="Date Range" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="today">Today</SelectItem>
+              <SelectItem value="yesterday">Yesterday</SelectItem>
+              <SelectItem value="last7days">Last 7 Days</SelectItem>
+              <SelectItem value="thisMonth">This Month</SelectItem>
+              <SelectItem value="last30days">Last 30 Days</SelectItem>
+              <SelectItem value="thisYear">This Year</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
-        <span className="text-xs text-muted-foreground font-semibold">Total Records: {transactions.length}</span>
+        <div className="flex items-center gap-4 text-xs font-semibold">
+          <span className="text-emerald-500">Income: {formatCurrency(totalIncome)}</span>
+          <span className="text-rose-500">Expense: {formatCurrency(totalExpense)}</span>
+          <span className={netBalance >= 0 ? "text-primary" : "text-rose-500"}>
+            Net: {formatCurrency(netBalance)}
+          </span>
+          <span className="text-muted-foreground">{transactions.length} records</span>
+        </div>
       </div>
 
       {/* Report Preview Document */}
@@ -93,11 +197,35 @@ export default function ReportsPage() {
         <div className="flex items-center justify-between border-b border-border pb-4">
           <div>
             <h2 className="text-xl font-extrabold text-foreground">ExpenseVault Financial Statement</h2>
-            <p className="text-xs text-muted-foreground">Period: {new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" })}</p>
+            <p className="text-xs text-muted-foreground">Period: {periodLabel[dateRange]}</p>
           </div>
           <div className="text-right">
             <span className="text-xs font-bold text-primary">Status: Audited</span>
             <p className="text-[10px] text-muted-foreground">Generated on {new Date().toLocaleDateString()}</p>
+          </div>
+        </div>
+
+        {/* Summary Row */}
+        <div className="grid grid-cols-3 gap-4">
+          <div className="p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/20 text-center">
+            <p className="text-[10px] text-emerald-500 font-bold uppercase">Total Income</p>
+            <p className="text-lg font-black text-emerald-500">{formatCurrency(totalIncome)}</p>
+          </div>
+          <div className="p-3 rounded-xl bg-rose-500/5 border border-rose-500/20 text-center">
+            <p className="text-[10px] text-rose-500 font-bold uppercase">Total Expense</p>
+            <p className="text-lg font-black text-rose-500">{formatCurrency(totalExpense)}</p>
+          </div>
+          <div className={`p-3 rounded-xl text-center ${
+            netBalance >= 0
+              ? "bg-primary/5 border border-primary/20"
+              : "bg-rose-500/5 border border-rose-500/20"
+          }`}>
+            <p className={`text-[10px] font-bold uppercase ${netBalance >= 0 ? "text-primary" : "text-rose-500"}`}>
+              Net Balance
+            </p>
+            <p className={`text-lg font-black ${netBalance >= 0 ? "text-primary" : "text-rose-500"}`}>
+              {formatCurrency(netBalance)}
+            </p>
           </div>
         </div>
 
@@ -109,21 +237,43 @@ export default function ReportsPage() {
                 <th className="p-3">Description</th>
                 <th className="p-3">Category</th>
                 <th className="p-3">Account</th>
+                <th className="p-3">Type</th>
                 <th className="p-3 text-right">Amount</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border font-medium">
-              {transactions.map((tx: any) => (
-                <tr key={tx._id}>
-                  <td className="p-3 text-muted-foreground">{formatDate(tx.date)}</td>
-                  <td className="p-3 font-bold text-foreground">{tx.notes || tx.category_id?.name || "Transaction"}</td>
-                  <td className="p-3">{tx.category_id?.name || "General"}</td>
-                  <td className="p-3">{tx.account_id?.name || "Account"}</td>
-                  <td className={`p-3 text-right font-bold ${tx.type === "income" ? "text-emerald-500" : "text-rose-500"}`}>
-                    {tx.type === "income" ? "+" : "-"}{formatCurrency(tx.amount)}
+              {isLoading ? (
+                <tr>
+                  <td colSpan={6} className="text-center py-8 text-muted-foreground">Loading...</td>
+                </tr>
+              ) : transactions.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="text-center py-8 text-muted-foreground">
+                    No transactions found for this period.
                   </td>
                 </tr>
-              ))}
+              ) : (
+                transactions.map((tx: any) => (
+                  <tr key={tx._id} className="hover:bg-secondary/30 transition-colors">
+                    <td className="p-3 text-muted-foreground whitespace-nowrap">{formatDate(tx.date)}</td>
+                    <td className="p-3 font-bold text-foreground">{tx.notes || tx.category_id?.name || "Transaction"}</td>
+                    <td className="p-3">{tx.category_id?.name || "General"}</td>
+                    <td className="p-3">{tx.account_id?.name || "Account"}</td>
+                    <td className="p-3">
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${
+                        tx.type === "income"
+                          ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
+                          : "bg-rose-500/10 text-rose-500 border border-rose-500/20"
+                      }`}>
+                        {tx.type}
+                      </span>
+                    </td>
+                    <td className={`p-3 text-right font-bold ${tx.type === "income" ? "text-emerald-500" : "text-rose-500"}`}>
+                      {tx.type === "income" || tx.type === "refund" ? "+" : "-"}{formatCurrency(tx.amount)}
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

@@ -20,8 +20,17 @@ import {
 import { useGetTransactionsQuery, useCreateTransactionMutation, useDeleteTransactionMutation } from "../../../services/transactionApi";
 import { useGetAccountsQuery } from "../../../services/accountApi";
 import { useGetCategoriesQuery } from "../../../services/categoryApi";
-import { formatCurrency, formatDate } from "../../../lib/utils";
+import { formatDate } from "../../../lib/utils";
+import { useCurrency } from "../../../hooks/useCurrency";
 import { toast } from "sonner";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../components/ui/select";
+import FormSelect from "../../../components/custom/form-select";
 
 const transactionSchema = z.object({
   account_id: z.string().min(1, "Select an account"),
@@ -38,6 +47,7 @@ const transactionSchema = z.object({
 type TransactionFormValues = z.infer<typeof transactionSchema>;
 
 export default function TransactionsPage() {
+  const { formatCurrency } = useCurrency();
   const [search, setSearch] = useState("");
   const [dateRange, setDateRange] = useState("thisMonth");
   const [typeFilter, setTypeFilter] = useState("all");
@@ -63,6 +73,8 @@ export default function TransactionsPage() {
     register,
     handleSubmit,
     reset,
+    control,
+    clearErrors,
     formState: { errors },
   } = useForm<TransactionFormValues>({
     resolver: zodResolver(transactionSchema),
@@ -124,27 +136,29 @@ export default function TransactionsPage() {
 
         {/* Date & Type Filters */}
         <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
-          <select
-            value={dateRange}
-            onChange={(e) => setDateRange(e.target.value)}
-            className="px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground font-medium outline-none"
-          >
-            <option value="today">Today</option>
-            <option value="yesterday">Yesterday</option>
-            <option value="last7days">Last 7 Days</option>
-            <option value="thisMonth">This Month</option>
-            <option value="thisYear">This Year</option>
-          </select>
+          <Select value={dateRange} onValueChange={setDateRange}>
+            <SelectTrigger className="w-[140px] px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground font-medium outline-none">
+              <SelectValue placeholder="Date Range" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="today">Today</SelectItem>
+              <SelectItem value="yesterday">Yesterday</SelectItem>
+              <SelectItem value="last7days">Last 7 Days</SelectItem>
+              <SelectItem value="thisMonth">This Month</SelectItem>
+              <SelectItem value="thisYear">This Year</SelectItem>
+            </SelectContent>
+          </Select>
 
-          <select
-            value={typeFilter}
-            onChange={(e) => setTypeFilter(e.target.value)}
-            className="px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground font-medium outline-none"
-          >
-            <option value="all">All Types</option>
-            <option value="income">Income Only</option>
-            <option value="expense">Expense Only</option>
-          </select>
+          <Select value={typeFilter} onValueChange={setTypeFilter}>
+            <SelectTrigger className="w-[140px] px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground font-medium outline-none">
+              <SelectValue placeholder="All Types" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Types</SelectItem>
+              <SelectItem value="income">Income Only</SelectItem>
+              <SelectItem value="expense">Expense Only</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
@@ -241,15 +255,19 @@ export default function TransactionsPage() {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">Type</label>
-                  <select
-                    {...register("type")}
-                    className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
-                  >
-                    <option value="expense">Expense</option>
-                    <option value="income">Income</option>
-                    <option value="refund">Refund</option>
-                  </select>
+                  <FormSelect
+                    label="Type"
+                    name="type"
+                    control={control}
+                    options={[
+                      { label: "Expense", value: "expense" },
+                      { label: "Income", value: "income" },
+                      { label: "Refund", value: "refund" }
+                    ]}
+                    searchable={false}
+                    clearErrors={clearErrors}
+                    error={errors.type}
+                  />
                 </div>
                 <div className="space-y-1">
                   <label className="text-xs font-semibold text-foreground">Amount</label>
@@ -264,29 +282,33 @@ export default function TransactionsPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">Account</label>
-                <select
-                  {...register("account_id")}
-                  className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
-                >
-                  <option value="">-- Select Account --</option>
-                  {accounts.map((acc: any) => (
-                    <option key={acc._id} value={acc._id}>{acc.name} ({formatCurrency(acc.current_balance)})</option>
-                  ))}
-                </select>
+                <FormSelect
+                  label="Account"
+                  name="account_id"
+                  control={control}
+                  options={accounts.map((acc: any) => ({
+                    label: `${acc.name} (${formatCurrency(acc.current_balance)})`,
+                    value: acc._id
+                  }))}
+                  searchable={true}
+                  clearErrors={clearErrors}
+                  error={errors.account_id}
+                />
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">Category</label>
-                <select
-                  {...register("category_id")}
-                  className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
-                >
-                  <option value="">-- Select Category --</option>
-                  {categories.map((cat: any) => (
-                    <option key={cat._id} value={cat._id}>{cat.name} ({cat.type})</option>
-                  ))}
-                </select>
+                <FormSelect
+                  label="Category"
+                  name="category_id"
+                  control={control}
+                  options={categories.map((cat: any) => ({
+                    label: `${cat.name} (${cat.type})`,
+                    value: cat._id
+                  }))}
+                  searchable={true}
+                  clearErrors={clearErrors}
+                  error={errors.category_id}
+                />
               </div>
 
               <div className="space-y-1">

@@ -7,7 +7,7 @@ export interface UserState {
   email_verified: boolean;
   user_role: string;
   user_profile_image?: string;
-  currency: string;
+  currency: "BDT" | string;
   theme: "light" | "dark" | "system";
 }
 

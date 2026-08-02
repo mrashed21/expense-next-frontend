@@ -8,6 +8,13 @@ import { logout } from "../../../redux/slices/authSlice";
 import { Settings, ShieldAlert, Download, Database, Sun, Moon, Monitor, Trash2, X, Loader2 } from "lucide-react";
 import { useDeleteAccountMutation } from "../../../services/userApi";
 import { toast } from "sonner";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../components/ui/select";
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -16,7 +23,7 @@ export default function SettingsPage() {
   const [deleteAccountApi, { isLoading: isDeleting }] = useDeleteAccountMutation();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  const [currency, setCurrency] = useState("USD");
+  const [currency, setCurrency] = useState("BDT");
   const [language, setLanguage] = useState("en");
 
   const handleDeleteAccount = async () => {
@@ -47,30 +54,32 @@ export default function SettingsPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-foreground">Default Currency</label>
-            <select
-              value={currency}
-              onChange={(e) => setCurrency(e.target.value)}
-              className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
-            >
-              <option value="USD">USD ($) - US Dollar</option>
-              <option value="BDT">BDT (৳) - Bangladeshi Taka</option>
-              <option value="EUR">EUR (€) - Euro</option>
-              <option value="GBP">GBP (£) - British Pound</option>
-              <option value="INR">INR (₹) - Indian Rupee</option>
-            </select>
+            <label className="mb-1 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Default Currency</label>
+            <Select value={currency} onValueChange={setCurrency}>
+              <SelectTrigger className="w-full h-10 py-5!">
+                <SelectValue placeholder="Currency" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="USD">USD ($) - US Dollar</SelectItem>
+                <SelectItem value="BDT">BDT (৳) - Bangladeshi Taka</SelectItem>
+                <SelectItem value="EUR">EUR (€) - Euro</SelectItem>
+                <SelectItem value="GBP">GBP (£) - British Pound</SelectItem>
+                <SelectItem value="INR">INR (₹) - Indian Rupee</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-foreground">Language</label>
-            <select
-              value={language}
-              onChange={(e) => setLanguage(e.target.value)}
-              className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
-            >
-              <option value="en">English (US)</option>
-              <option value="bn">Bengali (বাংলা)</option>
-            </select>
+            <label className="mb-1 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Language</label>
+            <Select value={language} onValueChange={setLanguage}>
+              <SelectTrigger className="w-full h-10 py-5!">
+                <SelectValue placeholder="Language" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="en">English (US)</SelectItem>
+                <SelectItem value="bn">Bengali (বাংলা)</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
 

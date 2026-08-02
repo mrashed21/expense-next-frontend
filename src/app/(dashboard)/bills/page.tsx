@@ -7,8 +7,17 @@ import { z } from "zod";
 import { FileCheck, Plus, CheckCircle2, Clock, Trash2, X, Loader2, CreditCard } from "lucide-react";
 import { useGetBillsQuery, useCreateBillMutation, usePayBillMutation, useDeleteBillMutation } from "../../../services/billApi";
 import { useGetAccountsQuery } from "../../../services/accountApi";
-import { formatCurrency, formatDate } from "../../../lib/utils";
+import { formatDate } from "../../../lib/utils";
+import { useCurrency } from "../../../hooks/useCurrency";
 import { toast } from "sonner";
+import FormSelect from "../../../components/custom/form-select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../components/ui/select";
 
 const billTypes = [
   "Electricity", "Internet", "Gas", "Water", "Rent", "Credit Card", "EMI", "Subscriptions"
@@ -24,6 +33,7 @@ const billSchema = z.object({
 type BillFormValues = z.infer<typeof billSchema>;
 
 export default function BillsPage() {
+  const { formatCurrency } = useCurrency();
   const { data: billsData } = useGetBillsQuery({});
   const { data: accountsData } = useGetAccountsQuery({});
   const [createBillApi, { isLoading: isCreating }] = useCreateBillMutation();
@@ -41,6 +51,8 @@ export default function BillsPage() {
     register,
     handleSubmit,
     reset,
+    control,
+    clearErrors,
     formState: { errors },
   } = useForm<BillFormValues>({
     resolver: zodResolver(billSchema),
@@ -182,15 +194,15 @@ export default function BillsPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">Type</label>
-                <select
-                  {...register("type")}
-                  className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
-                >
-                  {billTypes.map((t) => (
-                    <option key={t} value={t}>{t}</option>
-                  ))}
-                </select>
+                <FormSelect
+                  label="Type"
+                  name="type"
+                  control={control}
+                  options={billTypes.map((t) => ({ label: t, value: t }))}
+                  searchable={true}
+                  clearErrors={clearErrors}
+                  error={errors.type}
+                />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
@@ -239,17 +251,19 @@ export default function BillsPage() {
 
             <form onSubmit={handlePaySubmit} className="space-y-3">
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">Pay From Account</label>
-                <select
-                  value={selectedAccountId}
-                  onChange={(e) => setSelectedAccountId(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
-                >
-                  <option value="">-- Choose Account --</option>
-                  {accounts.map((a: any) => (
-                    <option key={a._id} value={a._id}>{a.name} ({formatCurrency(a.current_balance)})</option>
-                  ))}
-                </select>
+                <label className="mb-1 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Pay From Account</label>
+                <Select value={selectedAccountId} onValueChange={setSelectedAccountId}>
+                  <SelectTrigger className="w-full h-10 py-5!">
+                    <SelectValue placeholder="-- Choose Account --" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {accounts.map((a: any) => (
+                      <SelectItem key={a._id} value={a._id}>
+                        {a.name} ({formatCurrency(a.current_balance)})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <button

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -10,12 +10,22 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../../redux/store";
 import { useRegisterMutation } from "../../../services/authApi";
 import { toast } from "sonner";
-import { User, Mail, Lock, Phone, ArrowRight, Loader2, TrendingUp } from "lucide-react";
+import { User, Mail, Lock, Phone, ArrowRight, Loader2, TrendingUp, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Controller } from "react-hook-form";
+import PhonesInput from "../../../components/custom/phone-input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../../components/ui/select";
+import { bangladeshCities, cityAreas } from "../../../lib/locationData";
 
 const registerSchema = z.object({
   user_name: z.string().min(2, "Name must be at least 2 characters"),
@@ -23,7 +33,8 @@ const registerSchema = z.object({
   user_password: z.string().min(8, "Password must be at least 8 characters"),
   user_phone: z.string().optional(),
   user_city: z.string().optional(),
-  user_country: z.string().optional(),
+  user_area: z.string().optional(),
+  user_country: z.string().default("Bangladesh"),
 });
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
@@ -32,6 +43,7 @@ export default function RegisterPage() {
   const router = useRouter();
   const { isAuthenticated, isLoading: authLoading } = useSelector((state: RootState) => state.auth);
   const [registerApi, { isLoading }] = useRegisterMutation();
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     if (!authLoading && isAuthenticated) {
@@ -42,6 +54,7 @@ export default function RegisterPage() {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
@@ -49,7 +62,8 @@ export default function RegisterPage() {
 
   const onSubmit = async (data: RegisterFormValues) => {
     try {
-      const response: any = await registerApi(data).unwrap();
+      const payload = { ...data, user_country: "Bangladesh" };
+      const response: any = await registerApi(payload).unwrap();
       if (response.success) {
         toast.success("Account created! Enter the OTP sent to your email.");
         router.push(`/verify-otp?email=${encodeURIComponent(data.user_email)}`);
@@ -134,10 +148,21 @@ export default function RegisterPage() {
                   <Input
                     id="password"
                     {...register("user_password")}
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     placeholder="Min. 8 characters"
-                    className="pl-9 h-9 text-sm bg-secondary/40 border-border/60"
+                    className="pl-9 pr-9 h-9 text-sm bg-secondary/40 border-border/60"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-4 h-4" />
+                    ) : (
+                      <Eye className="w-4 h-4" />
+                    )}
+                  </button>
                 </div>
                 {errors.user_password && (
                   <p className="text-[11px] text-destructive">{errors.user_password.message}</p>
@@ -151,13 +176,79 @@ export default function RegisterPage() {
                   <span className="text-muted-foreground font-normal">(optional)</span>
                 </Label>
                 <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-                  <Input
-                    id="phone"
-                    {...register("user_phone")}
-                    type="text"
-                    placeholder="+8801700000000"
-                    className="pl-9 h-9 text-sm bg-secondary/40 border-border/60"
+                  <Controller
+                    name="user_phone"
+                    control={control}
+                    render={({ field }) => (
+                      <PhonesInput
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
+                    )}
+                  />
+                </div>
+              </div>
+
+              {/* City & Area */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-medium text-foreground">City (Bangladesh)</Label>
+                  <Controller
+                    name="user_city"
+                    control={control}
+                    render={({ field }) => (
+                      <Select
+                        onValueChange={(value) => {
+                          field.onChange(value);
+                        }}
+                        value={field.value || ""}
+                      >
+                        <SelectTrigger className="h-9 text-sm bg-secondary/40 border-border/60">
+                          <SelectValue placeholder="Select City" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {bangladeshCities.map((city) => (
+                            <SelectItem key={city} value={city}>
+                              {city}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                </div>
+                
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-medium text-foreground">Area</Label>
+                  <Controller
+                    name="user_area"
+                    control={control}
+                    render={({ field }) => {
+                      // Using getValues from form is better, but since we are not passing it, 
+                      // we can rely on react-hook-form 'watch' if we want it strictly dynamic.
+                      // Alternatively, we just use control._formValues.user_city
+                      const selectedCity = control._formValues.user_city;
+                      const availableAreas = selectedCity && cityAreas[selectedCity] ? cityAreas[selectedCity] : [];
+                      
+                      return (
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value || ""}
+                          disabled={!selectedCity}
+                        >
+                          <SelectTrigger className="h-9 text-sm bg-secondary/40 border-border/60">
+                            <SelectValue placeholder={selectedCity ? "Select Area" : "Select City first"} />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {availableAreas.map((area) => (
+                              <SelectItem key={area} value={area}>
+                                {area}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      );
+                    }}
                   />
                 </div>
               </div>

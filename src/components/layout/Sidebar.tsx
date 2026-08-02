@@ -22,6 +22,7 @@ import {
   ChevronLeft,
   ChevronRight,
   ArrowRightLeft,
+  ShieldAlert,
 } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { Button } from "@/components/ui/button";
@@ -57,6 +58,7 @@ export function Sidebar() {
   const pathname = usePathname();
   const dispatch = useDispatch();
   const { sidebarCollapsed } = useSelector((state: RootState) => state.layout);
+  const { user } = useSelector((state: RootState) => state.auth);
 
   const NavItem = ({
     item,
@@ -155,6 +157,14 @@ export function Sidebar() {
           {navigationItems.map((item) => (
             <NavItem key={item.name} item={item} />
           ))}
+          {user?.user_role === "ADMIN" && (
+            <>
+              <div className="my-2 px-3 text-[10px] font-bold uppercase text-muted-foreground tracking-wider">
+                {!sidebarCollapsed && "Administration"}
+              </div>
+              <NavItem item={{ name: "Admin Panel", href: "/admin", icon: ShieldAlert }} />
+            </>
+          )}
         </div>
 
         {/* Bottom Nav */}

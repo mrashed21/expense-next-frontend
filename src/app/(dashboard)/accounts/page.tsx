@@ -8,18 +8,18 @@ import {
   Wallet,
   Plus,
   ArrowRightLeft,
-  DollarSign,
-  CreditCard,
-  Building2,
-  Smartphone,
   Trash2,
+  Pencil,
   Loader2,
   X,
+  CheckCircle2,
 } from "lucide-react";
-import { useGetAccountsQuery, useCreateAccountMutation, useDeleteAccountMutation } from "../../../services/accountApi";
+import { useGetAccountsQuery, useCreateAccountMutation, useUpdateAccountMutation, useDeleteAccountMutation } from "../../../services/accountApi";
 import { useGetTransfersQuery, useCreateTransferMutation } from "../../../services/transferApi";
-import { formatCurrency, formatDate } from "../../../lib/utils";
+import { formatDate } from "../../../lib/utils";
+import { useCurrency } from "../../../hooks/useCurrency";
 import { toast } from "sonner";
+import FormSelect from "../../../components/custom/form-select";
 
 const accountTypes = [
   "Cash", "Wallet", "Bank", "Bkash", "Nagad", "Rocket", "Upay",
@@ -46,14 +46,17 @@ type AccountFormValues = z.infer<typeof accountSchema>;
 type TransferFormValues = z.infer<typeof transferSchema>;
 
 export default function AccountsPage() {
+  const { formatCurrency } = useCurrency();
   const { data: accountsData, isLoading: accountsLoading } = useGetAccountsQuery({});
   const { data: transfersData } = useGetTransfersQuery({});
   const [createAccountApi, { isLoading: isCreatingAccount }] = useCreateAccountMutation();
+  const [updateAccountApi, { isLoading: isUpdatingAccount }] = useUpdateAccountMutation();
   const [deleteAccountApi] = useDeleteAccountMutation();
   const [createTransferApi, { isLoading: isCreatingTransfer }] = useCreateTransferMutation();
 
   const [isAddAccountOpen, setIsAddAccountOpen] = useState(false);
   const [isTransferOpen, setIsTransferOpen] = useState(false);
+  const [editAccount, setEditAccount] = useState<any>(null);
 
   const accounts = accountsData?.data || [];
   const transfers = transfersData?.data || [];
@@ -62,20 +65,35 @@ export default function AccountsPage() {
     register: registerAccount,
     handleSubmit: handleSubmitAccount,
     reset: resetAccount,
+    control: controlAccount,
+    clearErrors: clearErrorsAccount,
     formState: { errors: accountErrors },
   } = useForm<AccountFormValues>({
     resolver: zodResolver(accountSchema),
-    defaultValues: { opening_balance: 0, color: "#4F46E5" },
+    defaultValues: { opening_balance: "" as any, color: "#4F46E5" },
+  });
+
+  const {
+    register: registerEdit,
+    handleSubmit: handleSubmitEdit,
+    reset: resetEdit,
+    control: controlEdit,
+    clearErrors: clearErrorsEdit,
+    formState: { errors: editErrors },
+  } = useForm<AccountFormValues>({
+    resolver: zodResolver(accountSchema),
   });
 
   const {
     register: registerTransfer,
     handleSubmit: handleSubmitTransfer,
     reset: resetTransfer,
+    control: controlTransfer,
+    clearErrors: clearErrorsTransfer,
     formState: { errors: transferErrors },
   } = useForm<TransferFormValues>({
     resolver: zodResolver(transferSchema),
-    defaultValues: { fee: 0 },
+    defaultValues: { fee: "" as any },
   });
 
   const onAddAccountSubmit = async (data: AccountFormValues) => {
@@ -86,6 +104,28 @@ export default function AccountsPage() {
       resetAccount();
     } catch (err: any) {
       toast.error(err?.data?.message || "Failed to create account");
+    }
+  };
+
+  const openEditAccount = (acc: any) => {
+    setEditAccount(acc);
+    resetEdit({
+      name: acc.name,
+      type: acc.type,
+      opening_balance: acc.opening_balance,
+      color: acc.color || "#4F46E5",
+      description: acc.description || "",
+    });
+  };
+
+  const onEditAccountSubmit = async (data: AccountFormValues) => {
+    if (!editAccount) return;
+    try {
+      await updateAccountApi({ id: editAccount._id, ...data }).unwrap();
+      toast.success("Account updated successfully!");
+      setEditAccount(null);
+    } catch (err: any) {
+      toast.error(err?.data?.message || "Failed to update account");
     }
   };
 
@@ -109,6 +149,8 @@ export default function AccountsPage() {
       toast.error(err?.data?.message || "Failed to delete account.");
     }
   };
+
+  const totalBalance = accounts.reduce((sum: number, acc: any) => sum + (acc.current_balance || 0), 0);
 
   return (
     <div className="space-y-6">
@@ -137,47 +179,79 @@ export default function AccountsPage() {
         </div>
       </div>
 
+      {/* Total Balance Summary */}
+      {accounts.length > 0 && (
+        <div className="p-5 rounded-2xl bg-gradient-to-r from-primary/10 to-indigo-500/10 border border-primary/20">
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Total Net Balance Across All Accounts</p>
+          <p className="text-3xl font-black text-foreground mt-1">{formatCurrency(totalBalance)}</p>
+          <p className="text-[11px] text-muted-foreground mt-1">{accounts.length} active account{accounts.length !== 1 ? "s" : ""}</p>
+        </div>
+      )}
+
       {/* Accounts Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {accounts.map((acc: any) => (
-          <div
-            key={acc._id}
-            className="glass-card p-5 rounded-3xl space-y-3 relative group overflow-hidden border border-border hover:border-primary/50 transition-all"
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div
-                  className="w-12 h-12 rounded-2xl flex items-center justify-center text-white font-bold text-lg shadow-md"
-                  style={{ backgroundColor: acc.color || "#4F46E5" }}
-                >
-                  {acc.name.charAt(0)}
-                </div>
-                <div>
-                  <h3 className="text-sm font-bold text-foreground">{acc.name}</h3>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-secondary border border-border font-semibold uppercase text-muted-foreground">
-                    {acc.type}
-                  </span>
-                </div>
-              </div>
-
-              <button
-                onClick={() => handleDeleteAccount(acc._id)}
-                className="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors opacity-0 group-hover:opacity-100"
-                title="Archive Account"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
-            </div>
-
-            <div className="pt-2 border-t border-border flex items-end justify-between">
-              <div>
-                <span className="text-[10px] font-semibold text-muted-foreground uppercase">Current Balance</span>
-                <p className="text-xl font-black text-foreground">{formatCurrency(acc.current_balance)}</p>
-              </div>
-              <span className="text-[11px] text-muted-foreground font-medium">Opening: {formatCurrency(acc.opening_balance)}</span>
-            </div>
+        {accountsLoading ? (
+          <div className="col-span-3 flex items-center justify-center py-12">
+            <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
           </div>
-        ))}
+        ) : accounts.length === 0 ? (
+          <div className="col-span-3 text-center py-12 text-xs text-muted-foreground">
+            No accounts created yet. Click "Add Account" to get started.
+          </div>
+        ) : (
+          accounts.map((acc: any) => (
+            <div
+              key={acc._id}
+              className="glass-card p-5 rounded-3xl space-y-3 relative group overflow-hidden border border-border hover:border-primary/50 transition-all"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div
+                    className="w-12 h-12 rounded-2xl flex items-center justify-center text-white font-bold text-lg shadow-md"
+                    style={{ backgroundColor: acc.color || "#4F46E5" }}
+                  >
+                    {acc.name.charAt(0)}
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-foreground">{acc.name}</h3>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-secondary border border-border font-semibold uppercase text-muted-foreground">
+                      {acc.type}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button
+                    onClick={() => openEditAccount(acc)}
+                    className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                    title="Edit Account"
+                  >
+                    <Pencil className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => handleDeleteAccount(acc._id)}
+                    className="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+                    title="Archive Account"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="pt-2 border-t border-border flex items-end justify-between">
+                <div>
+                  <span className="text-[10px] font-semibold text-muted-foreground uppercase">Current Balance</span>
+                  <p className="text-xl font-black text-foreground">{formatCurrency(acc.current_balance)}</p>
+                </div>
+                <span className="text-[11px] text-muted-foreground font-medium">Opening: {formatCurrency(acc.opening_balance)}</span>
+              </div>
+
+              {acc.description && (
+                <p className="text-[10px] text-muted-foreground border-t border-border pt-2">{acc.description}</p>
+              )}
+            </div>
+          ))
+        )}
       </div>
 
       {/* Money Transfer History Log */}
@@ -229,26 +303,46 @@ export default function AccountsPage() {
                   placeholder="e.g. Main Bank Account, Bkash Personal"
                   className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                 />
+                {accountErrors.name && <p className="text-[10px] text-destructive">{accountErrors.name.message}</p>}
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">Account Type</label>
-                <select
-                  {...registerAccount("type")}
-                  className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
-                >
-                  {accountTypes.map((t) => (
-                    <option key={t} value={t}>{t}</option>
-                  ))}
-                </select>
+                <FormSelect
+                  label="Account Type"
+                  name="type"
+                  control={controlAccount}
+                  options={accountTypes.map((t) => ({ label: t, value: t }))}
+                  searchable={true}
+                  clearErrors={clearErrorsAccount}
+                  error={accountErrors.type}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-foreground">Opening Balance</label>
+                  <input
+                    {...registerAccount("opening_balance", { valueAsNumber: true })}
+                    type="number"
+                    step="0.01"
+                    className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-foreground">Color</label>
+                  <input
+                    {...registerAccount("color")}
+                    type="color"
+                    className="w-full h-9 px-1 py-1 rounded-xl bg-secondary border border-border cursor-pointer"
+                  />
+                </div>
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">Opening Balance</label>
+                <label className="text-xs font-semibold text-foreground">Description (Optional)</label>
                 <input
-                  {...registerAccount("opening_balance", { valueAsNumber: true })}
-                  type="number"
-                  step="0.01"
+                  {...registerAccount("description")}
+                  placeholder="e.g. Primary checking account"
                   className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                 />
               </div>
@@ -259,6 +353,79 @@ export default function AccountsPage() {
                 className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-xs shadow-md shadow-primary/20 hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
               >
                 {isCreatingAccount ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save Account"}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Account Modal */}
+      {editAccount && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="w-full max-w-md bg-card border border-border p-6 rounded-3xl space-y-4 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-border pb-3">
+              <h3 className="text-base font-bold text-foreground">Edit Account</h3>
+              <button onClick={() => setEditAccount(null)} className="text-muted-foreground hover:text-foreground">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmitEdit(onEditAccountSubmit)} className="space-y-3">
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-foreground">Account Name</label>
+                <input
+                  {...registerEdit("name")}
+                  className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
+                />
+                {editErrors.name && <p className="text-[10px] text-destructive">{editErrors.name.message}</p>}
+              </div>
+
+              <div className="space-y-1">
+                <FormSelect
+                  label="Account Type"
+                  name="type"
+                  control={controlEdit}
+                  options={accountTypes.map((t) => ({ label: t, value: t }))}
+                  searchable={true}
+                  clearErrors={clearErrorsEdit}
+                  error={editErrors.type}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-foreground">Opening Balance</label>
+                  <input
+                    {...registerEdit("opening_balance", { valueAsNumber: true })}
+                    type="number"
+                    step="0.01"
+                    className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-foreground">Color</label>
+                  <input
+                    {...registerEdit("color")}
+                    type="color"
+                    className="w-full h-9 px-1 py-1 rounded-xl bg-secondary border border-border cursor-pointer"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-foreground">Description (Optional)</label>
+                <input
+                  {...registerEdit("description")}
+                  className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={isUpdatingAccount}
+                className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-xs shadow-md shadow-primary/20 hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
+              >
+                {isUpdatingAccount ? <Loader2 className="w-4 h-4 animate-spin" /> : "Update Account"}
               </button>
             </form>
           </div>
@@ -278,33 +445,33 @@ export default function AccountsPage() {
 
             <form onSubmit={handleSubmitTransfer(onTransferSubmit)} className="space-y-3">
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">From Account (Source)</label>
-                <select
-                  {...registerTransfer("from_account_id")}
-                  className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
-                >
-                  <option value="">-- Select Source Account --</option>
-                  {accounts.map((acc: any) => (
-                    <option key={acc._id} value={acc._id}>
-                      {acc.name} ({formatCurrency(acc.current_balance)})
-                    </option>
-                  ))}
-                </select>
+                <FormSelect
+                  label="From Account (Source)"
+                  name="from_account_id"
+                  control={controlTransfer}
+                  options={accounts.map((acc: any) => ({
+                    label: `${acc.name} (${formatCurrency(acc.current_balance)})`,
+                    value: acc._id
+                  }))}
+                  searchable={true}
+                  clearErrors={clearErrorsTransfer}
+                  error={transferErrors.from_account_id}
+                />
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">To Account (Destination)</label>
-                <select
-                  {...registerTransfer("to_account_id")}
-                  className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
-                >
-                  <option value="">-- Select Destination Account --</option>
-                  {accounts.map((acc: any) => (
-                    <option key={acc._id} value={acc._id}>
-                      {acc.name} ({formatCurrency(acc.current_balance)})
-                    </option>
-                  ))}
-                </select>
+                <FormSelect
+                  label="To Account (Destination)"
+                  name="to_account_id"
+                  control={controlTransfer}
+                  options={accounts.map((acc: any) => ({
+                    label: `${acc.name} (${formatCurrency(acc.current_balance)})`,
+                    value: acc._id
+                  }))}
+                  searchable={true}
+                  clearErrors={clearErrorsTransfer}
+                  error={transferErrors.to_account_id}
+                />
               </div>
 
               <div className="grid grid-cols-2 gap-3">

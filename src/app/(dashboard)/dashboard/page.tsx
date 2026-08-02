@@ -1,39 +1,61 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo } from "react";
 import Link from "next/link";
 import {
   Wallet,
   TrendingUp,
   TrendingDown,
   ArrowRightLeft,
-  DollarSign,
   Plus,
   ArrowUpRight,
   ArrowDownRight,
   Clock,
-  PiggyBank,
   ChevronRight,
+  Loader2,
 } from "lucide-react";
 import { useGetAccountsQuery } from "../../../services/accountApi";
 import { useGetTransactionsQuery } from "../../../services/transactionApi";
-import { formatCurrency, formatDate } from "../../../lib/utils";
+import { formatDate } from "../../../lib/utils";
+import { useCurrency } from "../../../hooks/useCurrency";
 
 export default function DashboardPage() {
-  const { data: accountsData } = useGetAccountsQuery({});
-  const { data: transactionsData } = useGetTransactionsQuery({ limit: 5 });
+  const { formatCurrency } = useCurrency();
+  const { data: accountsData, isLoading: accountsLoading } = useGetAccountsQuery({});
+  const { data: recentTxData } = useGetTransactionsQuery({ limit: 5 });
+  const { data: monthlyTxData } = useGetTransactionsQuery({ dateRange: "thisMonth", limit: 1000 });
+  const { data: todayTxData } = useGetTransactionsQuery({ dateRange: "today", limit: 1000 });
 
   const accounts = accountsData?.data || [];
-  const recentTransactions = transactionsData?.data || [];
+  const recentTransactions = recentTxData?.data || [];
+  const monthlyTransactions = monthlyTxData?.data || [];
+  const todayTransactions = todayTxData?.data || [];
 
-  // Calculate Net Worth & Current Total Balance
+  // Compute real stats from API data
   const netWorth = accounts.reduce((sum: number, acc: any) => sum + (acc.current_balance || 0), 0);
 
-  // Quick stats placeholders
-  const todayExpense = 45.50;
-  const yesterdayExpense = 120.00;
-  const monthlyExpense = 1450.00;
-  const monthlyIncome = 3800.00;
+  const monthlyIncome = useMemo(() =>
+    monthlyTransactions
+      .filter((tx: any) => tx.type === "income" || tx.type === "refund")
+      .reduce((sum: number, tx: any) => sum + (tx.amount || 0), 0),
+    [monthlyTransactions]
+  );
+
+  const monthlyExpense = useMemo(() =>
+    monthlyTransactions
+      .filter((tx: any) => tx.type === "expense")
+      .reduce((sum: number, tx: any) => sum + (tx.amount || 0), 0),
+    [monthlyTransactions]
+  );
+
+  const todayExpense = useMemo(() =>
+    todayTransactions
+      .filter((tx: any) => tx.type === "expense")
+      .reduce((sum: number, tx: any) => sum + (tx.amount || 0), 0),
+    [todayTransactions]
+  );
+
+  const expenseRatio = monthlyIncome > 0 ? Math.round((monthlyExpense / monthlyIncome) * 100) : 0;
 
   return (
     <div className="space-y-6">
@@ -67,10 +89,16 @@ export default function DashboardPage() {
               <Wallet className="w-5 h-5" />
             </div>
           </div>
-          <p className="text-2xl font-black text-foreground">{formatCurrency(netWorth)}</p>
-          <span className="text-[11px] font-medium text-emerald-500 flex items-center gap-1">
-            <ArrowUpRight className="w-3.5 h-3.5" /> +4.2% from last month
-          </span>
+          {accountsLoading ? (
+            <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+          ) : (
+            <>
+              <p className="text-2xl font-black text-foreground">{formatCurrency(netWorth)}</p>
+              <span className="text-[11px] font-medium text-muted-foreground">
+                Across {accounts.length} account{accounts.length !== 1 ? "s" : ""}
+              </span>
+            </>
+          )}
         </div>
 
         {/* Monthly Income */}
@@ -83,7 +111,8 @@ export default function DashboardPage() {
           </div>
           <p className="text-2xl font-black text-foreground">{formatCurrency(monthlyIncome)}</p>
           <span className="text-[11px] font-medium text-emerald-500 flex items-center gap-1">
-            <ArrowUpRight className="w-3.5 h-3.5" /> Healthy cash inflow
+            <ArrowUpRight className="w-3.5 h-3.5" />
+            {monthlyTransactions.filter((tx: any) => tx.type === "income").length} income transactions
           </span>
         </div>
 
@@ -97,7 +126,8 @@ export default function DashboardPage() {
           </div>
           <p className="text-2xl font-black text-foreground">{formatCurrency(monthlyExpense)}</p>
           <span className="text-[11px] font-medium text-rose-500 flex items-center gap-1">
-            <ArrowDownRight className="w-3.5 h-3.5" /> 38% of monthly income
+            <ArrowDownRight className="w-3.5 h-3.5" />
+            {expenseRatio}% of monthly income
           </span>
         </div>
 
@@ -111,7 +141,7 @@ export default function DashboardPage() {
           </div>
           <p className="text-2xl font-black text-foreground">{formatCurrency(todayExpense)}</p>
           <span className="text-[11px] font-medium text-muted-foreground">
-            Yesterday: {formatCurrency(yesterdayExpense)}
+            {todayTransactions.length} transactions today
           </span>
         </div>
       </div>
@@ -143,10 +173,12 @@ export default function DashboardPage() {
                       className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm ${
                         tx.type === "income"
                           ? "bg-emerald-500/10 text-emerald-500"
+                          : tx.type === "refund"
+                          ? "bg-blue-500/10 text-blue-500"
                           : "bg-rose-500/10 text-rose-500"
                       }`}
                     >
-                      {tx.type === "income" ? "+" : "-"}
+                      {tx.type === "income" || tx.type === "refund" ? "+" : "-"}
                     </div>
                     <div>
                       <p className="text-xs font-bold text-foreground">{tx.notes || tx.category_id?.name || "Transaction"}</p>
@@ -155,15 +187,15 @@ export default function DashboardPage() {
                   </div>
                   <span
                     className={`text-xs font-extrabold ${
-                      tx.type === "income" ? "text-emerald-500" : "text-rose-500"
+                      tx.type === "income" || tx.type === "refund" ? "text-emerald-500" : "text-rose-500"
                     }`}
                   >
-                    {tx.type === "income" ? "+" : "-"}{formatCurrency(tx.amount)}
+                    {tx.type === "income" || tx.type === "refund" ? "+" : "-"}{formatCurrency(tx.amount)}
                   </span>
                 </div>
               ))
             ) : (
-              <div className="text-center py-8 text-xs text-muted-foreground">
+               <div className="text-center py-8 text-xs text-muted-foreground">
                 No recent transactions recorded yet. Click "Add Transaction" to start!
               </div>
             )}
@@ -211,7 +243,34 @@ export default function DashboardPage() {
               </div>
             )}
           </div>
+
+          {accounts.length > 0 && (
+            <div className="pt-2 border-t border-border">
+              <div className="flex items-center justify-between text-xs font-semibold">
+                <span className="text-muted-foreground">Total Balance</span>
+                <span className="text-foreground font-bold">{formatCurrency(netWorth)}</span>
+              </div>
+            </div>
+          )}
         </div>
+      </div>
+
+      {/* Quick Action Links */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {[
+          { label: "Manage Budgets", href: "/budgets", color: "bg-amber-500/10 text-amber-500 border-amber-500/20" },
+          { label: "View Goals", href: "/goals", color: "bg-indigo-500/10 text-indigo-500 border-indigo-500/20" },
+          { label: "Pay Bills", href: "/bills", color: "bg-rose-500/10 text-rose-500 border-rose-500/20" },
+          { label: "Analytics", href: "/analytics", color: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20" },
+        ].map((item) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className={`p-3 rounded-2xl border text-center text-xs font-bold transition-colors hover:opacity-80 ${item.color}`}
+          >
+            {item.label}
+          </Link>
+        ))}
       </div>
     </div>
   );

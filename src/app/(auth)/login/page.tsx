@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, Suspense } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -11,7 +11,7 @@ import { RootState } from "../../../redux/store";
 import { setCredentials } from "../../../redux/slices/authSlice";
 import { useLoginMutation } from "../../../services/authApi";
 import { toast } from "sonner";
-import { Lock, Mail, ArrowRight, Loader2, TrendingUp } from "lucide-react";
+import { Lock, Mail, ArrowRight, Loader2, TrendingUp, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -31,6 +31,7 @@ function LoginContent() {
   const dispatch = useDispatch();
   const { isAuthenticated, isLoading: authLoading } = useSelector((state: RootState) => state.auth);
   const [loginApi, { isLoading }] = useLoginMutation();
+  const [showPassword, setShowPassword] = useState(false);
 
   const redirectUrl = searchParams.get("redirect") || "/dashboard";
 
@@ -129,10 +130,21 @@ function LoginContent() {
                   <Input
                     id="password"
                     {...register("user_password")}
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
-                    className="pl-9 h-9 text-sm bg-secondary/40 border-border/60"
+                    className="pl-9 pr-9 h-9 text-sm bg-secondary/40 border-border/60"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-4 h-4" />
+                    ) : (
+                      <Eye className="w-4 h-4" />
+                    )}
+                  </button>
                 </div>
                 {errors.user_password && (
                   <p className="text-[11px] text-destructive">{errors.user_password.message}</p>

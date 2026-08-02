@@ -5,11 +5,15 @@ import { useRouter, usePathname } from "next/navigation";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import { Loader2 } from "lucide-react";
+import { useSocket } from "../../hooks/useSocket";
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const { isAuthenticated, isLoading } = useSelector((state: RootState) => state.auth);
+  
+  // Initialize Socket.io connection for authenticated users
+  useSocket();
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {

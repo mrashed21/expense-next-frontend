@@ -1,13 +1,13 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useResetPasswordMutation } from "../../../services/authApi";
 import { toast } from "sonner";
-import { Lock, KeyRound, CheckCircle, Loader2 } from "lucide-react";
+import { Lock, KeyRound, CheckCircle, Loader2, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,6 +25,7 @@ function ResetPasswordContent() {
   const router = useRouter();
   const email = searchParams.get("email") || "";
   const [resetPasswordApi, { isLoading }] = useResetPasswordMutation();
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -108,10 +109,21 @@ function ResetPasswordContent() {
                   <Input
                     id="new-password"
                     {...register("new_password")}
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     placeholder="Min. 8 characters"
-                    className="pl-9 h-9 text-sm bg-secondary/40 border-border/60"
+                    className="pl-9 pr-9 h-9 text-sm bg-secondary/40 border-border/60"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-4 h-4" />
+                    ) : (
+                      <Eye className="w-4 h-4" />
+                    )}
+                  </button>
                 </div>
                 {errors.new_password && (
                   <p className="text-[11px] text-destructive">{errors.new_password.message}</p>

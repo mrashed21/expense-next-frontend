@@ -8,12 +8,12 @@ export function cn(...inputs: ClassValue[]) {
 /**
  * Format a number as currency.
  * @param amount - The numeric amount to format.
- * @param currency - ISO 4217 currency code (default: "USD").
+ * @param currency - ISO 4217 currency code (default: "BDT").
  * @param locale - BCP 47 locale string (default: "en-US").
  */
 export function formatCurrency(
   amount: number,
-  currency = "USD",
+  currency = "BDT",
   locale = "en-US"
 ): string {
   return new Intl.NumberFormat(locale, {

@@ -6,8 +6,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Target, Plus, PiggyBank, Trash2, X, Loader2, DollarSign } from "lucide-react";
 import { useGetGoalsQuery, useCreateGoalMutation, useDepositToGoalMutation, useDeleteGoalMutation } from "../../../services/goalApi";
-import { formatCurrency, formatDate } from "../../../lib/utils";
+import { formatDate } from "../../../lib/utils";
+import { useCurrency } from "../../../hooks/useCurrency";
 import { toast } from "sonner";
+import FormSelect from "../../../components/custom/form-select";
 
 const goalCategories = [
   "Savings Goal", "Emergency Fund", "Vacation", "Car", "House", "Laptop", "Custom Goal"
@@ -23,6 +25,7 @@ const goalSchema = z.object({
 type GoalFormValues = z.infer<typeof goalSchema>;
 
 export default function GoalsPage() {
+  const { formatCurrency } = useCurrency();
   const { data: goalsData } = useGetGoalsQuery({});
   const [createGoalApi, { isLoading: isCreating }] = useCreateGoalMutation();
   const [depositApi, { isLoading: isDepositing }] = useDepositToGoalMutation();
@@ -38,6 +41,8 @@ export default function GoalsPage() {
     register,
     handleSubmit,
     reset,
+    control,
+    clearErrors,
     formState: { errors },
   } = useForm<GoalFormValues>({
     resolver: zodResolver(goalSchema),
@@ -167,15 +172,15 @@ export default function GoalsPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">Category</label>
-                <select
-                  {...register("category")}
-                  className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
-                >
-                  {goalCategories.map((c) => (
-                    <option key={c} value={c}>{c}</option>
-                  ))}
-                </select>
+                <FormSelect
+                  label="Category"
+                  name="category"
+                  control={control}
+                  options={goalCategories.map((c) => ({ label: c, value: c }))}
+                  searchable={true}
+                  clearErrors={clearErrors}
+                  error={errors.category}
+                />
               </div>
 
               <div className="space-y-1">
