@@ -18,6 +18,8 @@ import {
   FileCheck,
   FileText,
   Grid,
+  HandCoins,
+  Home,
   LayoutDashboard,
   PiggyBank,
   Receipt,
@@ -46,6 +48,9 @@ const navigationItems = [
   { name: "Bills", href: "/bills", icon: FileCheck },
   { name: "Analytics", href: "/analytics", icon: BarChart3 },
   { name: "Reports", href: "/reports", icon: FileText },
+  { name: "Debts", href: "/debts", icon: HandCoins },
+  { name: "Investments", href: "/investments", icon: TrendingUp },
+  { name: "Assets", href: "/assets", icon: Home },
   { name: "Calendar", href: "/calendar", icon: Calendar },
   { name: "Notifications", href: "/notifications", icon: Bell },
 ];
