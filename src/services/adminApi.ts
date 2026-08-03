@@ -55,6 +55,43 @@ export const adminApi = apiSlice.injectEndpoints({
       }),
       providesTags: ["AdminActivity"] as any,
     }),
+    getDashboardStats: builder.query({
+      query: () => ({
+        url: "/admin/dashboard-stats",
+        method: "GET",
+      }),
+      providesTags: ["AdminDashboard"] as any,
+    }),
+    getUserGrowth: builder.query({
+      query: () => ({
+        url: "/admin/user-growth",
+        method: "GET",
+      }),
+      providesTags: ["AdminDashboard"] as any,
+    }),
+    getErrorLogs: builder.query({
+      query: (params) => ({
+        url: "/admin/error-logs",
+        method: "GET",
+        params,
+      }),
+      providesTags: ["AdminLogs"] as any,
+    }),
+    getAuditLogs: builder.query({
+      query: (params) => ({
+        url: "/admin/audit-logs",
+        method: "GET",
+        params,
+      }),
+      providesTags: ["AdminLogs"] as any,
+    }),
+    broadcastNotification: builder.mutation({
+      query: (data) => ({
+        url: "/admin/broadcast",
+        method: "POST",
+        body: data,
+      }),
+    }),
   }),
 });
 
@@ -66,4 +103,9 @@ export const {
   useUpdateAdminStatusMutation,
   useGetSystemHealthQuery,
   useGetActivityQuery,
+  useGetDashboardStatsQuery,
+  useGetUserGrowthQuery,
+  useGetErrorLogsQuery,
+  useGetAuditLogsQuery,
+  useBroadcastNotificationMutation,
 } = adminApi;

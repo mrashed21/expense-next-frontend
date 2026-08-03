@@ -29,6 +29,8 @@ import {
   User,
   Users,
   Wallet,
+  Megaphone,
+  ScrollText,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -60,6 +62,11 @@ const adminItems = [
   { name: "User Management", href: "/admin/users", icon: Users },
   { name: "Activity", href: "/admin/activity", icon: Activity },
   { name: "System Health", href: "/admin/system-health", icon: ShieldAlert },
+];
+
+const superAdminItems = [
+  { name: "Logs", href: "/admin/logs", icon: ScrollText },
+  { name: "Broadcast", href: "/admin/broadcast", icon: Megaphone },
 ];
 
 const bottomItems = [
@@ -185,6 +192,10 @@ export function Sidebar() {
               {adminItems.map((item) => (
                 <NavItem key={item.name} item={item} />
               ))}
+              {user?.user_role === "super_admin" &&
+                superAdminItems.map((item) => (
+                  <NavItem key={item.name} item={item} />
+                ))}
             </>
           ) : (
             <>

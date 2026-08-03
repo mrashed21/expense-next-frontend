@@ -6,7 +6,17 @@ import {
   useGetActivityQuery,
   useGetSystemHealthQuery,
   useGetUsersQuery,
+  useGetDashboardStatsQuery,
+  useGetUserGrowthQuery,
 } from "@/services/adminApi";
+import {
+  Area,
+  AreaChart,
+  ResponsiveContainer,
+  Tooltip as RechartsTooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import {
   Activity,
   Cpu,
@@ -14,6 +24,8 @@ import {
   Loader2,
   ShieldAlert,
   Users,
+  CreditCard,
+  UserCheck,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -35,6 +47,8 @@ export default function AdminDashboardPage() {
     useGetSystemHealthQuery({});
   const { data: activityData, isLoading: activityLoading } =
     useGetActivityQuery({});
+  const { data: statsData, isLoading: statsLoading } = useGetDashboardStatsQuery({});
+  const { data: growthData, isLoading: growthLoading } = useGetUserGrowthQuery({});
 
   if (!user || !user.isAdmin) {
     return (
@@ -48,7 +62,7 @@ export default function AdminDashboardPage() {
     );
   }
 
-  const usersCount = usersData?.data?.length || 0;
+  const stats = statsData?.data || { totalUsers: 0, totalAdmins: 0, totalTransactions: 0, activeUsers: 0 };
   const activitiesCount = activityData?.data?.length || 0;
 
   // Format uptime
@@ -79,10 +93,10 @@ export default function AdminDashboardPage() {
             </div>
           </div>
           <div>
-            {usersLoading ? (
+            {statsLoading ? (
               <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
-              <p className="text-2xl font-bold">{usersCount}</p>
+              <p className="text-2xl font-bold">{stats.totalUsers}</p>
             )}
           </div>
           <Link href="/admin/users" className="absolute inset-0" />
@@ -98,10 +112,10 @@ export default function AdminDashboardPage() {
             </div>
           </div>
           <div>
-            {activityLoading ? (
+            {statsLoading ? (
               <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
-              <p className="text-2xl font-bold">{activitiesCount}</p>
+              <p className="text-2xl font-bold">{stats.totalTransactions}</p>
             )}
           </div>
           <Link href="/admin/activity" className="absolute inset-0" />
@@ -131,33 +145,70 @@ export default function AdminDashboardPage() {
         <Card className="p-5 flex flex-col gap-2 relative overflow-hidden group">
           <div className="flex justify-between items-start">
             <p className="text-sm font-medium text-muted-foreground">
-              Memory Usage
+              Active Users (30d)
             </p>
             <div className="w-8 h-8 rounded-lg bg-rose-500/10 flex items-center justify-center">
-              <Database className="w-4 h-4 text-rose-500" />
+              <UserCheck className="w-4 h-4 text-rose-500" />
             </div>
           </div>
           <div>
-            {healthLoading ? (
+            {statsLoading ? (
               <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
-              <p className="text-2xl font-bold">
-                {healthData?.data?.totalMemory
-                  ? (
-                      (healthData.data.totalMemory -
-                        healthData.data.freeMemory) /
-                      1024 /
-                      1024 /
-                      1024
-                    ).toFixed(2)
-                  : "0.00"}{" "}
-                GB
-              </p>
+              <p className="text-2xl font-bold">{stats.activeUsers}</p>
             )}
           </div>
           <Link href="/admin/system-health" className="absolute inset-0" />
         </Card>
       </div>
+
+      <Card className="p-6">
+        <h3 className="font-bold text-lg mb-6">User Growth (Last 30 Days)</h3>
+        {growthLoading ? (
+          <div className="h-64 flex items-center justify-center">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          </div>
+        ) : (
+          <div className="h-64 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={growthData?.data || []}>
+                <defs>
+                  <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <XAxis 
+                  dataKey="date" 
+                  tickFormatter={(val) => new Date(val).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                  stroke="hsl(var(--muted-foreground))" 
+                  fontSize={12} 
+                  tickLine={false} 
+                  axisLine={false} 
+                />
+                <YAxis 
+                  stroke="hsl(var(--muted-foreground))" 
+                  fontSize={12} 
+                  tickLine={false} 
+                  axisLine={false} 
+                />
+                <RechartsTooltip 
+                  contentStyle={{ backgroundColor: "hsl(var(--card))", borderColor: "hsl(var(--border))", borderRadius: "8px" }}
+                  itemStyle={{ color: "hsl(var(--foreground))" }}
+                />
+                <Area 
+                  type="monotone" 
+                  dataKey="users" 
+                  stroke="hsl(var(--primary))" 
+                  strokeWidth={2}
+                  fillOpacity={1} 
+                  fill="url(#colorUsers)" 
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        )}
+      </Card>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
         <Link href="/admin/users" className="group">
