@@ -3,49 +3,35 @@ import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  
-  const token = request.cookies.get("accessToken")?.value || request.cookies.get("refreshToken")?.value;
 
-  const isAuthRoute = [
-    "/login", 
-    "/register", 
-    "/admin-login", 
-    "/forgot-password", 
-    "/reset-password", 
-    "/verify-otp"
-  ].some(route => pathname === route || pathname.startsWith(route + "/"));
-  
-  const dashboardRoutes = [
-    "/dashboard", 
-    "/transactions", 
-    "/accounts", 
-    "/transfers", 
-    "/categories", 
-    "/budgets", 
-    "/goals", 
-    "/bills", 
-    "/analytics", 
-    "/reports", 
-    "/calendar", 
-    "/notifications", 
-    "/profile", 
-    "/settings"
-  ];
-  
-  const isDashboardRoute = dashboardRoutes.some(route => pathname === route || pathname.startsWith(route + "/"));
-  const isAdminRoute = pathname.startsWith("/admin") && !pathname.startsWith("/admin-login");
+  const isPublicRoute =
+    pathname.startsWith("/login") ||
+    pathname.startsWith("/register") ||
+    pathname.startsWith("/verify-otp") ||
+    pathname.startsWith("/forgot-password") ||
+    pathname.startsWith("/reset-password") ||
+    pathname.startsWith("/admin-login");
 
-  if (!token) {
-    if (isAdminRoute) {
-      return NextResponse.redirect(new URL("/admin-login", request.url));
-    }
-    if (isDashboardRoute) {
-      return NextResponse.redirect(new URL("/login", request.url));
-    }
+  const isApiRoute = pathname.startsWith("/api");
+  const isStaticRoute =
+    pathname.startsWith("/_next") ||
+    pathname.match(/\.(png|jpg|jpeg|gif|svg|ico)$/);
+
+  if (isPublicRoute || isApiRoute || isStaticRoute) {
+    return NextResponse.next();
   }
 
-  if (token && isAuthRoute) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+  // Check for the HttpOnly access token set by the backend
+  const token = request.cookies.get("accessToken")?.value;
+
+  if (!token) {
+    // Prevent redirect loops
+    if (pathname !== "/login") {
+      const url = request.nextUrl.clone();
+      url.pathname = "/login";
+      url.searchParams.set("redirect", pathname);
+      return NextResponse.redirect(url);
+    }
   }
 
   return NextResponse.next();
@@ -53,6 +39,7 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
+    // Apply middleware to all routes except api, _next, and static files
     "/((?!api|_next/static|_next/image|favicon.ico).*)",
   ],
 };

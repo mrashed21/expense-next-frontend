@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/select";
 import { logout } from "@/redux/slices/authSlice";
 import { useLazyExportBackupQuery, useRestoreBackupMutation } from "@/services/dataApi";
-import { useDeleteAccountMutation } from "@/services/userApi";
+import { useDeleteAccountMutation, useUpdateProfileMutation } from "@/services/userApi";
 import {
   Download,
   Loader2,
@@ -24,19 +24,39 @@ import {
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 
 export default function SettingsPage() {
   const router = useRouter();
   const dispatch = useDispatch();
+  const user = useSelector((state: any) => state.auth.user);
   const { theme, setTheme } = useTheme();
+  const [updateProfile] = useUpdateProfileMutation();
   const [deleteAccountApi, { isLoading: isDeleting }] =
     useDeleteAccountMutation();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  const [currency, setCurrency] = useState("BDT");
+  const [currency, setCurrency] = useState(user?.currency || "BDT");
   const [language, setLanguage] = useState("en");
+
+  const handleThemeChange = async (newTheme: string) => {
+    setTheme(newTheme);
+    try {
+      await updateProfile({ theme: newTheme }).unwrap();
+    } catch (err) {
+      console.error("Failed to sync theme");
+    }
+  };
+
+  const handleCurrencyChange = async (newCurrency: string) => {
+    setCurrency(newCurrency);
+    try {
+      await updateProfile({ currency: newCurrency }).unwrap();
+    } catch (err) {
+      console.error("Failed to sync currency");
+    }
+  };
 
   const [exportBackup, { isFetching: isExporting }] = useLazyExportBackupQuery();
   const [restoreBackup, { isLoading: isRestoring }] = useRestoreBackupMutation();
@@ -113,7 +133,7 @@ export default function SettingsPage() {
             <label className="mb-1 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
               Default Currency
             </label>
-            <Select value={currency} onValueChange={setCurrency}>
+            <Select value={currency} onValueChange={handleCurrencyChange}>
               <SelectTrigger className="w-full h-10 py-5!">
                 <SelectValue placeholder="Currency" />
               </SelectTrigger>
@@ -150,7 +170,7 @@ export default function SettingsPage() {
           </label>
           <div className="grid grid-cols-3 gap-3">
             <button
-              onClick={() => setTheme("light")}
+              onClick={() => handleThemeChange("light")}
               className={`p-4 rounded-2xl border flex flex-col items-center gap-2 transition-all ${
                 theme === "light"
                   ? "border-primary bg-primary/10 text-primary font-bold"
@@ -162,7 +182,7 @@ export default function SettingsPage() {
             </button>
 
             <button
-              onClick={() => setTheme("dark")}
+              onClick={() => handleThemeChange("dark")}
               className={`p-4 rounded-2xl border flex flex-col items-center gap-2 transition-all ${
                 theme === "dark"
                   ? "border-primary bg-primary/10 text-primary font-bold"
@@ -174,7 +194,7 @@ export default function SettingsPage() {
             </button>
 
             <button
-              onClick={() => setTheme("system")}
+              onClick={() => handleThemeChange("system")}
               className={`p-4 rounded-2xl border flex flex-col items-center gap-2 transition-all ${
                 theme === "system"
                   ? "border-primary bg-primary/10 text-primary font-bold"
