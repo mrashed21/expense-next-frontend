@@ -6,6 +6,7 @@ import { useGetTransactionsQuery } from "@/services/transactionApi";
 import { Download, FileSpreadsheet, Printer } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
+import * as XLSX from "xlsx";
 
 import {
   Select,
@@ -94,6 +95,31 @@ export default function ReportsPage() {
     toast.success("CSV report downloaded successfully!");
   };
 
+  const handleExportExcel = () => {
+    if (transactions.length === 0) {
+      toast.error("No data available to export.");
+      return;
+    }
+
+    const data = transactions.map((t: any) => ({
+      Date: formatDate(t.date),
+      Description: t.notes || t.category_id?.name || "Transaction",
+      Category: t.category_id?.name || "General",
+      Account: t.account_id?.name || "Account",
+      Type: t.type,
+      Amount: t.amount,
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Transactions");
+    XLSX.writeFile(
+      workbook,
+      `ExpenseVault_Report_${dateRange}_${new Date().toISOString().slice(0, 10)}.xlsx`
+    );
+    toast.success("Excel report downloaded successfully!");
+  };
+
   const handlePrint = () => {
     window.print();
   };
@@ -157,8 +183,7 @@ export default function ReportsPage() {
             Report Generator & Exporter
           </h1>
           <p className="text-xs text-muted-foreground">
-            Generate comprehensive financial audit reports in CSV or Print
-            format
+            Generate comprehensive financial audit reports in CSV, Excel, PDF, or Print format
           </p>
         </div>
 
@@ -169,6 +194,13 @@ export default function ReportsPage() {
           >
             <FileSpreadsheet className="w-4 h-4" />
             <span>Export CSV</span>
+          </button>
+          <button
+            onClick={handleExportExcel}
+            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-green-600 text-white font-semibold text-xs shadow-md hover:bg-green-700 transition-colors"
+          >
+            <FileSpreadsheet className="w-4 h-4" />
+            <span>Export Excel</span>
           </button>
           <button
             onClick={handleExportPDF}

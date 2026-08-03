@@ -8,6 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { logout } from "@/redux/slices/authSlice";
+import { useLazyExportBackupQuery, useRestoreBackupMutation } from "@/services/dataApi";
 import { useDeleteAccountMutation } from "@/services/userApi";
 import {
   Download,
@@ -16,6 +17,7 @@ import {
   Moon,
   ShieldAlert,
   Sun,
+  Upload,
   Trash2,
   X,
 } from "lucide-react";
@@ -36,6 +38,9 @@ export default function SettingsPage() {
   const [currency, setCurrency] = useState("BDT");
   const [language, setLanguage] = useState("en");
 
+  const [exportBackup, { isFetching: isExporting }] = useLazyExportBackupQuery();
+  const [restoreBackup, { isLoading: isRestoring }] = useRestoreBackupMutation();
+
   const handleDeleteAccount = async () => {
     try {
       await deleteAccountApi({}).unwrap();
@@ -47,8 +52,42 @@ export default function SettingsPage() {
     }
   };
 
-  const handleExportBackup = () => {
-    toast.success("Full data backup downloaded as JSON!");
+  const handleExportBackup = async () => {
+    try {
+      const response = await exportBackup({}).unwrap();
+      const backupData = JSON.stringify(response.data, null, 2);
+      const blob = new Blob([backupData], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `ExpenseVault_Backup_${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      toast.success("Full data backup downloaded successfully!");
+    } catch (err: any) {
+      toast.error(err?.data?.message || "Failed to export backup");
+    }
+  };
+
+  const handleRestoreBackup = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      try {
+        const json = JSON.parse(event.target?.result as string);
+        await restoreBackup(json).unwrap();
+        toast.success("Backup restored successfully!");
+        window.location.reload();
+      } catch (err: any) {
+        toast.error(err?.data?.message || "Failed to restore backup.");
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = "";
   };
 
   return (
@@ -154,7 +193,7 @@ export default function SettingsPage() {
         <h2 className="text-base font-bold text-foreground border-b border-border pb-3">
           Data Backup & Export
         </h2>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h3 className="text-xs font-bold text-foreground">
               Download Data Snapshot
@@ -163,13 +202,27 @@ export default function SettingsPage() {
               Export your complete financial records, accounts, and budgets
             </p>
           </div>
-          <button
-            onClick={handleExportBackup}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-secondary border border-border text-foreground text-xs font-semibold hover:bg-secondary/80 transition-colors"
-          >
-            <Download className="w-4 h-4 text-primary" />
-            <span>Export JSON</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleExportBackup}
+              disabled={isExporting}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-secondary border border-border text-foreground text-xs font-semibold hover:bg-secondary/80 transition-colors disabled:opacity-50"
+            >
+              {isExporting ? <Loader2 className="w-4 h-4 text-primary animate-spin" /> : <Download className="w-4 h-4 text-primary" />}
+              <span>Export JSON</span>
+            </button>
+            <label className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/10 border border-primary/20 text-primary text-xs font-semibold hover:bg-primary/20 transition-colors cursor-pointer disabled:opacity-50">
+              {isRestoring ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+              <span>Restore Backup</span>
+              <input
+                type="file"
+                accept=".json"
+                className="hidden"
+                onChange={handleRestoreBackup}
+                disabled={isRestoring}
+              />
+            </label>
+          </div>
         </div>
       </div>
 
