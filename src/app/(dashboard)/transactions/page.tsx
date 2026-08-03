@@ -18,8 +18,9 @@ import {
   useGetTransactionsQuery,
 } from "@/services/transactionApi";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, Plus, Search, Trash2, X } from "lucide-react";
-import { useState } from "react";
+import { useDebounce } from "@/hooks/useDebounce";
+import { ChevronLeft, ChevronRight, Loader2, Plus, Search, Trash2, X } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -47,14 +48,22 @@ type TransactionFormValues = z.infer<typeof transactionSchema>;
 export default function TransactionsPage() {
   const { formatCurrency } = useCurrency();
   const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 500);
   const [dateRange, setDateRange] = useState("thisMonth");
   const [typeFilter, setTypeFilter] = useState("all");
+  const [page, setPage] = useState(1);
   const [isAddOpen, setIsAddOpen] = useState(false);
 
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch, dateRange, typeFilter]);
+
   const { data: transactionsData, isLoading } = useGetTransactionsQuery({
-    search,
+    search: debouncedSearch,
     dateRange,
     type: typeFilter,
+    page,
+    limit: 20,
   });
 
   const { data: accountsData } = useGetAccountsQuery({});
@@ -65,6 +74,7 @@ export default function TransactionsPage() {
   const [deleteTransactionApi] = useDeleteTransactionMutation();
 
   const transactions = transactionsData?.data || [];
+  const meta = transactionsData?.meta;
   const accounts = accountsData?.data || [];
   const categories = categoriesData?.data || [];
 
@@ -252,6 +262,31 @@ export default function TransactionsPage() {
           </table>
         </div>
       </div>
+
+      {/* Pagination Controls */}
+      {meta && meta.totalPage > 1 && (
+        <div className="flex items-center justify-between p-4 bg-card rounded-2xl border border-border shadow-sm">
+          <div className="text-xs text-muted-foreground font-medium">
+            Showing page <span className="text-foreground font-bold">{meta.page}</span> of <span className="text-foreground font-bold">{meta.totalPage}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={meta.page <= 1}
+              className="p-1.5 rounded-lg border border-border text-foreground hover:bg-secondary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setPage((p) => Math.min(meta.totalPage, p + 1))}
+              disabled={meta.page >= meta.totalPage}
+              className="p-1.5 rounded-lg border border-border text-foreground hover:bg-secondary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Add Transaction Modal */}
       {isAddOpen && (

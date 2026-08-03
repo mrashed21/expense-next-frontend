@@ -22,20 +22,22 @@ export default function DashboardPage() {
   const { formatCurrency } = useCurrency();
   const { data: accountsData, isLoading: accountsLoading } =
     useGetAccountsQuery({});
-  const { data: recentTxData } = useGetTransactionsQuery({ limit: 5 });
   const { data: monthlyTxData } = useGetTransactionsQuery({
     dateRange: "thisMonth",
     limit: 1000,
   });
-  const { data: todayTxData } = useGetTransactionsQuery({
-    dateRange: "today",
-    limit: 1000,
-  });
 
   const accounts = accountsData?.data || [];
-  const recentTransactions = recentTxData?.data || [];
   const monthlyTransactions = monthlyTxData?.data || [];
-  const todayTransactions = todayTxData?.data || [];
+
+  const recentTransactions = useMemo(() => {
+    return monthlyTransactions.slice(0, 5);
+  }, [monthlyTransactions]);
+
+  const todayTransactions = useMemo(() => {
+    const todayStr = new Date().toDateString();
+    return monthlyTransactions.filter((tx: any) => new Date(tx.date).toDateString() === todayStr);
+  }, [monthlyTransactions]);
 
   // Compute real stats from API data
   const netWorth = accounts.reduce(

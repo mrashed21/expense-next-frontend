@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
 import {
   logout,
@@ -16,8 +16,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [triggerGetMe] = useLazyGetMeQuery();
   const [triggerGetAdminMe] = useLazyGetAdminMeQuery();
 
+  const hasInitialized = useRef(false);
+
   useEffect(() => {
+    if (hasInitialized.current) return;
+    
     const initializeAuth = async () => {
+      hasInitialized.current = true;
       try {
         const isAdminRoute =
           pathname?.startsWith("/admin") ||

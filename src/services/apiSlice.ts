@@ -16,6 +16,9 @@ const baseQuery = fetchBaseQuery({
   credentials: "include", // For HttpOnly refresh and access cookies
 });
 
+let isRefreshing = false;
+let refreshPromise: Promise<any> | null = null;
+
 const baseQueryWithReauth: BaseQueryFn<
   string | FetchArgs,
   unknown,
@@ -24,19 +27,33 @@ const baseQueryWithReauth: BaseQueryFn<
   let result = await baseQuery(args, api, extraOptions);
 
   if (result.error && result.error.status === 401) {
-    // Attempt token refresh
-    const refreshResult: any = await baseQuery(
+    if (isRefreshing) {
+      if (refreshPromise) {
+        await refreshPromise;
+        result = await baseQuery(args, api, extraOptions);
+      }
+      return result;
+    }
+
+    isRefreshing = true;
+    const state = api.getState() as RootState;
+    const isAdmin = state.auth.user?.isAdmin;
+    const refreshUrl = isAdmin ? "/admin/auth/refresh-token" : "/auth/refresh-token";
+
+    refreshPromise = baseQuery(
       {
-        url: "/auth/refresh-token",
+        url: refreshUrl,
         method: "POST",
       },
       api,
       extraOptions,
     );
 
+    const refreshResult: any = await refreshPromise;
+
     if (refreshResult.data && refreshResult.data.success) {
       const user =
-        refreshResult.data.data.user || (api.getState() as RootState).auth.user;
+        refreshResult.data.data.user || refreshResult.data.data.admin || state.auth.user;
       if (user) {
         api.dispatch(setCredentials({ user }));
       }
@@ -45,6 +62,9 @@ const baseQueryWithReauth: BaseQueryFn<
     } else {
       api.dispatch(logout());
     }
+
+    isRefreshing = false;
+    refreshPromise = null;
   }
 
   return result;

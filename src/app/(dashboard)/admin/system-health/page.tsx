@@ -1,6 +1,13 @@
 "use client";
 
-import { SystemHealthChart } from "@/components/admin/SystemHealthChart";
+import dynamic from "next/dynamic";
+const SystemHealthChart = dynamic(
+  () =>
+    import("@/components/admin/SystemHealthChart").then(
+      (mod) => mod.SystemHealthChart
+    ),
+  { ssr: false }
+);
 import { RootState } from "@/redux/store";
 import { ShieldAlert } from "lucide-react";
 import { useRouter } from "next/navigation";

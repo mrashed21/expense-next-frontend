@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Poppins, Roboto } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { ReduxProvider } from "@/providers/ReduxProvider";
 import { AuthProvider } from "@/providers/AuthProvider";
@@ -9,18 +9,6 @@ import { ToastProvider } from "@/providers/ToastProvider";
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
-});
-
-const poppins = Poppins({
-  subsets: ["latin"],
-  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
-  variable: "--font-poppins",
-});
-
-const roboto = Roboto({
-  subsets: ["latin"],
-  weight: ["100", "300", "400", "500", "700", "900"],
-  variable: "--font-roboto",
 });
 
 export const metadata: Metadata = {
@@ -37,7 +25,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${inter.variable} ${poppins.variable} ${roboto.variable} font-sans antialiased selection:bg-primary/20 selection:text-primary`}
+        className={`${inter.variable} font-sans antialiased selection:bg-primary/20 selection:text-primary`}
       >
         <ReduxProvider>
           <AuthProvider>
