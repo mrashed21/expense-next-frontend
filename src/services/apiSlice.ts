@@ -11,9 +11,46 @@ import {
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:5005/api/v1";
 
+let csrfPromise: Promise<string | null> | null = null;
+
 const baseQuery = fetchBaseQuery({
   baseUrl: API_BASE_URL,
   credentials: "include", // For HttpOnly refresh and access cookies
+  prepareHeaders: async (headers) => {
+    const getCsrfFromCookie = () => {
+      if (typeof document === "undefined") return null;
+      const match = document.cookie.match(new RegExp("(^| )csrfToken=([^;]+)"));
+      if (match) return match[2];
+      return null;
+    };
+
+    let token = getCsrfFromCookie();
+    
+    // Fetch if missing
+    if (!token && typeof window !== "undefined") {
+      if (!csrfPromise) {
+        csrfPromise = fetch(`${API_BASE_URL}/auth/csrf-token`, {
+          credentials: "include",
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            csrfPromise = null;
+            return data?.data?.csrfToken || null;
+          })
+          .catch((e) => {
+            console.error("Failed to fetch CSRF token", e);
+            csrfPromise = null;
+            return null;
+          });
+      }
+      token = await csrfPromise;
+    }
+
+    if (token) {
+      headers.set("x-csrf-token", token);
+    }
+    return headers;
+  },
 });
 
 let isRefreshing = false;
