@@ -28,8 +28,11 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
+import { useSocket } from "@/hooks/useSocket";
+import { useGetNotificationsQuery } from "@/services/notificationApi";
 import { ThemeToggle } from "./ThemeToggle";
 
 export function Header() {
@@ -38,6 +41,20 @@ export function Header() {
   const { user } = useSelector((state: RootState) => state.auth);
   const [logoutApi] = useLogoutMutation();
   const [logoutAllApi] = useLogoutAllDevicesMutation();
+
+  // Mount the singleton socket connection for this session
+  useSocket();
+
+  // Live unread notification count for the bell badge
+  // pollingInterval: 0 — updates come exclusively via socket cache invalidation
+  const { data: notificationsData } = useGetNotificationsQuery(
+    {},
+    { refetchOnFocus: false, refetchOnReconnect: true },
+  );
+  const unreadCount = useMemo(
+    () => (notificationsData?.data || []).filter((n: any) => !n.is_read).length,
+    [notificationsData],
+  );
 
   const handleLogout = async () => {
     try {
@@ -117,7 +134,11 @@ export function Header() {
         >
           <Link href="/notifications">
             <Bell className="w-4 h-4" />
-            <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-primary" />
+            {unreadCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 min-w-4 h-4 flex items-center justify-center rounded-full bg-primary text-primary-foreground text-[9px] font-bold px-1 leading-none">
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </span>
+            )}
           </Link>
         </Button>
 

@@ -5,6 +5,7 @@ import {
   useGetNotificationsQuery,
   useMarkAllAsReadMutation,
   useMarkAsReadMutation,
+  useDeleteNotificationMutation,
 } from "@/services/notificationApi";
 import {
   AlertTriangle,
@@ -14,6 +15,7 @@ import {
   Info,
   Loader2,
   Target,
+  Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -21,6 +23,7 @@ export default function NotificationsPage() {
   const { data: notificationsData, isLoading } = useGetNotificationsQuery({});
   const [markAsReadApi] = useMarkAsReadMutation();
   const [markAllApi] = useMarkAllAsReadMutation();
+  const [deleteApi] = useDeleteNotificationMutation();
 
   const notifications = notificationsData?.data || [];
   const unreadCount = notifications.filter((n: any) => !n.is_read).length;
@@ -35,10 +38,21 @@ export default function NotificationsPage() {
   };
 
   const handleMarkSingle = async (id: string, isRead: boolean) => {
-    if (isRead) return; // Already read
+    if (isRead) return;
     try {
       await markAsReadApi(id).unwrap();
-    } catch (e) {}
+    } catch {
+      toast.error("Failed to mark as read.");
+    }
+  };
+
+  const handleDelete = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation(); // prevent triggering mark-as-read
+    try {
+      await deleteApi(id).unwrap();
+    } catch {
+      toast.error("Failed to delete notification.");
+    }
   };
 
   const getIcon = (type: string) => {
@@ -128,6 +142,13 @@ export default function NotificationsPage() {
                     <span className="text-[10px] text-muted-foreground whitespace-nowrap">
                       {formatDate(n.createdAt)}
                     </span>
+                    <button
+                      onClick={(e) => handleDelete(e, n._id)}
+                      className="p-1 rounded-lg text-muted-foreground hover:text-rose-500 hover:bg-rose-500/10 transition-colors"
+                      title="Delete notification"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
                   </div>
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
