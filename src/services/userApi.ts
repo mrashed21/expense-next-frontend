@@ -40,6 +40,38 @@ export const userApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["User"],
     }),
+    generate2FA: builder.mutation({
+      query: () => ({
+        url: "/users/2fa/generate",
+        method: "POST",
+      }),
+    }),
+    verify2FA: builder.mutation({
+      query: (data) => ({
+        url: "/users/2fa/verify",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["User"],
+    }),
+    disable2FA: builder.mutation({
+      query: () => ({
+        url: "/users/2fa/disable",
+        method: "POST",
+      }),
+      invalidatesTags: ["User"],
+    }),
+    getDevices: builder.query({
+      query: () => "/users/devices",
+      providesTags: ["User"],
+    }),
+    revokeDevice: builder.mutation({
+      query: (deviceId) => ({
+        url: `/users/devices/${deviceId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["User"],
+    }),
   }),
 });
 
@@ -50,4 +82,9 @@ export const {
   useChangePasswordMutation,
   useGetLoginHistoryQuery,
   useDeleteAccountMutation,
+  useGenerate2FAMutation,
+  useVerify2FAMutation,
+  useDisable2FAMutation,
+  useGetDevicesQuery,
+  useRevokeDeviceMutation,
 } = userApi;

@@ -31,6 +31,14 @@ export const authApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["User"],
     }),
+    verifyLogin2FA: builder.mutation({
+      query: (data) => ({
+        url: "/auth/login/verify",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["User"],
+    }),
     adminLogin: builder.mutation({
       query: (credentials) => ({
         url: "/admin/auth/login",
@@ -83,6 +91,7 @@ export const {
   useVerifyOtpMutation,
   useResendOtpMutation,
   useLoginMutation,
+  useVerifyLogin2FAMutation,
   useAdminLoginMutation,
   useGetMeQuery,
   useLazyGetMeQuery,

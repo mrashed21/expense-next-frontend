@@ -13,6 +13,11 @@ import {
   useGetProfileQuery,
   useUpdateProfileImageMutation,
   useUpdateProfileMutation,
+  useGenerate2FAMutation,
+  useVerify2FAMutation,
+  useDisable2FAMutation,
+  useGetDevicesQuery,
+  useRevokeDeviceMutation,
 } from "@/services/userApi";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -23,6 +28,9 @@ import {
   Loader2,
   ShieldAlert,
   Upload,
+  Smartphone,
+  Copy,
+  X
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo, useRef, useState } from "react";
@@ -65,6 +73,12 @@ export default function ProfilePage() {
     useDeleteAccountMutation();
   const [logoutAllApi] = useLogoutAllDevicesMutation();
 
+  const { data: devicesData } = useGetDevicesQuery({});
+  const [generate2FA] = useGenerate2FAMutation();
+  const [verify2FA, { isLoading: isVerifying2FA }] = useVerify2FAMutation();
+  const [disable2FA, { isLoading: isDisabling2FA }] = useDisable2FAMutation();
+  const [revokeDeviceApi] = useRevokeDeviceMutation();
+
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
 
@@ -73,6 +87,10 @@ export default function ProfilePage() {
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isCropModalOpen, setIsCropModalOpen] = useState(false);
+  const [is2FaModalOpen, setIs2FaModalOpen] = useState(false);
+  const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
+  const [twoFaCode, setTwoFaCode] = useState("");
+  const [recoveryCodes, setRecoveryCodes] = useState<string[] | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
@@ -145,6 +163,46 @@ export default function ProfilePage() {
       router.push("/login");
     } catch (err: any) {
       toast.error(err?.data?.message || "Failed to logout all devices");
+    }
+  };
+
+  const handleEnable2FA = async () => {
+    try {
+      const res = await generate2FA({}).unwrap();
+      setQrCodeUrl(res.data.qrCodeUrl);
+      setIs2FaModalOpen(true);
+      setRecoveryCodes(null);
+    } catch (err: any) {
+      toast.error(err?.data?.message || "Failed to generate 2FA");
+    }
+  };
+
+  const handleVerify2FA = async () => {
+    if (twoFaCode.length !== 6) return toast.error("Code must be 6 digits");
+    try {
+      const res = await verify2FA({ code: twoFaCode }).unwrap();
+      toast.success("Two-Factor Authentication Enabled!");
+      setRecoveryCodes(res.data.recoveryCodes);
+    } catch (err: any) {
+      toast.error(err?.data?.message || "Invalid 2FA code");
+    }
+  };
+
+  const handleDisable2FA = async () => {
+    try {
+      await disable2FA({}).unwrap();
+      toast.success("Two-Factor Authentication Disabled");
+    } catch (err: any) {
+      toast.error(err?.data?.message || "Failed to disable 2FA");
+    }
+  };
+
+  const handleRevokeDevice = async (id: string) => {
+    try {
+      await revokeDeviceApi(id).unwrap();
+      toast.success("Device revoked successfully");
+    } catch (err: any) {
+      toast.error(err?.data?.message || "Failed to revoke device");
     }
   };
 
@@ -513,6 +571,99 @@ export default function ProfilePage() {
               </button>
             </form>
           </div>
+
+          {/* 2FA Security Form */}
+          <div className="glass-card p-6 rounded-3xl space-y-4">
+            <h3 className="text-base font-bold text-foreground border-b border-border pb-3 flex justify-between items-center">
+              <span>Two-Factor Authentication (2FA)</span>
+              {user.two_factor_enabled ? (
+                <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] font-bold border border-emerald-500/20">Enabled</span>
+              ) : (
+                <span className="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-500 text-[10px] font-bold border border-amber-500/20">Disabled</span>
+              )}
+            </h3>
+            <p className="text-xs text-muted-foreground">
+              Protect your account with an extra layer of security. Once configured, you'll be required to enter both your password and an authentication code from your mobile phone in order to sign in.
+            </p>
+            {user.two_factor_enabled ? (
+              <button
+                onClick={handleDisable2FA}
+                disabled={isDisabling2FA}
+                className="py-2.5 px-6 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 font-semibold text-xs border border-rose-500/20 transition-colors flex items-center justify-center gap-2"
+              >
+                {isDisabling2FA ? <Loader2 className="w-4 h-4 animate-spin" /> : "Disable 2FA"}
+              </button>
+            ) : (
+              <button
+                onClick={handleEnable2FA}
+                className="py-2.5 px-6 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-xs shadow-md transition-colors flex items-center justify-center gap-2"
+              >
+                Setup 2FA
+              </button>
+            )}
+          </div>
+
+        </div>
+      </div>
+
+      {/* Trusted Devices Table */}
+      <div className="glass-card p-6 rounded-3xl space-y-4">
+        <h2 className="text-base font-bold text-foreground flex items-center gap-2">
+          <Smartphone className="w-5 h-5 text-primary" />
+          Trusted Devices
+        </h2>
+        <p className="text-xs text-muted-foreground mb-4">
+          Devices that have securely logged into your account. You can revoke access to any unrecognized device.
+        </p>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs border-collapse">
+            <thead>
+              <tr className="bg-secondary/60 text-muted-foreground uppercase text-[10px] font-bold border-b border-border">
+                <th scope="col" className="p-3">Device Name</th>
+                <th scope="col" className="p-3">IP Address</th>
+                <th scope="col" className="p-3">Last Active</th>
+                <th scope="col" className="p-3 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border font-medium">
+              {devicesData?.data?.length > 0 ? (
+                devicesData.data.map((d: any) => (
+                  <tr
+                    key={d._id}
+                    className="hover:bg-secondary/30 transition-colors"
+                  >
+                    <td className="p-3 text-foreground font-bold flex items-center gap-2">
+                      <Smartphone className="w-4 h-4 text-muted-foreground" />
+                      {d.device_name}
+                    </td>
+                    <td className="p-3 font-mono text-muted-foreground">
+                      {d.ip_address}
+                    </td>
+                    <td className="p-3 text-muted-foreground">
+                      {formatDate(d.last_active)}
+                    </td>
+                    <td className="p-3 text-right">
+                      <button
+                        onClick={() => handleRevokeDevice(d._id)}
+                        className="px-3 py-1.5 rounded-lg bg-rose-500/10 text-rose-500 hover:bg-rose-500/20 text-[10px] font-bold transition-colors"
+                      >
+                        Revoke
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td
+                    colSpan={4}
+                    className="text-center py-6 text-muted-foreground"
+                  >
+                    No trusted devices found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
 
@@ -656,6 +807,81 @@ export default function ProfilePage() {
                 )}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* 2FA Setup Modal */}
+      {is2FaModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+          <div role="dialog" aria-modal="true" className="w-full max-w-md bg-card border border-border p-6 rounded-3xl space-y-4 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-border pb-3">
+              <h3 className="text-base font-bold text-foreground">
+                Two-Factor Authentication Setup
+              </h3>
+              <button
+                onClick={() => setIs2FaModalOpen(false)}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {!recoveryCodes ? (
+              <div className="space-y-4 flex flex-col items-center text-center">
+                <p className="text-xs text-muted-foreground">
+                  Scan the QR code below using an authenticator app (like Google Authenticator or Authy).
+                </p>
+                {qrCodeUrl && (
+                  <div className="bg-white p-2 rounded-xl">
+                    <img src={qrCodeUrl} alt="2FA QR Code" className="w-40 h-40" />
+                  </div>
+                )}
+                <div className="w-full space-y-2">
+                  <label className="text-xs font-semibold text-foreground text-left block">
+                    Enter the 6-digit code from your app
+                  </label>
+                  <input
+                    type="text"
+                    maxLength={6}
+                    value={twoFaCode}
+                    onChange={(e) => setTwoFaCode(e.target.value)}
+                    placeholder="000000"
+                    className="w-full px-4 py-2 rounded-xl bg-secondary border border-border text-center text-lg font-mono tracking-widest focus:outline-none focus:border-primary"
+                  />
+                </div>
+                <button
+                  onClick={handleVerify2FA}
+                  disabled={isVerifying2FA}
+                  className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-xs shadow-md hover:bg-primary/90 flex items-center justify-center gap-2"
+                >
+                  {isVerifying2FA ? <Loader2 className="w-4 h-4 animate-spin" /> : "Verify and Enable"}
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-4 text-center">
+                <div className="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-500 flex items-center justify-center mx-auto">
+                  <CheckCircle2 className="w-6 h-6" />
+                </div>
+                <h4 className="text-sm font-bold text-foreground">2FA Enabled Successfully!</h4>
+                <p className="text-xs text-muted-foreground">
+                  Save these recovery codes in a secure place. You can use them to log in if you lose access to your authenticator app.
+                </p>
+                <div className="grid grid-cols-2 gap-2 bg-secondary/50 p-4 rounded-xl text-left">
+                  {recoveryCodes.map((code, idx) => (
+                    <div key={idx} className="font-mono text-xs text-foreground tracking-widest">
+                      {code}
+                    </div>
+                  ))}
+                </div>
+                <button
+                  onClick={() => setIs2FaModalOpen(false)}
+                  className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-xs shadow-md hover:bg-primary/90"
+                >
+                  Done
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}

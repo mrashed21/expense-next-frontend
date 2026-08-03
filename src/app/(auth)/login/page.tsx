@@ -11,10 +11,9 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
 import { setCredentials } from "@/redux/slices/authSlice";
 import { RootState } from "@/redux/store";
-import { useLoginMutation } from "@/services/authApi";
+import { useLoginMutation, useVerifyLogin2FAMutation } from "@/services/authApi";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   ArrowRight,
@@ -38,7 +37,12 @@ const loginSchema = z.object({
   user_password: z.string().min(1, "Password is required"),
 });
 
+const twoFaSchema = z.object({
+  code: z.string().length(6, "Code must be 6 digits")
+});
+
 type LoginFormValues = z.infer<typeof loginSchema>;
+type TwoFaFormValues = z.infer<typeof twoFaSchema>;
 
 function LoginContent() {
   const router = useRouter();
@@ -48,7 +52,10 @@ function LoginContent() {
     (state: RootState) => state.auth,
   );
   const [loginApi, { isLoading }] = useLoginMutation();
+  const [verify2FA, { isLoading: isVerifying2FA }] = useVerifyLogin2FAMutation();
   const [showPassword, setShowPassword] = useState(false);
+  const [requires2FA, setRequires2FA] = useState(false);
+  const [tempToken, setTempToken] = useState<string | null>(null);
 
   const redirectUrl = searchParams.get("redirect") || "/dashboard";
 
@@ -66,9 +73,25 @@ function LoginContent() {
     resolver: zodResolver(loginSchema),
   });
 
+  const {
+    register: register2FA,
+    handleSubmit: handleSubmit2FA,
+    formState: { errors: errors2FA },
+  } = useForm<TwoFaFormValues>({
+    resolver: zodResolver(twoFaSchema),
+  });
+
   const onSubmit = async (data: LoginFormValues) => {
     try {
       const response: any = await loginApi(data).unwrap();
+      
+      if (response.data?.requires2FA) {
+        setRequires2FA(true);
+        setTempToken(response.data.tempToken);
+        toast.info("Two-Factor Authentication required.");
+        return;
+      }
+
       if (response.success) {
         dispatch(
           setCredentials({
@@ -82,6 +105,24 @@ function LoginContent() {
       toast.error(
         err?.data?.message || "Failed to log in. Please check credentials.",
       );
+    }
+  };
+
+  const on2FASubmit = async (data: TwoFaFormValues) => {
+    if (!tempToken) return;
+    try {
+      const response: any = await verify2FA({ tempToken, code: data.code }).unwrap();
+      if (response.success) {
+        dispatch(
+          setCredentials({
+            user: response.data.user,
+          }),
+        );
+        toast.success("Login successful.");
+        router.push(redirectUrl);
+      }
+    } catch (err: any) {
+      toast.error(err?.data?.message || "Invalid 2FA code.");
     }
   };
 
@@ -112,91 +153,147 @@ function LoginContent() {
           </CardHeader>
 
           <CardContent>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              {/* Email */}
-              <div className="space-y-1.5">
-                <Label
-                  htmlFor="email"
-                  className="text-xs font-medium text-foreground"
-                >
-                  Email address
-                </Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-                  <Input
-                    id="email"
-                    {...register("user_email")}
-                    type="email"
-                    placeholder="name@example.com"
-                    className="pl-9 h-9 text-sm bg-secondary/40 border-border/60"
-                  />
-                </div>
-                {errors.user_email && (
-                  <p className="text-[11px] text-destructive">
-                    {errors.user_email.message}
-                  </p>
-                )}
-              </div>
-
-              {/* Password */}
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
+            {!requires2FA ? (
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                {/* Email */}
+                <div className="space-y-1.5">
                   <Label
-                    htmlFor="password"
+                    htmlFor="email"
                     className="text-xs font-medium text-foreground"
                   >
-                    Password
+                    Email address
                   </Label>
-                  <Link
-                    href="/forgot-password"
-                    className="text-[11px] text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    Forgot password?
-                  </Link>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                    <Input
+                      id="email"
+                      {...register("user_email")}
+                      type="email"
+                      placeholder="name@example.com"
+                      className="pl-9 h-9 text-sm bg-secondary/40 border-border/60"
+                    />
+                  </div>
+                  {errors.user_email && (
+                    <p className="text-[11px] text-destructive">
+                      {errors.user_email.message}
+                    </p>
+                  )}
                 </div>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-                  <Input
-                    id="password"
-                    {...register("user_password")}
-                    type={showPassword ? "text" : "password"}
-                    placeholder="••••••••"
-                    className="pl-9 pr-9 h-9 text-sm bg-secondary/40 border-border/60"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
-                  >
-                    {showPassword ? (
-                      <EyeOff className="w-4 h-4" />
-                    ) : (
-                      <Eye className="w-4 h-4" />
-                    )}
-                  </button>
-                </div>
-                {errors.user_password && (
-                  <p className="text-[11px] text-destructive">
-                    {errors.user_password.message}
-                  </p>
-                )}
-              </div>
 
-              <Button
-                type="submit"
-                disabled={isLoading}
-                className="w-full h-9 text-sm font-medium mt-2"
-              >
-                {isLoading ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <>
-                    <span>Sign in</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
-                  </>
-                )}
-              </Button>
-            </form>
+                {/* Password */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <Label
+                      htmlFor="password"
+                      className="text-xs font-medium text-foreground"
+                    >
+                      Password
+                    </Label>
+                    <Link
+                      href="/forgot-password"
+                      className="text-[11px] text-muted-foreground hover:text-primary transition-colors"
+                    >
+                      Forgot password?
+                    </Link>
+                  </div>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                    <Input
+                      id="password"
+                      {...register("user_password")}
+                      type={showPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      className="pl-9 pr-9 h-9 text-sm bg-secondary/40 border-border/60"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
+                    >
+                      {showPassword ? (
+                        <EyeOff className="w-4 h-4" />
+                      ) : (
+                        <Eye className="w-4 h-4" />
+                      )}
+                    </button>
+                  </div>
+                  {errors.user_password && (
+                    <p className="text-[11px] text-destructive">
+                      {errors.user_password.message}
+                    </p>
+                  )}
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full h-9 text-sm font-medium mt-2"
+                >
+                  {isLoading ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <>
+                      <span>Sign in</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </>
+                  )}
+                </Button>
+              </form>
+            ) : (
+              <form onSubmit={handleSubmit2FA(on2FASubmit)} className="space-y-4">
+                <div className="space-y-1.5">
+                  <Label
+                    htmlFor="code"
+                    className="text-xs font-medium text-foreground"
+                  >
+                    Authentication Code
+                  </Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                    <Input
+                      id="code"
+                      {...register2FA("code")}
+                      type="text"
+                      placeholder="000000"
+                      maxLength={6}
+                      className="pl-9 h-9 text-sm bg-secondary/40 border-border/60 text-center tracking-widest font-mono"
+                    />
+                  </div>
+                  {errors2FA.code && (
+                    <p className="text-[11px] text-destructive">
+                      {errors2FA.code.message}
+                    </p>
+                  )}
+                </div>
+                
+                <Button
+                  type="submit"
+                  disabled={isVerifying2FA}
+                  className="w-full h-9 text-sm font-medium mt-2"
+                >
+                  {isVerifying2FA ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <>
+                      <span>Verify Code</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </>
+                  )}
+                </Button>
+                
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => {
+                    setRequires2FA(false);
+                    setTempToken(null);
+                  }}
+                  className="w-full h-9 text-xs"
+                >
+                  Cancel
+                </Button>
+              </form>
+            )}
           </CardContent>
 
           <CardFooter className="flex-col gap-0 pt-0 pb-5 px-6">
