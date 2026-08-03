@@ -143,12 +143,12 @@ export function SystemHealthChart() {
               />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: "hsl(var(--card))",
-                  borderColor: "hsl(var(--border))",
+                  backgroundColor: "var(--card)",
+                  borderColor: "var(--border)",
                   borderRadius: "8px",
-                  color: "hsl(var(--foreground))",
+                  color: "var(--foreground)",
                 }}
-                itemStyle={{ color: "hsl(var(--foreground))" }}
+                itemStyle={{ color: "var(--foreground)" }}
                 labelFormatter={(label) => formatTime(label as string)}
               />
               <Area

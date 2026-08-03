@@ -175,9 +175,9 @@ export default function BillsPage() {
       {/* Add Bill Modal */}
       {isAddOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="w-full max-w-md bg-card border border-border p-6 rounded-3xl space-y-4 shadow-2xl">
+          <div role="dialog" aria-modal="true" aria-labelledby="modal-title" className="w-full max-w-md bg-card border border-border p-6 rounded-3xl space-y-4 shadow-2xl">
             <div className="flex items-center justify-between border-b border-border pb-3">
-              <h3 className="text-base font-bold text-foreground">Add Bill Reminder</h3>
+              <h3 id="modal-title" className="text-base font-bold text-foreground">Add Bill Reminder</h3>
               <button onClick={() => setIsAddOpen(false)} className="text-muted-foreground hover:text-foreground">
                 <X className="w-5 h-5" />
               </button>

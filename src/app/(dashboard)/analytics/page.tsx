@@ -270,14 +270,14 @@ export default function AnalyticsPage() {
                   <YAxis
                     stroke="#888888"
                     fontSize={11}
-                    tickFormatter={(v) => `$${v}`}
+                    tickFormatter={(v) => formatCurrency(v)}
                   />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "#111827",
-                      borderColor: "#374151",
+                      backgroundColor: "var(--card)",
+                      borderColor: "var(--border)",
                       borderRadius: "12px",
-                      color: "#F9FAFB",
+                      color: "var(--foreground)",
                       fontSize: "12px",
                     }}
                     formatter={(val: any) => formatCurrency(val)}
@@ -326,10 +326,10 @@ export default function AnalyticsPage() {
                     </Pie>
                     <Tooltip
                       contentStyle={{
-                        backgroundColor: "#111827",
-                        borderColor: "#374151",
+                        backgroundColor: "var(--card)",
+                        borderColor: "var(--border)",
                         borderRadius: "12px",
-                        color: "#F9FAFB",
+                        color: "var(--foreground)",
                         fontSize: "12px",
                       }}
                       formatter={(val: any) => formatCurrency(val)}
@@ -435,14 +435,14 @@ export default function AnalyticsPage() {
                 <YAxis
                   stroke="#888888"
                   fontSize={10}
-                  tickFormatter={(v) => `$${v}`}
+                  tickFormatter={(v) => formatCurrency(v)}
                 />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: "#111827",
-                    borderColor: "#374151",
+                    backgroundColor: "var(--card)",
+                    borderColor: "var(--border)",
                     borderRadius: "12px",
-                    color: "#F9FAFB",
+                    color: "var(--foreground)",
                     fontSize: "12px",
                   }}
                   formatter={(val: any) => formatCurrency(val)}
