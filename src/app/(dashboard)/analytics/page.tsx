@@ -361,7 +361,7 @@ export default function AnalyticsPage() {
                     <div
                       className={`h-full rounded-full transition-all ${b.isExceeded ? 'bg-rose-500' : ''}`}
                       style={{
-                        width: \`\${b.percentage}%\`,
+                        width: `${b.percentage}%`,
                         backgroundColor: b.isExceeded ? undefined : b.color,
                       }}
                     />
@@ -397,7 +397,7 @@ export default function AnalyticsPage() {
                   <div className="w-full h-2 rounded-full bg-secondary overflow-hidden">
                     <div
                       className="h-full rounded-full bg-emerald-500 transition-all"
-                      style={{ width: \`\${g.percentage}%\` }}
+                      style={{ width: `${g.percentage}%` }}
                     />
                   </div>
                   <p className="text-[10px] text-muted-foreground text-right">

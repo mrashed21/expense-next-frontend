@@ -30,7 +30,8 @@ import {
   Upload,
   Smartphone,
   Copy,
-  X
+  X,
+  Trash2
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo, useRef, useState } from "react";

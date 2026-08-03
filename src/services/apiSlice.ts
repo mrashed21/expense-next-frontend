@@ -38,22 +38,26 @@ const baseQueryWithReauth: BaseQueryFn<
     isRefreshing = true;
     const state = api.getState() as RootState;
     const isAdmin = state.auth.user?.isAdmin;
-    const refreshUrl = isAdmin ? "/admin/auth/refresh-token" : "/auth/refresh-token";
+    const refreshUrl = isAdmin
+      ? "/admin/auth/refresh-token"
+      : "/auth/refresh-token";
 
-    refreshPromise = baseQuery(
+    refreshPromise = Promise.resolve(baseQuery(
       {
         url: refreshUrl,
         method: "POST",
       },
       api,
       extraOptions,
-    );
+    ));
 
     const refreshResult: any = await refreshPromise;
 
     if (refreshResult.data && refreshResult.data.success) {
       const user =
-        refreshResult.data.data.user || refreshResult.data.data.admin || state.auth.user;
+        refreshResult.data.data.user ||
+        refreshResult.data.data.admin ||
+        state.auth.user;
       if (user) {
         api.dispatch(setCredentials({ user }));
       }

@@ -17,7 +17,7 @@ let subscriberCount = 0;
  * Joins the user's private room so the backend can send targeted events.
  * On `new_notification`: shows a toast and invalidates RTK Notifications cache.
  */
-export const useSocket = (): void => {
+export const useSocket = (): Socket | null => {
   const { user } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch();
 
@@ -55,4 +55,6 @@ export const useSocket = (): void => {
       }
     };
   }, [user?._id, dispatch]);
+
+  return globalSocket;
 };

@@ -21,16 +21,17 @@ import {
   HandCoins,
   Home,
   LayoutDashboard,
+  Megaphone,
   PiggyBank,
   Receipt,
+  ScrollText,
   Settings,
   ShieldAlert,
   Target,
+  TrendingUp,
   User,
   Users,
   Wallet,
-  Megaphone,
-  ScrollText,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";

@@ -14,7 +14,7 @@ import { useSelector } from "react-redux";
 import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { FormSelect } from "@/components/custom/form-select";
+import FormSelect from "@/components/custom/form-select";
 
 const broadcastSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters").max(50),

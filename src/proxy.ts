@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const isPublicRoute =
@@ -39,7 +39,7 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Apply middleware to all routes except api, _next, and static files
+    // Apply proxy to all routes except api, _next, and static files
     "/((?!api|_next/static|_next/image|favicon.ico).*)",
   ],
 };
