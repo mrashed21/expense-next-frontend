@@ -2,6 +2,12 @@ import { apiSlice } from "./apiSlice";
 
 export const dataApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
+    searchData: builder.query({
+      query: (q: string) => ({
+        url: `/data/search?q=${encodeURIComponent(q)}`,
+        method: "GET",
+      }),
+    }),
     exportBackup: builder.query({
       query: () => ({
         url: "/data/backup",
@@ -28,4 +34,4 @@ export const dataApi = apiSlice.injectEndpoints({
   }),
 });
 
-export const { useLazyExportBackupQuery, useRestoreBackupMutation } = dataApi;
+export const { useLazyExportBackupQuery, useRestoreBackupMutation, useLazySearchDataQuery } = dataApi;

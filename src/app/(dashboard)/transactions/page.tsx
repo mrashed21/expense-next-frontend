@@ -12,14 +12,17 @@ import { useCurrency } from "@/hooks/useCurrency";
 import { formatDate } from "@/lib/utils";
 import { useGetAccountsQuery } from "@/services/accountApi";
 import { useGetCategoriesQuery } from "@/services/categoryApi";
+import { useGetSavedFiltersQuery, useCreateSavedFilterMutation } from "@/services/savedFilterApi";
 import {
-  useCreateTransactionMutation,
   useDeleteTransactionMutation,
   useGetTransactionsQuery,
+  useBulkDeleteTransactionsMutation,
+  useRestoreTransactionMutation,
+  useBulkRestoreTransactionsMutation,
 } from "@/services/transactionApi";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useDebounce } from "@/hooks/useDebounce";
-import { ChevronLeft, ChevronRight, Loader2, Plus, Search, Trash2, X } from "lucide-react";
+import { Bookmark, ChevronLeft, ChevronRight, Loader2, Plus, Save, Search, Trash2, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -53,9 +56,12 @@ export default function TransactionsPage() {
   const [typeFilter, setTypeFilter] = useState("all");
   const [page, setPage] = useState(1);
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [activeFilterId, setActiveFilterId] = useState<string>("none");
 
   useEffect(() => {
     setPage(1);
+    setSelectedIds([]);
   }, [debouncedSearch, dateRange, typeFilter]);
 
   const { data: transactionsData, isLoading } = useGetTransactionsQuery({
@@ -68,15 +74,21 @@ export default function TransactionsPage() {
 
   const { data: accountsData } = useGetAccountsQuery({});
   const { data: categoriesData } = useGetCategoriesQuery({});
+  const { data: savedFiltersData } = useGetSavedFiltersQuery("transaction");
 
   const [createTransactionApi, { isLoading: isCreating }] =
     useCreateTransactionMutation();
   const [deleteTransactionApi] = useDeleteTransactionMutation();
+  const [bulkDeleteApi, { isLoading: isBulkDeleting }] = useBulkDeleteTransactionsMutation();
+  const [restoreApi] = useRestoreTransactionMutation();
+  const [bulkRestoreApi] = useBulkRestoreTransactionsMutation();
+  const [createSavedFilterApi] = useCreateSavedFilterMutation();
 
   const transactions = transactionsData?.data || [];
   const meta = transactionsData?.meta;
   const accounts = accountsData?.data || [];
   const categories = categoriesData?.data || [];
+  const savedFilters = savedFiltersData?.data || [];
 
   const {
     register,
@@ -105,9 +117,94 @@ export default function TransactionsPage() {
     if (!confirm("Are you sure you want to delete this transaction?")) return;
     try {
       await deleteTransactionApi(id).unwrap();
-      toast.success("Transaction deleted.");
+      
+      toast.success("Transaction deleted.", {
+        action: {
+          label: "Undo",
+          onClick: async () => {
+            try {
+              await restoreApi(id).unwrap();
+              toast.success("Transaction restored.");
+            } catch (err: any) {
+              toast.error("Failed to restore transaction");
+            }
+          }
+        },
+        duration: 5000,
+      });
     } catch (err: any) {
       toast.error(err?.data?.message || "Failed to delete transaction");
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (!confirm(`Are you sure you want to delete ${selectedIds.length} transactions?`)) return;
+    try {
+      await bulkDeleteApi(selectedIds).unwrap();
+      const idsToRestore = [...selectedIds];
+      setSelectedIds([]);
+      
+      toast.success(`${idsToRestore.length} transactions deleted.`, {
+        action: {
+          label: "Undo All",
+          onClick: async () => {
+            try {
+              await bulkRestoreApi(idsToRestore).unwrap();
+              toast.success("Transactions restored.");
+            } catch (err: any) {
+              toast.error("Failed to restore some transactions");
+            }
+          }
+        },
+        duration: 6000,
+      });
+    } catch (err: any) {
+      toast.error(err?.data?.message || "Failed to bulk delete");
+    }
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.length === transactions.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(transactions.map((t: any) => t._id));
+    }
+  };
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => 
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    );
+  };
+
+  const handleSaveFilter = async () => {
+    const name = prompt("Enter a name for this filter:");
+    if (!name) return;
+    try {
+      await createSavedFilterApi({
+        name,
+        type: "transaction",
+        filter_payload: { search, dateRange, typeFilter },
+      }).unwrap();
+      toast.success("Filter saved successfully!");
+    } catch (err) {
+      toast.error("Failed to save filter");
+    }
+  };
+
+  const applySavedFilter = (filterId: string) => {
+    setActiveFilterId(filterId);
+    if (filterId === "none") {
+      setSearch("");
+      setDateRange("thisMonth");
+      setTypeFilter("all");
+      return;
+    }
+    const filter = savedFilters.find((f: any) => f._id === filterId);
+    if (filter) {
+      setSearch(filter.filter_payload.search || "");
+      setDateRange(filter.filter_payload.dateRange || "thisMonth");
+      setTypeFilter(filter.filter_payload.typeFilter || "all");
     }
   };
 
@@ -172,6 +269,28 @@ export default function TransactionsPage() {
               <SelectItem value="expense">Expense Only</SelectItem>
             </SelectContent>
           </Select>
+
+          {/* Saved Filters Dropdown */}
+          <Select value={activeFilterId} onValueChange={applySavedFilter}>
+            <SelectTrigger className="w-35 px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground font-medium outline-none">
+              <Bookmark className="w-3.5 h-3.5 mr-2 inline-block text-primary" />
+              <SelectValue placeholder="Saved Filters" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">No Filter</SelectItem>
+              {savedFilters.map((f: any) => (
+                <SelectItem key={f._id} value={f._id}>{f.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <button 
+            onClick={handleSaveFilter}
+            className="p-2 rounded-xl bg-secondary border border-border hover:bg-secondary/80 text-muted-foreground transition-colors"
+            title="Save current filters"
+          >
+            <Save className="w-4 h-4" />
+          </button>
         </div>
       </div>
 
@@ -181,6 +300,14 @@ export default function TransactionsPage() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-secondary/60 text-muted-foreground text-[11px] font-bold uppercase tracking-wider border-b border-border">
+                <th scope="col" className="p-4 w-10">
+                  <input 
+                    type="checkbox" 
+                    className="rounded border-border bg-background accent-primary"
+                    checked={transactions.length > 0 && selectedIds.length === transactions.length}
+                    onChange={toggleSelectAll}
+                  />
+                </th>
                 <th scope="col" className="p-4">Date</th>
                 <th scope="col" className="p-4">Description / Notes</th>
                 <th scope="col" className="p-4">Category</th>
@@ -195,8 +322,16 @@ export default function TransactionsPage() {
                 transactions.map((tx: any) => (
                   <tr
                     key={tx._id}
-                    className="hover:bg-secondary/30 transition-colors"
+                    className={`transition-colors ${selectedIds.includes(tx._id) ? 'bg-primary/5 hover:bg-primary/10' : 'hover:bg-secondary/30'}`}
                   >
+                    <td className="p-4">
+                      <input 
+                        type="checkbox" 
+                        className="rounded border-border bg-background accent-primary"
+                        checked={selectedIds.includes(tx._id)}
+                        onChange={() => toggleSelect(tx._id)}
+                      />
+                    </td>
                     <td className="p-4 whitespace-nowrap text-muted-foreground font-semibold">
                       {formatDate(tx.date)}
                     </td>
@@ -285,6 +420,30 @@ export default function TransactionsPage() {
               <ChevronRight className="w-4 h-4" />
             </button>
           </div>
+        </div>
+      )}
+
+      {/* Floating Bulk Action Bar */}
+      {selectedIds.length > 0 && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-card border border-border shadow-2xl rounded-full px-6 py-3 flex items-center gap-4 animate-in slide-in-from-bottom-10 fade-in duration-300">
+          <span className="text-sm font-bold bg-primary/10 text-primary px-2.5 py-0.5 rounded-full">
+            {selectedIds.length} selected
+          </span>
+          <div className="w-px h-6 bg-border mx-2"></div>
+          <button 
+            onClick={handleBulkDelete}
+            disabled={isBulkDeleting}
+            className="flex items-center gap-2 text-sm font-medium text-destructive hover:bg-destructive/10 px-3 py-1.5 rounded-xl transition-colors disabled:opacity-50"
+          >
+            {isBulkDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+            Delete All
+          </button>
+          <button 
+            onClick={() => setSelectedIds([])}
+            className="p-1.5 rounded-full hover:bg-secondary text-muted-foreground transition-colors ml-2"
+          >
+            <X className="w-4 h-4" />
+          </button>
         </div>
       )}
 

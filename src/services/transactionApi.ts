@@ -24,11 +24,47 @@ export const transactionApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: ["Transactions", "Accounts", "Analytics"],
     }),
+    bulkDeleteTransactions: builder.mutation({
+      query: (ids) => ({
+        url: "/transactions/bulk-delete",
+        method: "POST",
+        body: { ids },
+      }),
+      invalidatesTags: ["Transactions", "Accounts", "Analytics"],
+    }),
+    bulkEditTransactions: builder.mutation({
+      query: (data) => ({
+        url: "/transactions/bulk-edit",
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: ["Transactions", "Analytics"],
+    }),
+    restoreTransaction: builder.mutation({
+      query: (id) => ({
+        url: `/transactions/${id}/restore`,
+        method: "POST",
+      }),
+      invalidatesTags: ["Transactions", "Accounts", "Analytics"],
+    }),
+    bulkRestoreTransactions: builder.mutation({
+      query: (ids: string[]) => ({
+        url: "/transactions/bulk-restore",
+        method: "POST",
+        body: { ids },
+      }),
+      invalidatesTags: ["Transactions", "Accounts", "Analytics"],
+    }),
   }),
 });
 
 export const {
   useGetTransactionsQuery,
   useCreateTransactionMutation,
+  useUpdateTransactionMutation,
   useDeleteTransactionMutation,
+  useBulkDeleteTransactionsMutation,
+  useBulkEditTransactionsMutation,
+  useRestoreTransactionMutation,
+  useBulkRestoreTransactionsMutation,
 } = transactionApi;
