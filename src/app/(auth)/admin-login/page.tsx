@@ -94,9 +94,7 @@ function AdminLoginContent() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-background">
-      <div className="fixed inset-0 -z-10 bg-[radial-gradient(ellipse_80%_60%_at_50%_-20%,oklch(0.54_0.19_264/0.08),transparent)] dark:bg-[radial-gradient(ellipse_80%_60%_at_50%_-20%,oklch(0.62_0.19_264/0.12),transparent)]" />
-
+    <>
       <div className="w-full max-w-sm">
         <div className="flex flex-col items-center text-center mb-8">
           <div className="w-11 h-11 rounded-xl bg-destructive flex items-center justify-center mb-4 shadow-lg shadow-destructive/20">
@@ -201,7 +199,7 @@ function AdminLoginContent() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </>
   );
 }
 

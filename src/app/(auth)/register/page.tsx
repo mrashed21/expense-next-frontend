@@ -72,10 +72,13 @@ export default function RegisterPage() {
     register,
     handleSubmit,
     control,
+    watch,
     formState: { errors },
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
   });
+
+  const selectedCity = watch("user_city");
 
   const onSubmit = async (data: RegisterFormValues) => {
     try {
@@ -91,10 +94,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-background">
-      {/* Subtle background pattern */}
-      <div className="fixed inset-0 -z-10 bg-[radial-gradient(ellipse_80%_60%_at_50%_-20%,oklch(0.54_0.19_264/0.08),transparent)] dark:bg-[radial-gradient(ellipse_80%_60%_at_50%_-20%,oklch(0.62_0.19_264/0.12),transparent)]" />
-
+    <>
       <div className="w-full max-w-sm">
         {/* Brand Mark */}
         <div className="flex flex-col items-center text-center mb-8">
@@ -271,10 +271,6 @@ export default function RegisterPage() {
                     name="user_area"
                     control={control}
                     render={({ field }) => {
-                      // Using getValues from form is better, but since we are not passing it,
-                      // we can rely on react-hook-form 'watch' if we want it strictly dynamic.
-                      // Alternatively, we just use control._formValues.user_city
-                      const selectedCity = control._formValues.user_city;
                       const availableAreas =
                         selectedCity && cityAreas[selectedCity]
                           ? cityAreas[selectedCity]
@@ -340,6 +336,6 @@ export default function RegisterPage() {
           </CardFooter>
         </Card>
       </div>
-    </div>
+    </>
   );
 }

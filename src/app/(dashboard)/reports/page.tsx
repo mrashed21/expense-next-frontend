@@ -162,7 +162,7 @@ export default function ReportsPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={handleExportCSV}
             className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-emerald-600 text-white font-semibold text-xs shadow-md hover:bg-emerald-700 transition-colors"
@@ -286,12 +286,12 @@ export default function ReportsPage() {
           <table className="w-full text-left text-xs border-collapse">
             <thead>
               <tr className="bg-secondary/70 border-b border-border text-muted-foreground font-bold uppercase text-[10px]">
-                <th className="p-3">Date</th>
-                <th className="p-3">Description</th>
-                <th className="p-3">Category</th>
-                <th className="p-3">Account</th>
-                <th className="p-3">Type</th>
-                <th className="p-3 text-right">Amount</th>
+                <th scope="col" className="p-3">Date</th>
+                <th scope="col" className="p-3">Description</th>
+                <th scope="col" className="p-3">Category</th>
+                <th scope="col" className="p-3">Account</th>
+                <th scope="col" className="p-3">Type</th>
+                <th scope="col" className="p-3 text-right">Amount</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border font-medium">

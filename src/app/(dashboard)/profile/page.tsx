@@ -482,9 +482,9 @@ export default function ProfilePage() {
           <table className="w-full text-left text-xs border-collapse">
             <thead>
               <tr className="bg-secondary/60 text-muted-foreground uppercase text-[10px] font-bold border-b border-border">
-                <th className="p-3">IP Address</th>
-                <th className="p-3">Device / Browser</th>
-                <th className="p-3 text-right">Timestamp</th>
+                <th scope="col" className="p-3">IP Address</th>
+                <th scope="col" className="p-3">Device / Browser</th>
+                <th scope="col" className="p-3 text-right">Timestamp</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border font-medium">

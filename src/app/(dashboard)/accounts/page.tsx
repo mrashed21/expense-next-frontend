@@ -225,11 +225,11 @@ export default function AccountsPage() {
       {/* Accounts Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {accountsLoading ? (
-          <div className="col-span-3 flex items-center justify-center py-12">
+          <div className="col-span-full flex items-center justify-center py-12">
             <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
           </div>
         ) : accounts.length === 0 ? (
-          <div className="col-span-3 text-center py-12 text-xs text-muted-foreground">
+          <div className="col-span-full text-center py-12 text-xs text-muted-foreground">
             No accounts created yet. Click "Add Account" to get started.
           </div>
         ) : (

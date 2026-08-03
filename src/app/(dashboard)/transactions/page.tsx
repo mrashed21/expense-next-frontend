@@ -181,13 +181,13 @@ export default function TransactionsPage() {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-secondary/60 text-muted-foreground text-[11px] font-bold uppercase tracking-wider border-b border-border">
-                <th className="p-4">Date</th>
-                <th className="p-4">Description / Notes</th>
-                <th className="p-4">Category</th>
-                <th className="p-4">Account</th>
-                <th className="p-4">Type</th>
-                <th className="p-4 text-right">Amount</th>
-                <th className="p-4 text-center">Action</th>
+                <th scope="col" className="p-4">Date</th>
+                <th scope="col" className="p-4">Description / Notes</th>
+                <th scope="col" className="p-4">Category</th>
+                <th scope="col" className="p-4">Account</th>
+                <th scope="col" className="p-4">Type</th>
+                <th scope="col" className="p-4 text-right">Amount</th>
+                <th scope="col" className="p-4 text-center">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border text-xs font-medium">
