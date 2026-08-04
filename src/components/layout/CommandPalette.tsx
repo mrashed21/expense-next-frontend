@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Search, Loader2, X, Command, CreditCard, Folder, Wallet, FileText } from "lucide-react";
 import { useLazyGlobalSearchQuery } from "@/services/searchApi";
+import { useLazyGlobalAdminSearchQuery } from "@/services/adminApi";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useDebounce } from "@/hooks/useDebounce"; // Need to make sure this hook exists or use inline debounce
 
@@ -17,7 +18,12 @@ export function CommandPalette() {
   const router = useRouter();
   const user = useSelector((state: RootState) => state.auth.user);
   
-  const [triggerSearch, { data, isFetching }] = useLazyGlobalSearchQuery();
+  const [triggerUserSearch, { data: userData, isFetching: isUserFetching }] = useLazyGlobalSearchQuery();
+  const [triggerAdminSearch, { data: adminData, isFetching: isAdminFetching }] = useLazyGlobalAdminSearchQuery();
+  
+  const isFetching = isUserFetching || isAdminFetching;
+  const results = (user?.isAdmin ? adminData?.data : userData?.data) || [];
+
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Toggle with Ctrl+K / Cmd+K
@@ -36,13 +42,12 @@ export function CommandPalette() {
   useEffect(() => {
     if (debouncedQuery.length >= 2) {
       if (user?.isAdmin) {
-        return; // Admins don't have a global search API yet, prevent 401 loops
+        triggerAdminSearch(debouncedQuery);
+      } else {
+        triggerUserSearch(debouncedQuery);
       }
-      triggerSearch(debouncedQuery);
     }
-  }, [debouncedQuery, triggerSearch, user]);
-
-  const results = data?.data || [];
+  }, [debouncedQuery, triggerUserSearch, triggerAdminSearch, user]);
 
   const handleSelect = (url: string) => {
     setIsOpen(false);
@@ -56,6 +61,8 @@ export function CommandPalette() {
       case "category": return <Folder className="w-4 h-4 text-indigo-500" />;
       case "account": return <Wallet className="w-4 h-4 text-blue-500" />;
       case "bill": return <FileText className="w-4 h-4 text-purple-500" />;
+      case "user": return <Folder className="w-4 h-4 text-emerald-500" />;
+      case "admin": return <Wallet className="w-4 h-4 text-rose-500" />;
       default: return <Command className="w-4 h-4 text-muted-foreground" />;
     }
   };

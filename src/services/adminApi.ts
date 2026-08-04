@@ -92,6 +92,28 @@ export const adminApi = apiSlice.injectEndpoints({
         body: data,
       }),
     }),
+    updateAdminProfile: builder.mutation({
+      query: (data) => ({
+        url: "/admin/profile",
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: ["AdminUsers"] as any,
+    }),
+    updateAdminProfileImage: builder.mutation({
+      query: (formData) => ({
+        url: "/admin/profile-image",
+        method: "PATCH",
+        body: formData,
+      }),
+      invalidatesTags: ["AdminUsers"] as any,
+    }),
+    globalAdminSearch: builder.query({
+      query: (q) => ({
+        url: "/admin/search",
+        params: { q },
+      }),
+    }),
   }),
 });
 
@@ -108,4 +130,8 @@ export const {
   useGetErrorLogsQuery,
   useGetAuditLogsQuery,
   useBroadcastNotificationMutation,
+  useUpdateAdminProfileMutation,
+  useUpdateAdminProfileImageMutation,
+  useGlobalAdminSearchQuery,
+  useLazyGlobalAdminSearchQuery,
 } = adminApi;

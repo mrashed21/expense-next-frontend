@@ -19,6 +19,10 @@ import {
   useGetDevicesQuery,
   useRevokeDeviceMutation,
 } from "@/services/userApi";
+import {
+  useUpdateAdminProfileMutation,
+  useUpdateAdminProfileImageMutation
+} from "@/services/adminApi";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Camera,
@@ -62,12 +66,21 @@ export default function ProfilePage() {
   const dispatch = useDispatch();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { data: profileData } = useGetProfileQuery({});
+  const authUser = useSelector((state: any) => state.auth.user);
+  const { data: profileData } = useGetProfileQuery({}, { skip: !!authUser?.isAdmin });
   const { data: historyData } = useGetLoginHistoryQuery({});
-  const [updateProfileApi, { isLoading: isUpdatingProfile }] =
+  const [updateProfileApi, { isLoading: isUpdatingUserProfile }] =
     useUpdateProfileMutation();
-  const [updateProfileImageApi, { isLoading: isUploadingImage }] =
+  const [updateProfileImageApi, { isLoading: isUploadingUserImage }] =
     useUpdateProfileImageMutation();
+    
+  const [updateAdminProfileApi, { isLoading: isUpdatingAdminProfile }] =
+    useUpdateAdminProfileMutation();
+  const [updateAdminProfileImageApi, { isLoading: isUploadingAdminImage }] =
+    useUpdateAdminProfileImageMutation();
+    
+  const isUpdatingProfile = isUpdatingUserProfile || isUpdatingAdminProfile;
+  const isUploadingImage = isUploadingUserImage || isUploadingAdminImage;
   const [changePasswordApi, { isLoading: isChangingPassword }] =
     useChangePasswordMutation();
   const [deleteAccountApi, { isLoading: isDeleting }] =
@@ -83,7 +96,7 @@ export default function ProfilePage() {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
 
-  const user = profileData?.data || {};
+  const user = authUser?.isAdmin ? authUser : (profileData?.data || {});
   const history = historyData?.data || [];
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -135,7 +148,23 @@ export default function ProfilePage() {
 
   const onUpdateProfile = async (data: ProfileFormValues) => {
     try {
-      await updateProfileApi(data).unwrap();
+      if (authUser?.isAdmin) {
+        const adminData = {
+          admin_name: data.user_name,
+          admin_phone: data.user_phone,
+          admin_area: data.user_area,
+          admin_city: data.user_city,
+          admin_country: data.user_country,
+          currency: data.currency,
+        };
+        await updateAdminProfileApi(adminData).unwrap();
+        dispatch(updateUser({ 
+          user_name: data.user_name, 
+          admin_name: data.user_name 
+        } as any)); // update local redux state
+      } else {
+        await updateProfileApi(data).unwrap();
+      }
       toast.success("Profile updated successfully!");
     } catch (err: any) {
       toast.error(err?.data?.message || "Failed to update profile");
@@ -222,10 +251,15 @@ export default function ProfilePage() {
     if (!selectedFile) return;
     
     const formData = new FormData();
-    formData.append("user_profile_image", selectedFile);
+    formData.append(authUser?.isAdmin ? "admin_profile_image" : "user_profile_image", selectedFile);
 
     try {
-      await updateProfileImageApi(formData).unwrap();
+      if (authUser?.isAdmin) {
+        const res = await updateAdminProfileImageApi(formData).unwrap();
+        dispatch(updateUser({ user_profile_image: res.data.admin_profile_image }));
+      } else {
+        await updateProfileImageApi(formData).unwrap();
+      }
       toast.success("Profile image updated!");
       setIsCropModalOpen(false);
       setSelectedFile(null);
