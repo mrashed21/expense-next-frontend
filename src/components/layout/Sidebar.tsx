@@ -50,6 +50,7 @@ const navigationItems = [
   { name: "Goals", href: "/goals", icon: Target },
   { name: "Bills", href: "/bills", icon: FileCheck },
   { name: "Analytics", href: "/analytics", icon: BarChart3 },
+  { name: "Net Worth", href: "/net-worth", icon: TrendingUp },
   { name: "Reports", href: "/reports", icon: FileText },
   { name: "Debts", href: "/debts", icon: HandCoins },
   { name: "Investments", href: "/investments", icon: TrendingUp },
