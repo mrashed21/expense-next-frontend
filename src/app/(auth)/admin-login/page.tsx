@@ -49,7 +49,7 @@ function AdminLoginContent() {
   const [adminLoginApi, { isLoading }] = useAdminLoginMutation();
   const [showPassword, setShowPassword] = useState(false);
 
-  const redirectUrl = searchParams.get("redirect") || "/admin";
+  const redirectUrl = "/admin";
 
   useEffect(() => {
     if (!authLoading && isAuthenticated && user?.isAdmin) {

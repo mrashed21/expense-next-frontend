@@ -7,11 +7,15 @@ import { useLazyGlobalSearchQuery } from "@/services/searchApi";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useDebounce } from "@/hooks/useDebounce"; // Need to make sure this hook exists or use inline debounce
 
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
+
 export function CommandPalette() {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
   const debouncedQuery = useDebounce(query, 300);
   const router = useRouter();
+  const user = useSelector((state: RootState) => state.auth.user);
   
   const [triggerSearch, { data, isFetching }] = useLazyGlobalSearchQuery();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -31,9 +35,12 @@ export function CommandPalette() {
   // Trigger search when debounced query changes
   useEffect(() => {
     if (debouncedQuery.length >= 2) {
+      if (user?.isAdmin) {
+        return; // Admins don't have a global search API yet, prevent 401 loops
+      }
       triggerSearch(debouncedQuery);
     }
-  }, [debouncedQuery, triggerSearch]);
+  }, [debouncedQuery, triggerSearch, user]);
 
   const results = data?.data || [];
 

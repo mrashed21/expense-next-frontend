@@ -92,10 +92,21 @@ const baseQueryWithReauth: BaseQueryFn<
     const refreshResult: any = await refreshPromise;
 
     if (refreshResult.data && refreshResult.data.success) {
-      const user =
+      let user =
         refreshResult.data.data.user ||
         refreshResult.data.data.admin ||
         state.auth.user;
+        
+      if (refreshResult.data.data.admin) {
+        user = {
+          ...user,
+          user_name: user.admin_name || user.user_name,
+          user_email: user.admin_email || user.user_email,
+          user_role: user.admin_role || user.user_role,
+          isAdmin: true,
+        };
+      }
+
       if (user) {
         api.dispatch(setCredentials({ user }));
       }
