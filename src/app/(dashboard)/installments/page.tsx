@@ -12,7 +12,7 @@ import {
   useUpdateInstallmentMutation,
 } from "@/services/installmentApi";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, Pencil, Plus, Trash2, X, Search, Calendar, CheckCircle2, CreditCard } from "lucide-react";
+import { Calendar, CheckCircle2, CreditCard, Loader2, Pencil, Plus, Search, Trash2, X } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -45,7 +45,7 @@ export default function InstallmentsPage() {
     search: searchTerm,
     status: statusFilter,
   });
-  const { data: accountsData } = useGetAccountsQuery();
+  const { data: accountsData } = useGetAccountsQuery({});
   
   const [createInstallmentApi, { isLoading: isCreating }] = useCreateInstallmentMutation();
   const [updateInstallmentApi, { isLoading: isUpdating }] = useUpdateInstallmentMutation();

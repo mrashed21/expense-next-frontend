@@ -20,6 +20,7 @@ import {
   useRestoreTransactionMutation,
   useBulkRestoreTransactionsMutation,
   useCreateTransactionMutation,
+  useBulkEditTransactionsMutation,
 } from "@/services/transactionApi";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -337,10 +338,9 @@ export default function TransactionsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border text-xs font-medium">
-              {transactions.length > 0 ? (
-                transactions.map((tx: any) => (
-                  <tr
-                    key={tx._id}
+              {transactions.map((tx: any) => (
+                <tr
+                  key={tx._id}
                     className={`transition-colors ${selectedIds.includes(tx._id) ? 'bg-primary/5 hover:bg-primary/10' : 'hover:bg-secondary/30'}`}
                   >
                     <td className="p-4">
@@ -401,8 +401,7 @@ export default function TransactionsPage() {
                       </button>
                     </td>
                   </tr>
-                ))
-              )}
+                ))}
             </tbody>
           </table>
         </div>

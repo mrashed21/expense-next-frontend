@@ -7,34 +7,20 @@ import {
   ArrowDownCircle,
   ArrowUpCircle,
   BarChart3,
-  Calendar,
+  CreditCard,
   Goal,
+  Landmark,
   LayoutDashboard,
   Loader2,
   PieChart as PieIcon,
   Target,
   TrendingUp,
-  Wallet,
-  Landmark,
-  CreditCard
+  Wallet
 } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useCallback, useState } from "react";
 
-const Area = dynamic(() => import("recharts").then((mod) => mod.Area), { ssr: false });
-const AreaChart = dynamic(() => import("recharts").then((mod) => mod.AreaChart), { ssr: false });
-const Bar = dynamic(() => import("recharts").then((mod) => mod.Bar), { ssr: false });
-const BarChart = dynamic(() => import("recharts").then((mod) => mod.BarChart), { ssr: false });
-const Cell = dynamic(() => import("recharts").then((mod) => mod.Cell), { ssr: false });
-const Legend = dynamic(() => import("recharts").then((mod) => mod.Legend), { ssr: false });
-const Pie = dynamic(() => import("recharts").then((mod) => mod.Pie), { ssr: false });
-const PieChart = dynamic(() => import("recharts").then((mod) => mod.PieChart), { ssr: false });
-const ResponsiveContainer = dynamic(() => import("recharts").then((mod) => mod.ResponsiveContainer), { ssr: false });
-const Tooltip = dynamic(() => import("recharts").then((mod) => mod.Tooltip), { ssr: false });
-const XAxis = dynamic(() => import("recharts").then((mod) => mod.XAxis), { ssr: false });
-const YAxis = dynamic(() => import("recharts").then((mod) => mod.YAxis), { ssr: false });
-const CartesianGrid = dynamic(() => import("recharts").then((mod) => mod.CartesianGrid), { ssr: false });
-
+import { Area, AreaChart, Bar, BarChart, Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid } from "recharts";
 export default function AnalyticsPage() {
   const { formatCurrency } = useCurrency();
   const { data: analyticsData, isLoading } = useGetAnalyticsSummaryQuery({});
