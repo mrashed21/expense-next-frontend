@@ -57,6 +57,7 @@ export default function TransactionsPage() {
   const [typeFilter, setTypeFilter] = useState("all");
   const [page, setPage] = useState(1);
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isBulkEditOpen, setIsBulkEditOpen] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [activeFilterId, setActiveFilterId] = useState<string>("none");
 
@@ -81,6 +82,7 @@ export default function TransactionsPage() {
     useCreateTransactionMutation();
   const [deleteTransactionApi] = useDeleteTransactionMutation();
   const [bulkDeleteApi, { isLoading: isBulkDeleting }] = useBulkDeleteTransactionsMutation();
+  const [bulkEditApi, { isLoading: isBulkEditing }] = useBulkEditTransactionsMutation();
   const [restoreApi] = useRestoreTransactionMutation();
   const [bulkRestoreApi] = useBulkRestoreTransactionsMutation();
   const [createSavedFilterApi] = useCreateSavedFilterMutation();
@@ -161,6 +163,17 @@ export default function TransactionsPage() {
       });
     } catch (err: any) {
       toast.error(err?.data?.message || "Failed to bulk delete");
+    }
+  };
+
+  const handleBulkEdit = async (data: any) => {
+    try {
+      await bulkEditApi({ ids: selectedIds, ...data }).unwrap();
+      toast.success(`${selectedIds.length} transactions updated.`);
+      setIsBulkEditOpen(false);
+      setSelectedIds([]);
+    } catch (err: any) {
+      toast.error(err?.data?.message || "Failed to bulk edit");
     }
   };
 
@@ -432,6 +445,12 @@ export default function TransactionsPage() {
           </span>
           <div className="w-px h-6 bg-border mx-2"></div>
           <button 
+            onClick={() => setIsBulkEditOpen(true)}
+            className="flex items-center gap-2 text-sm font-medium text-foreground hover:bg-secondary px-3 py-1.5 rounded-xl transition-colors"
+          >
+            Edit All
+          </button>
+          <button 
             onClick={handleBulkDelete}
             disabled={isBulkDeleting}
             className="flex items-center gap-2 text-sm font-medium text-destructive hover:bg-destructive/10 px-3 py-1.5 rounded-xl transition-colors disabled:opacity-50"
@@ -546,6 +565,56 @@ export default function TransactionsPage() {
                 ) : (
                   "Save Transaction"
                 )}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Bulk Edit Modal */}
+      {isBulkEditOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+          <div role="dialog" aria-modal="true" aria-labelledby="bulk-modal-title" className="w-full max-w-sm bg-card border border-border p-6 rounded-3xl space-y-4 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-border pb-3">
+              <h3 id="bulk-modal-title" className="text-base font-bold text-foreground">
+                Bulk Edit ({selectedIds.length} selected)
+              </h3>
+              <button
+                onClick={() => setIsBulkEditOpen(false)}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              const formData = new FormData(e.currentTarget);
+              const catId = formData.get("category_id") as string;
+              if (!catId || catId === "none") return;
+              handleBulkEdit({ category_id: catId });
+            }} className="space-y-4">
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-foreground">Update Category</label>
+                <select 
+                  name="category_id"
+                  className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
+                  required
+                >
+                  <option value="">Select a new category...</option>
+                  {categories.map((c: any) => (
+                    <option key={c._id} value={c._id}>{c.name} ({c.type})</option>
+                  ))}
+                </select>
+              </div>
+              <p className="text-[10px] text-muted-foreground italic">Note: Only category updating is supported in MVP for bulk operations.</p>
+              
+              <button
+                type="submit"
+                disabled={isBulkEditing}
+                className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-xs shadow-md hover:bg-primary/90 transition-colors flex justify-center"
+              >
+                {isBulkEditing ? <Loader2 className="w-4 h-4 animate-spin" /> : "Apply Changes"}
               </button>
             </form>
           </div>
