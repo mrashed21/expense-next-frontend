@@ -34,7 +34,7 @@ import { toast } from "sonner";
 import { useSocket } from "@/hooks/useSocket";
 import { useGetNotificationsQuery } from "@/services/notificationApi";
 import { ThemeToggle } from "./ThemeToggle";
-import { CommandPalette } from "../custom/CommandPalette";
+import { CommandPalette } from "./CommandPalette";
 
 export function Header() {
   const router = useRouter();
@@ -42,18 +42,6 @@ export function Header() {
   const { user } = useSelector((state: RootState) => state.auth);
   const [logoutApi] = useLogoutMutation();
   const [logoutAllApi] = useLogoutAllDevicesMutation();
-  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
-        e.preventDefault();
-        setIsCommandPaletteOpen(true);
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
 
   // Mount the singleton socket connection for this session
   useSocket();
@@ -115,23 +103,9 @@ export function Header() {
 
         {/* Desktop Search */}
         <div className="hidden sm:flex items-center gap-2">
-            <button
-              onClick={() => setIsCommandPaletteOpen(true)}
-              className="flex items-center gap-2 h-8 px-3 rounded-lg bg-secondary/60 border border-border/60 w-56 md:w-72 text-muted-foreground focus:text-foreground focus:border-primary/40 focus:bg-secondary transition-all text-xs"
-            >
-              <Search className="w-3.5 h-3.5 shrink-0" />
-              <span>Search...</span>
-              <kbd className="ml-auto flex items-center gap-1 font-mono text-[10px] font-medium text-muted-foreground bg-background border border-border rounded px-1.5 opacity-70">
-                ⌘K
-              </kbd>
-            </button>
+            <CommandPalette />
         </div>
       </div>
-
-      <CommandPalette 
-        isOpen={isCommandPaletteOpen} 
-        onClose={() => setIsCommandPaletteOpen(false)} 
-      />
 
       {/* Right Controls */}
       <div className="flex items-center gap-1.5">
