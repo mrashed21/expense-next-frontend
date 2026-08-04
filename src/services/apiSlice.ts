@@ -126,6 +126,7 @@ export const apiSlice = createApi({
     "Notifications",
     "Analytics",
     "SavedFilters",
+    "Assets",
   ],
   endpoints: () => ({}),
 });
