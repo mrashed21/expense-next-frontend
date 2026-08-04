@@ -4,7 +4,7 @@ import FormSelect from "@/components/custom/form-select";
 import PhonesInput from "@/components/custom/phone-input";
 import { bangladeshCities, cityAreas } from "@/lib/locationData";
 import { formatDate } from "@/lib/utils";
-import { logout } from "@/redux/slices/authSlice";
+import { logout, updateUser } from "@/redux/slices/authSlice";
 import { useLogoutAllDevicesMutation } from "@/services/authApi";
 import {
   useChangePasswordMutation,
@@ -40,7 +40,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -73,7 +73,7 @@ export default function ProfilePage() {
     useUpdateProfileMutation();
   const [updateProfileImageApi, { isLoading: isUploadingUserImage }] =
     useUpdateProfileImageMutation();
-    
+
   const [updateAdminProfileApi, { isLoading: isUpdatingAdminProfile }] =
     useUpdateAdminProfileMutation();
   const [updateAdminProfileImageApi, { isLoading: isUploadingAdminImage }] =
