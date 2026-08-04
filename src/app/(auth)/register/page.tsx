@@ -40,16 +40,30 @@ import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
 import { toast } from "sonner";
+import { PasswordStrength } from "@/components/auth/PasswordStrength";
 import { z } from "zod";
+
+const passwordSchema = z
+  .string()
+  .min(8, "Password must be at least 8 characters")
+  .max(128, "Password must not exceed 128 characters")
+  .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+  .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+  .regex(/[0-9]/, "Password must contain at least one number")
+  .regex(/[^a-zA-Z0-9]/, "Password must contain at least one special character");
 
 const registerSchema = z.object({
   user_name: z.string().min(2, "Name must be at least 2 characters"),
   user_email: z.string().email("Please enter a valid email address"),
-  user_password: z.string().min(8, "Password must be at least 8 characters"),
+  user_password: passwordSchema,
+  user_confirm_password: z.string(),
   user_phone: z.string().optional(),
   user_city: z.string().optional(),
   user_area: z.string().optional(),
   user_country: z.string().optional(),
+}).refine((data) => data.user_password === data.user_confirm_password, {
+  message: "Passwords do not match",
+  path: ["user_confirm_password"],
 });
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
@@ -61,6 +75,7 @@ export default function RegisterPage() {
   );
   const [registerApi, { isLoading }] = useRegisterMutation();
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   useEffect(() => {
     if (!authLoading && isAuthenticated) {
@@ -79,6 +94,7 @@ export default function RegisterPage() {
   });
 
   const selectedCity = watch("user_city");
+  const currentPassword = watch("user_password");
 
   const onSubmit = async (data: RegisterFormValues) => {
     try {
@@ -191,6 +207,7 @@ export default function RegisterPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
                   >
                     {showPassword ? (
@@ -200,9 +217,47 @@ export default function RegisterPage() {
                     )}
                   </button>
                 </div>
+                <PasswordStrength password={currentPassword} />
                 {errors.user_password && (
                   <p className="text-[11px] text-destructive">
                     {errors.user_password.message}
+                  </p>
+                )}
+              </div>
+
+              {/* Confirm Password */}
+              <div className="space-y-1.5">
+                <Label
+                  htmlFor="confirm_password"
+                  className="text-xs font-medium text-foreground"
+                >
+                  Confirm Password
+                </Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                  <Input
+                    id="confirm_password"
+                    {...register("user_confirm_password")}
+                    type={showConfirmPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    className="pl-9 pr-9 h-9 text-sm bg-secondary/40 border-border/60"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOff className="w-4 h-4" />
+                    ) : (
+                      <Eye className="w-4 h-4" />
+                    )}
+                  </button>
+                </div>
+                {errors.user_confirm_password && (
+                  <p className="text-[11px] text-destructive">
+                    {errors.user_confirm_password.message}
                   </p>
                 )}
               </div>

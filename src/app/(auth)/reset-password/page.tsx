@@ -24,11 +24,25 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { PasswordStrength } from "@/components/auth/PasswordStrength";
 import { z } from "zod";
+
+const passwordSchema = z
+  .string()
+  .min(8, "Password must be at least 8 characters")
+  .max(128, "Password must not exceed 128 characters")
+  .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+  .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+  .regex(/[0-9]/, "Password must contain at least one number")
+  .regex(/[^a-zA-Z0-9]/, "Password must contain at least one special character");
 
 const resetSchema = z.object({
   otp_code: z.string().length(6, "OTP must be 6 digits"),
-  new_password: z.string().min(8, "New password must be at least 8 characters"),
+  new_password: passwordSchema,
+  confirm_password: z.string(),
+}).refine((data) => data.new_password === data.confirm_password, {
+  message: "Passwords do not match",
+  path: ["confirm_password"],
 });
 
 type ResetFormValues = z.infer<typeof resetSchema>;
@@ -39,14 +53,18 @@ function ResetPasswordContent() {
   const email = searchParams.get("email") || "";
   const [resetPasswordApi, { isLoading }] = useResetPasswordMutation();
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<ResetFormValues>({
     resolver: zodResolver(resetSchema),
   });
+
+  const currentPassword = watch("new_password");
 
   const onSubmit = async (data: ResetFormValues) => {
     try {
@@ -107,8 +125,14 @@ function ResetPasswordContent() {
                   <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
                   <Input
                     id="otp"
-                    {...register("otp_code")}
+                    {...register("otp_code", {
+                      onChange: (e) => {
+                        e.target.value = e.target.value.replace(/[^0-9]/g, "");
+                      }
+                    })}
                     type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     maxLength={6}
                     placeholder="6-digit OTP"
                     className="pl-9 h-9 text-sm tracking-widest bg-secondary/40 border-border/60"
@@ -141,6 +165,7 @@ function ResetPasswordContent() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
                   >
                     {showPassword ? (
@@ -150,9 +175,47 @@ function ResetPasswordContent() {
                     )}
                   </button>
                 </div>
+                <PasswordStrength password={currentPassword} />
                 {errors.new_password && (
                   <p className="text-[11px] text-destructive">
                     {errors.new_password.message}
+                  </p>
+                )}
+              </div>
+
+              {/* Confirm Password */}
+              <div className="space-y-1.5">
+                <Label
+                  htmlFor="confirm-password"
+                  className="text-xs font-medium text-foreground"
+                >
+                  Confirm password
+                </Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                  <Input
+                    id="confirm-password"
+                    {...register("confirm_password")}
+                    type={showConfirmPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    className="pl-9 pr-9 h-9 text-sm bg-secondary/40 border-border/60"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOff className="w-4 h-4" />
+                    ) : (
+                      <Eye className="w-4 h-4" />
+                    )}
+                  </button>
+                </div>
+                {errors.confirm_password && (
+                  <p className="text-[11px] text-destructive">
+                    {errors.confirm_password.message}
                   </p>
                 )}
               </div>

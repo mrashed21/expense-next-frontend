@@ -39,7 +39,7 @@ const loginSchema = z.object({
 });
 
 const twoFaSchema = z.object({
-  code: z.string().length(6, "Code must be 6 digits")
+  code: z.string().min(6, "Code must be at least 6 digits")
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -209,6 +209,7 @@ function LoginContent() {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
+                      aria-label={showPassword ? "Hide password" : "Show password"}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
                     >
                       {showPassword ? (
@@ -253,11 +254,16 @@ function LoginContent() {
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
                     <Input
                       id="code"
-                      {...register2FA("code")}
+                      {...register2FA("code", {
+                        onChange: (e) => {
+                          e.target.value = e.target.value.replace(/[^0-9a-zA-Z-]/g, "");
+                        }
+                      })}
                       type="text"
+                      inputMode="text"
                       placeholder="000000"
-                      maxLength={6}
-                      className="pl-9 h-9 text-sm bg-secondary/40 border-border/60 text-center tracking-widest font-mono"
+                      maxLength={20}
+                      className="pl-9 h-9 text-sm bg-secondary/40 border-border/60 text-center tracking-widest font-mono uppercase"
                     />
                   </div>
                   {errors2FA.code && (

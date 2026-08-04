@@ -23,6 +23,8 @@ import {
   useResendOtpMutation,
   useVerifyOtpMutation,
 } from "../../../services/authApi";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 
 const otpSchema = z.object({
   otp_code: z.string().length(6, "OTP must be exactly 6 digits"),
@@ -45,6 +47,14 @@ function VerifyOtpContent() {
     }, 1000);
     return () => clearInterval(timer);
   }, [countdown]);
+
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.replace("/");
+    }
+  }, [isAuthenticated, router]);
 
   const {
     register,
@@ -125,8 +135,14 @@ function VerifyOtpContent() {
                 </Label>
                 <Input
                   id="otp"
-                  {...register("otp_code")}
+                  {...register("otp_code", {
+                    onChange: (e) => {
+                      e.target.value = e.target.value.replace(/[^0-9]/g, "");
+                    }
+                  })}
                   type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   maxLength={6}
                   placeholder="000000"
                   className="text-center tracking-[0.5em] text-lg font-semibold h-11 bg-secondary/40 border-border/60"
