@@ -133,6 +133,10 @@ export const apiSlice = createApi({
     "Installments",
     "NetWorth",
     "Recurring",
+    "AdminSystemHealth",
+    "AdminUsers",
+    "AdminDashboard",
+    "AdminActivity",
   ],
   endpoints: () => ({}),
 });

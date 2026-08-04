@@ -10,7 +10,7 @@ import { useSelector } from "react-redux";
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { isAuthenticated, isLoading } = useSelector(
+  const { isAuthenticated, isLoading, user } = useSelector(
     (state: RootState) => state.auth,
   );
 
@@ -18,10 +18,14 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   useSocket();
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.replace(`/login?redirect=${encodeURIComponent(pathname)}`);
+    if (!isLoading) {
+      if (!isAuthenticated) {
+        router.replace(`/login?redirect=${encodeURIComponent(pathname || "/")}`);
+      } else if (user?.isAdmin && !pathname?.startsWith("/admin")) {
+        router.replace("/admin");
+      }
     }
-  }, [isLoading, isAuthenticated, router, pathname]);
+  }, [isLoading, isAuthenticated, user, pathname, router]);
 
   if (isLoading) {
     return (

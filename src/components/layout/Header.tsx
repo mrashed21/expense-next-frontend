@@ -48,10 +48,11 @@ export function Header() {
 
   // Live unread notification count for the bell badge
   // pollingInterval: 0 — updates come exclusively via socket cache invalidation
-  const { data: notificationsData } = useGetNotificationsQuery(
-    {},
-    { refetchOnFocus: false, refetchOnReconnect: true },
-  );
+  const { data: notificationsData } = useGetNotificationsQuery(undefined, {
+    skip: user?.isAdmin,
+    refetchOnFocus: false,
+    refetchOnReconnect: true,
+  });
   const unreadCount = useMemo(
     () => (notificationsData?.data || []).filter((n: any) => !n.is_read).length,
     [notificationsData],
