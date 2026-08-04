@@ -78,13 +78,14 @@ function AdminLoginContent() {
           isAdmin: true,
         };
 
+        localStorage.setItem("isAdmin", "true");
         dispatch(
           setCredentials({
             user: userObj as any,
           }),
         );
         toast.success("Admin login successful.");
-        router.push(redirectUrl);
+        router.push("/admin");
       }
     } catch (err: any) {
       toast.error(

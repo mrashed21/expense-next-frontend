@@ -94,6 +94,7 @@ function LoginContent() {
       }
 
       if (response.success) {
+        localStorage.removeItem("isAdmin");
         dispatch(
           setCredentials({
             user: response.data.user,
@@ -114,6 +115,7 @@ function LoginContent() {
     try {
       const response: any = await verify2FA({ tempToken, code: data.code }).unwrap();
       if (response.success) {
+        localStorage.removeItem("isAdmin");
         dispatch(
           setCredentials({
             user: response.data.user,

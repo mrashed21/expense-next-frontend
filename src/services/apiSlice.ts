@@ -74,7 +74,8 @@ const baseQueryWithReauth: BaseQueryFn<
 
     isRefreshing = true;
     const state = api.getState() as RootState;
-    const isAdmin = state.auth.user?.isAdmin;
+    const isLocalAdmin = typeof window !== "undefined" ? localStorage.getItem("isAdmin") === "true" : false;
+    const isAdmin = state.auth.user?.isAdmin || isLocalAdmin;
     const refreshUrl = isAdmin
       ? "/admin/auth/refresh-token"
       : "/auth/refresh-token";
