@@ -54,6 +54,7 @@ const navigationItems = [
   { name: "Debts", href: "/debts", icon: HandCoins },
   { name: "Investments", href: "/investments", icon: TrendingUp },
   { name: "Assets", href: "/assets", icon: Home },
+  { name: "Installments", href: "/installments", icon: Calendar },
   { name: "Calendar", href: "/calendar", icon: Calendar },
   { name: "Notifications", href: "/notifications", icon: Bell },
 ];
