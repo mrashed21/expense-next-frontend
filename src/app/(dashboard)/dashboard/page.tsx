@@ -110,7 +110,7 @@ export default function DashboardPage() {
       {/* KPI Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Net Worth */}
-        <div className="glass-card p-5 rounded-3xl space-y-3 relative overflow-hidden border border-border">
+        <div className="glass-card p-5 rounded-3xl space-y-3 relative overflow-hidden border border-border hover:-translate-y-1 hover:shadow-xl hover:border-primary/30 transition-all duration-300 group">
           <div className="absolute top-0 right-0 p-4 opacity-5">
             <Wallet className="w-24 h-24" />
           </div>
@@ -134,7 +134,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Monthly Income */}
-        <div className="glass-card p-5 rounded-3xl space-y-3 relative overflow-hidden border border-border">
+        <div className="glass-card p-5 rounded-3xl space-y-3 relative overflow-hidden border border-border hover:-translate-y-1 hover:shadow-xl hover:border-emerald-500/30 transition-all duration-300 group">
           <div className="flex items-center gap-2 text-emerald-500">
             <TrendingUp className="w-5 h-5" />
             <span className="text-xs font-bold uppercase tracking-wider">This Month In</span>
@@ -150,7 +150,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Monthly Expense */}
-        <div className="glass-card p-5 rounded-3xl space-y-3 relative overflow-hidden border border-border">
+        <div className="glass-card p-5 rounded-3xl space-y-3 relative overflow-hidden border border-border hover:-translate-y-1 hover:shadow-xl hover:border-rose-500/30 transition-all duration-300 group">
           <div className="flex items-center gap-2 text-rose-500">
             <TrendingDown className="w-5 h-5" />
             <span className="text-xs font-bold uppercase tracking-wider">This Month Out</span>
@@ -166,7 +166,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Savings Rate */}
-        <div className="glass-card p-5 rounded-3xl space-y-3 relative overflow-hidden border border-border bg-gradient-to-br from-emerald-500/5 to-transparent">
+        <div className="glass-card p-5 rounded-3xl space-y-3 relative overflow-hidden border border-border bg-gradient-to-br from-emerald-500/5 to-transparent hover:-translate-y-1 hover:shadow-xl hover:border-emerald-500/30 transition-all duration-300 group">
           <div className="flex items-center gap-2 text-emerald-500">
             <PieChart className="w-5 h-5" />
             <span className="text-xs font-bold uppercase tracking-wider">Savings Rate</span>
@@ -197,23 +197,23 @@ export default function DashboardPage() {
           <div className="glass-card p-6 rounded-3xl border border-border">
             <h2 className="text-base font-bold text-foreground mb-4">Portfolio Overview</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <Link href="/accounts" className="p-4 rounded-2xl bg-secondary/50 border border-border hover:border-primary/50 transition-colors">
-                <Wallet className="w-5 h-5 text-emerald-500 mb-2" />
+              <Link href="/accounts" className="p-4 rounded-2xl bg-secondary/50 border border-border hover:border-emerald-500/50 hover:bg-emerald-500/5 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 group">
+                <Wallet className="w-5 h-5 text-emerald-500 mb-2 group-hover:scale-110 transition-transform" />
                 <p className="text-xs text-muted-foreground font-semibold">Cash</p>
                 <p className="text-sm font-bold text-foreground">{formatCurrency(netWorthInfo.breakdown.assets.cash)}</p>
               </Link>
-              <Link href="/investments" className="p-4 rounded-2xl bg-secondary/50 border border-border hover:border-primary/50 transition-colors">
-                <TrendingUp className="w-5 h-5 text-blue-500 mb-2" />
+              <Link href="/investments" className="p-4 rounded-2xl bg-secondary/50 border border-border hover:border-blue-500/50 hover:bg-blue-500/5 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 group">
+                <TrendingUp className="w-5 h-5 text-blue-500 mb-2 group-hover:scale-110 transition-transform" />
                 <p className="text-xs text-muted-foreground font-semibold">Investments</p>
                 <p className="text-sm font-bold text-foreground">{formatCurrency(netWorthInfo.breakdown.assets.investments)}</p>
               </Link>
-              <Link href="/assets" className="p-4 rounded-2xl bg-secondary/50 border border-border hover:border-primary/50 transition-colors">
-                <CircleDollarSign className="w-5 h-5 text-purple-500 mb-2" />
+              <Link href="/assets" className="p-4 rounded-2xl bg-secondary/50 border border-border hover:border-purple-500/50 hover:bg-purple-500/5 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 group">
+                <CircleDollarSign className="w-5 h-5 text-purple-500 mb-2 group-hover:scale-110 transition-transform" />
                 <p className="text-xs text-muted-foreground font-semibold">Physical Assets</p>
                 <p className="text-sm font-bold text-foreground">{formatCurrency(netWorthInfo.breakdown.assets.physical_assets)}</p>
               </Link>
-              <Link href="/debts" className="p-4 rounded-2xl bg-secondary/50 border border-border hover:border-primary/50 transition-colors">
-                <CreditCard className="w-5 h-5 text-rose-500 mb-2" />
+              <Link href="/debts" className="p-4 rounded-2xl bg-secondary/50 border border-border hover:border-rose-500/50 hover:bg-rose-500/5 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 group">
+                <CreditCard className="w-5 h-5 text-rose-500 mb-2 group-hover:scale-110 transition-transform" />
                 <p className="text-xs text-muted-foreground font-semibold">Debt (Owed)</p>
                 <p className="text-sm font-bold text-foreground">{formatCurrency(netWorthInfo.breakdown.liabilities.money_borrowed)}</p>
               </Link>

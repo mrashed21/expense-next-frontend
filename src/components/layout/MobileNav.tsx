@@ -38,7 +38,7 @@ export function MobileNav() {
   const itemsToRender = user?.isAdmin ? adminMobileItems : mobileItems;
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-card border-t border-border z-40 flex items-center px-2 shadow-2xl shadow-black/10">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-card border-t border-border z-40 flex items-center px-2 shadow-2xl shadow-black/10 pb-[env(safe-area-inset-bottom)] box-content">
       {itemsToRender.map((item) => {
         const isActive =
           pathname === item.href || pathname.startsWith(`${item.href}/`);
@@ -49,10 +49,10 @@ export function MobileNav() {
             key={item.name}
             href={item.href}
             className={cn(
-              "flex flex-col items-center justify-center flex-1 py-1.5 gap-1 rounded-xl transition-colors",
+              "flex flex-col items-center justify-center flex-1 py-1.5 gap-1 rounded-xl transition-all duration-200 active:scale-95 select-none",
               isActive
                 ? "text-primary"
-                : "text-muted-foreground hover:text-foreground",
+                : "text-muted-foreground hover:text-foreground hover:bg-secondary/50",
             )}
           >
             <div

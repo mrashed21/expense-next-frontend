@@ -23,11 +23,13 @@ import {
 } from "@/services/transactionApi";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useDebounce } from "@/hooks/useDebounce";
-import { Bookmark, ChevronLeft, ChevronRight, Loader2, Plus, Save, Search, Trash2, X } from "lucide-react";
+import { Bookmark, ChevronLeft, ChevronRight, Loader2, Plus, Save, Search, Trash2, X, Receipt } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { EmptyState } from "@/components/custom/EmptyState";
+import { TableSkeleton } from "@/components/custom/TableSkeleton";
 
 const transactionSchema = z.object({
   account_id: z.string().min(1, "Select an account"),
@@ -310,8 +312,11 @@ export default function TransactionsPage() {
 
       {/* Transactions Data Table */}
       <div className="glass-card rounded-3xl overflow-hidden border border-border shadow-xl">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+        {isLoading ? (
+          <TableSkeleton columns={7} rows={10} />
+        ) : transactions.length > 0 ? (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-secondary/60 text-muted-foreground text-[11px] font-bold uppercase tracking-wider border-b border-border">
                 <th scope="col" className="p-4 w-10">
@@ -397,19 +402,19 @@ export default function TransactionsPage() {
                     </td>
                   </tr>
                 ))
-              ) : (
-                <tr>
-                  <td
-                    colSpan={7}
-                    className="text-center py-10 text-muted-foreground"
-                  >
-                    No transactions match your search or filter options.
-                  </td>
-                </tr>
               )}
             </tbody>
           </table>
         </div>
+        ) : (
+          <EmptyState 
+            title="No transactions found" 
+            description="We couldn't find any transactions matching your current filters."
+            icon={<Receipt className="w-8 h-8" />}
+            actionLabel="Record Transaction"
+            onAction={() => setIsAddOpen(true)}
+          />
+        )}
       </div>
 
       {/* Pagination Controls */}
