@@ -131,6 +131,7 @@ export const apiSlice = createApi({
     "Debts",
     "Installments",
     "NetWorth",
+    "Recurring",
   ],
   endpoints: () => ({}),
 });

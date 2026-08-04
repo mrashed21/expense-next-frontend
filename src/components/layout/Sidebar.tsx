@@ -24,6 +24,7 @@ import {
   Megaphone,
   PiggyBank,
   Receipt,
+  RefreshCw,
   ScrollText,
   Settings,
   ShieldAlert,
@@ -56,6 +57,7 @@ const navigationItems = [
   { name: "Investments", href: "/investments", icon: TrendingUp },
   { name: "Assets", href: "/assets", icon: Home },
   { name: "Installments", href: "/installments", icon: Calendar },
+  { name: "Recurring", href: "/recurring", icon: RefreshCw },
   { name: "Calendar", href: "/calendar", icon: Calendar },
   { name: "Notifications", href: "/notifications", icon: Bell },
 ];
