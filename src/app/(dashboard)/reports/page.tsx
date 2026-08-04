@@ -2,386 +2,387 @@
 
 import { useCurrency } from "@/hooks/useCurrency";
 import { formatDate } from "@/lib/utils";
-import { useGetTransactionsQuery } from "@/services/transactionApi";
-import { Download, FileSpreadsheet, Printer } from "lucide-react";
-import { useMemo, useState } from "react";
-import { toast } from "sonner";
-import * as XLSX from "xlsx";
-
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-
-const REPORT_DATE_RANGES: Record<string, string> = {
-  today: "today",
-  yesterday: "yesterday",
-  last7days: "last7days",
-  thisMonth: "thisMonth",
-  last30days: "last30days",
-  thisYear: "thisYear",
-};
+  useGetBalanceSheetQuery,
+  useGetCashFlowReportQuery,
+  useGetTaxReportQuery,
+} from "@/services/reportApi";
+import {
+  Download,
+  FileSpreadsheet,
+  Landmark,
+  Loader2,
+  PieChart as PieIcon,
+  Receipt,
+} from "lucide-react";
+import { useState } from "react";
 
 export default function ReportsPage() {
   const { formatCurrency } = useCurrency();
-  const [dateRange, setDateRange] = useState("thisMonth");
-  const { data: transactionsData, isLoading } = useGetTransactionsQuery({
-    dateRange: REPORT_DATE_RANGES[dateRange],
-    limit: 1000,
-  });
-  const transactions = transactionsData?.data || [];
+  const [activeReport, setActiveReport] = useState<"balance-sheet" | "cash-flow" | "tax">("balance-sheet");
 
-  const totalIncome = useMemo(
-    () =>
-      transactions
-        .filter((tx: any) => tx.type === "income" || tx.type === "refund")
-        .reduce((sum: number, tx: any) => sum + (tx.amount || 0), 0),
-    [transactions],
-  );
+  const { data: bsData, isLoading: bsLoading } = useGetBalanceSheetQuery(undefined, { skip: activeReport !== "balance-sheet" });
+  
+  // For cash flow, default to current year
+  const now = new Date();
+  const startDate = `${now.getFullYear()}-01-01`;
+  const endDate = `${now.getFullYear()}-12-31`;
+  const { data: cfData, isLoading: cfLoading } = useGetCashFlowReportQuery({ startDate, endDate }, { skip: activeReport !== "cash-flow" });
+  
+  const { data: taxData, isLoading: taxLoading } = useGetTaxReportQuery(now.getFullYear(), { skip: activeReport !== "tax" });
 
-  const totalExpense = useMemo(
-    () =>
-      transactions
-        .filter((tx: any) => tx.type === "expense")
-        .reduce((sum: number, tx: any) => sum + (tx.amount || 0), 0),
-    [transactions],
-  );
-
-  const netBalance = totalIncome - totalExpense;
-
-  const handleExportCSV = () => {
-    if (transactions.length === 0) {
-      toast.error("No data available to export.");
-      return;
-    }
-
-    const headers = [
-      "Date",
-      "Description",
-      "Category",
-      "Account",
-      "Type",
-      "Amount",
-    ];
-    const rows = transactions.map((t: any) => [
-      formatDate(t.date),
-      `"${t.notes || t.category_id?.name || "Transaction"}"`,
-      t.category_id?.name || "General",
-      t.account_id?.name || "Account",
-      t.type,
-      t.amount,
-    ]);
-
-    const csvData = [
-      headers.join(","),
-      ...rows.map((e: any) => e.join(",")),
-    ].join("\n");
-    const blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
+  const handleExportCSV = (filename: string, rows: string[][]) => {
+    const csvContent = "data:text/csv;charset=utf-8," + rows.map(e => e.join(",")).join("\n");
+    const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
-    link.setAttribute("href", url);
-    link.setAttribute(
-      "download",
-      `ExpenseVault_Report_${dateRange}_${new Date().toISOString().slice(0, 10)}.csv`,
-    );
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `${filename}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-
-    toast.success("CSV report downloaded successfully!");
   };
 
-  const handleExportExcel = () => {
-    if (transactions.length === 0) {
-      toast.error("No data available to export.");
-      return;
-    }
-
-    const data = transactions.map((t: any) => ({
-      Date: formatDate(t.date),
-      Description: t.notes || t.category_id?.name || "Transaction",
-      Category: t.category_id?.name || "General",
-      Account: t.account_id?.name || "Account",
-      Type: t.type,
-      Amount: t.amount,
-    }));
-
-    const worksheet = XLSX.utils.json_to_sheet(data);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Transactions");
-    XLSX.writeFile(
-      workbook,
-      `ExpenseVault_Report_${dateRange}_${new Date().toISOString().slice(0, 10)}.xlsx`
-    );
-    toast.success("Excel report downloaded successfully!");
+  const exportBalanceSheet = () => {
+    if (!bsData?.data) return;
+    const d = bsData.data;
+    const rows = [
+      ["BALANCE SHEET", formatDate(d.date)],
+      [],
+      ["ASSETS", ""],
+      ["Cash", d.assets.currentAssets.cash],
+      ["Investments", d.assets.nonCurrentAssets.investments],
+      ["Physical Assets", d.assets.nonCurrentAssets.physical_assets],
+      ["Money Lent", d.assets.nonCurrentAssets.money_lent],
+      ["Total Assets", d.assets.totalAssets],
+      [],
+      ["LIABILITIES", ""],
+      ["Money Borrowed", d.liabilities.longTermLiabilities.money_borrowed],
+      ["EMIs Remaining", d.liabilities.currentLiabilities.emi_remaining],
+      ["Total Liabilities", d.liabilities.totalLiabilities],
+      [],
+      ["EQUITY", ""],
+      ["Total Equity (Net Worth)", d.equity.totalEquity],
+    ];
+    handleExportCSV("balance-sheet", rows);
   };
 
-  const handlePrint = () => {
-    window.print();
+  const exportCashFlow = () => {
+    if (!cfData?.data) return;
+    const d = cfData.data;
+    const rows = [
+      ["CASH FLOW STATEMENT", `${formatDate(d.period.start)} to ${formatDate(d.period.end)}`],
+      [],
+      ["INFLOWS", ""],
+      ...d.cashFlow.operatingActivities.inflows.map((i: any) => [i.category, i.amount]),
+      ["Total Inflows", d.summary.totalInflows],
+      [],
+      ["OUTFLOWS", ""],
+      ...d.cashFlow.operatingActivities.outflows.map((o: any) => [o.category, o.amount]),
+      ["Total Outflows", d.summary.totalOutflows],
+      [],
+      ["NET CASH FLOW", d.summary.netCashFlow],
+    ];
+    handleExportCSV("cash-flow", rows);
   };
 
-  const handleExportPDF = async () => {
-    try {
-      toast.info("Generating PDF report...");
-
-      // Dynamic imports to avoid SSR issues with @react-pdf/renderer
-      const [{ pdf }, { PdfReportDocument }] = await Promise.all([
-        import("@react-pdf/renderer"),
-        import("@/components/custom/pdf-report"),
-      ]);
-
-      const doc = PdfReportDocument({
-        transactions,
-        periodLabel: periodLabel[dateRange],
-        totalIncome: formatCurrency(totalIncome),
-        totalExpense: formatCurrency(totalExpense),
-        netBalance: formatCurrency(netBalance),
-        netBalanceRaw: netBalance,
-        formatDate,
-        formatCurrency,
-      });
-
-      const blob = await pdf(doc).toBlob();
-
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `ExpenseVault_Report_${dateRange}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-
-      toast.success("PDF Report downloaded successfully");
-    } catch (error) {
-      console.error("PDF Export Error", error);
-      toast.error("Failed to generate PDF report");
-    }
+  const exportTaxReport = () => {
+    if (!taxData?.data) return;
+    const d = taxData.data;
+    const rows = [
+      ["TAX REPORT", `FY ${d.financialYear}`],
+      [],
+      ["INCOME", ""],
+      ["Taxable Income", d.income.taxable],
+      ["Non-Taxable Income", d.income.nonTaxable],
+      ["Total Income", d.income.total],
+      [],
+      ["DEDUCTIONS", ""],
+      ["Eligible Deductions", d.deductions.eligibleDeductions],
+      [],
+      ["ESTIMATED TAXABLE AMOUNT", d.estimatedTaxableAmount],
+    ];
+    handleExportCSV("tax-report", rows);
   };
 
-  const periodLabel: Record<string, string> = {
-    today: "Today",
-    yesterday: "Yesterday",
-    last7days: "Last 7 Days",
-    thisMonth: new Date().toLocaleDateString("en-US", {
-      month: "long",
-      year: "numeric",
-    }),
-    last30days: "Last 30 Days",
-    thisYear: `Year ${new Date().getFullYear()}`,
-  };
+  const renderLoader = () => (
+    <div className="flex items-center justify-center h-96">
+      <Loader2 className="w-8 h-8 animate-spin text-primary" />
+    </div>
+  );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-6 max-w-5xl mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight">
-            Report Generator & Exporter
-          </h1>
+          <h1 className="text-2xl font-extrabold tracking-tight">Financial Reports</h1>
           <p className="text-xs text-muted-foreground">
-            Generate comprehensive financial audit reports in CSV, Excel, PDF, or Print format
+            Generate, view, and export formal financial documents.
           </p>
         </div>
-
-        <div className="flex flex-wrap items-center gap-2">
-          <button
-            onClick={handleExportCSV}
-            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-emerald-600 text-white font-semibold text-xs shadow-md hover:bg-emerald-700 transition-colors"
-          >
-            <FileSpreadsheet className="w-4 h-4" />
-            <span>Export CSV</span>
-          </button>
-          <button
-            onClick={handleExportExcel}
-            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-green-600 text-white font-semibold text-xs shadow-md hover:bg-green-700 transition-colors"
-          >
-            <FileSpreadsheet className="w-4 h-4" />
-            <span>Export Excel</span>
-          </button>
-          <button
-            onClick={handleExportPDF}
-            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-primary text-primary-foreground font-semibold text-xs shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all"
-          >
-            <Download className="w-4 h-4" />
-            <span>Download PDF</span>
-          </button>
-
-          <button
-            onClick={handlePrint}
-            className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-secondary border border-border text-foreground font-semibold text-xs hover:bg-secondary/80 transition-colors"
-          >
-            <Printer className="w-4 h-4 text-primary" />
-            <span>Print</span>
-          </button>
-        </div>
       </div>
 
-      {/* Filter & Stats Bar */}
-      <div className="glass-card p-4 rounded-3xl flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <span className="text-xs font-bold text-foreground">Date Range:</span>
-          <Select value={dateRange} onValueChange={setDateRange}>
-            <SelectTrigger className="w-35 px-3 py-1.5 rounded-xl bg-secondary border border-border text-xs text-foreground font-semibold outline-none h-8">
-              <SelectValue placeholder="Date Range" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="today">Today</SelectItem>
-              <SelectItem value="yesterday">Yesterday</SelectItem>
-              <SelectItem value="last7days">Last 7 Days</SelectItem>
-              <SelectItem value="thisMonth">This Month</SelectItem>
-              <SelectItem value="last30days">Last 30 Days</SelectItem>
-              <SelectItem value="thisYear">This Year</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="flex items-center gap-4 text-xs font-semibold">
-          <span className="text-emerald-500">
-            Income: {formatCurrency(totalIncome)}
-          </span>
-          <span className="text-rose-500">
-            Expense: {formatCurrency(totalExpense)}
-          </span>
-          <span className={netBalance >= 0 ? "text-primary" : "text-rose-500"}>
-            Net: {formatCurrency(netBalance)}
-          </span>
-          <span className="text-muted-foreground">
-            {transactions.length} records
-          </span>
-        </div>
-      </div>
-
-      {/* Report Preview Document */}
-      <div className="glass-card p-8 rounded-3xl space-y-6 print:p-0 print:shadow-none">
-        <div className="flex items-center justify-between border-b border-border pb-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <button
+          onClick={() => setActiveReport("balance-sheet")}
+          className={`flex items-center gap-3 p-4 rounded-2xl border text-left transition-all ${
+            activeReport === "balance-sheet" ? "bg-primary/5 border-primary shadow-sm" : "bg-card border-border hover:border-primary/50"
+          }`}
+        >
+          <div className={`p-3 rounded-xl ${activeReport === "balance-sheet" ? "bg-primary text-white" : "bg-secondary text-foreground"}`}>
+            <Landmark className="w-5 h-5" />
+          </div>
           <div>
-            <h2 className="text-xl font-extrabold text-foreground">
-              ExpenseVault Financial Statement
-            </h2>
-            <p className="text-xs text-muted-foreground">
-              Period: {periodLabel[dateRange]}
-            </p>
+            <h3 className="font-bold text-sm">Balance Sheet</h3>
+            <p className="text-[11px] text-muted-foreground mt-0.5">Assets = Liabilities + Equity</p>
           </div>
-          <div className="text-right">
-            <span className="text-xs font-bold text-primary">
-              Status: Audited
-            </span>
-            <p className="text-[10px] text-muted-foreground">
-              Generated on {new Date().toLocaleDateString()}
-            </p>
-          </div>
-        </div>
+        </button>
 
-        {/* Summary Row */}
-        <div className="grid grid-cols-3 gap-4">
-          <div className="p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/20 text-center">
-            <p className="text-[10px] text-emerald-500 font-bold uppercase">
-              Total Income
-            </p>
-            <p className="text-lg font-black text-emerald-500">
-              {formatCurrency(totalIncome)}
-            </p>
+        <button
+          onClick={() => setActiveReport("cash-flow")}
+          className={`flex items-center gap-3 p-4 rounded-2xl border text-left transition-all ${
+            activeReport === "cash-flow" ? "bg-primary/5 border-primary shadow-sm" : "bg-card border-border hover:border-primary/50"
+          }`}
+        >
+          <div className={`p-3 rounded-xl ${activeReport === "cash-flow" ? "bg-primary text-white" : "bg-secondary text-foreground"}`}>
+            <PieIcon className="w-5 h-5" />
           </div>
-          <div className="p-3 rounded-xl bg-rose-500/5 border border-rose-500/20 text-center">
-            <p className="text-[10px] text-rose-500 font-bold uppercase">
-              Total Expense
-            </p>
-            <p className="text-lg font-black text-rose-500">
-              {formatCurrency(totalExpense)}
-            </p>
+          <div>
+            <h3 className="font-bold text-sm">Cash Flow</h3>
+            <p className="text-[11px] text-muted-foreground mt-0.5">Income vs Expenses (FY)</p>
           </div>
-          <div
-            className={`p-3 rounded-xl text-center ${
-              netBalance >= 0
-                ? "bg-primary/5 border border-primary/20"
-                : "bg-rose-500/5 border border-rose-500/20"
-            }`}
-          >
-            <p
-              className={`text-[10px] font-bold uppercase ${netBalance >= 0 ? "text-primary" : "text-rose-500"}`}
-            >
-              Net Balance
-            </p>
-            <p
-              className={`text-lg font-black ${netBalance >= 0 ? "text-primary" : "text-rose-500"}`}
-            >
-              {formatCurrency(netBalance)}
-            </p>
-          </div>
-        </div>
+        </button>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs border-collapse">
-            <thead>
-              <tr className="bg-secondary/70 border-b border-border text-muted-foreground font-bold uppercase text-[10px]">
-                <th scope="col" className="p-3">Date</th>
-                <th scope="col" className="p-3">Description</th>
-                <th scope="col" className="p-3">Category</th>
-                <th scope="col" className="p-3">Account</th>
-                <th scope="col" className="p-3">Type</th>
-                <th scope="col" className="p-3 text-right">Amount</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border font-medium">
-              {isLoading ? (
-                <tr>
-                  <td
-                    colSpan={6}
-                    className="text-center py-8 text-muted-foreground"
-                  >
-                    Loading...
-                  </td>
-                </tr>
-              ) : transactions.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan={6}
-                    className="text-center py-8 text-muted-foreground"
-                  >
-                    No transactions found for this period.
-                  </td>
-                </tr>
-              ) : (
-                transactions.map((tx: any) => (
-                  <tr
-                    key={tx._id}
-                    className="hover:bg-secondary/30 transition-colors"
-                  >
-                    <td className="p-3 text-muted-foreground whitespace-nowrap">
-                      {formatDate(tx.date)}
-                    </td>
-                    <td className="p-3 font-bold text-foreground">
-                      {tx.notes || tx.category_id?.name || "Transaction"}
-                    </td>
-                    <td className="p-3">{tx.category_id?.name || "General"}</td>
-                    <td className="p-3">{tx.account_id?.name || "Account"}</td>
-                    <td className="p-3">
-                      <span
-                        className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase ${
-                          tx.type === "income"
-                            ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
-                            : "bg-rose-500/10 text-rose-500 border border-rose-500/20"
-                        }`}
-                      >
-                        {tx.type}
-                      </span>
-                    </td>
-                    <td
-                      className={`p-3 text-right font-bold ${tx.type === "income" ? "text-emerald-500" : "text-rose-500"}`}
-                    >
-                      {tx.type === "income" || tx.type === "refund" ? "+" : "-"}
-                      {formatCurrency(tx.amount)}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+        <button
+          onClick={() => setActiveReport("tax")}
+          className={`flex items-center gap-3 p-4 rounded-2xl border text-left transition-all ${
+            activeReport === "tax" ? "bg-primary/5 border-primary shadow-sm" : "bg-card border-border hover:border-primary/50"
+          }`}
+        >
+          <div className={`p-3 rounded-xl ${activeReport === "tax" ? "bg-primary text-white" : "bg-secondary text-foreground"}`}>
+            <Receipt className="w-5 h-5" />
+          </div>
+          <div>
+            <h3 className="font-bold text-sm">Tax Report</h3>
+            <p className="text-[11px] text-muted-foreground mt-0.5">Taxable vs Deductible (FY)</p>
+          </div>
+        </button>
+      </div>
+
+      <div className="glass-card rounded-3xl overflow-hidden border border-border shadow-xs">
+        
+        {/* BALANCE SHEET VIEW */}
+        {activeReport === "balance-sheet" && (
+          <div className="animate-in fade-in duration-300">
+            <div className="flex items-center justify-between p-6 border-b border-border bg-secondary/30">
+              <div>
+                <h2 className="text-lg font-black tracking-tight">Balance Sheet</h2>
+                <p className="text-xs text-muted-foreground">Snapshot as of {formatDate(new Date())}</p>
+              </div>
+              <button onClick={exportBalanceSheet} className="flex items-center gap-2 px-4 py-2 bg-primary text-white text-xs font-bold rounded-xl hover:opacity-90 transition-opacity">
+                <FileSpreadsheet className="w-4 h-4" /> Export CSV
+              </button>
+            </div>
+            {bsLoading ? renderLoader() : bsData?.data && (
+              <div className="p-6 md:p-8 max-w-3xl mx-auto space-y-8">
+                
+                {/* Assets Table */}
+                <div>
+                  <h3 className="text-sm font-black text-foreground uppercase tracking-widest border-b-2 border-primary/20 pb-2 mb-4">Assets</h3>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between py-1">
+                      <span className="text-muted-foreground">Cash (Current)</span>
+                      <span className="font-medium">{formatCurrency(bsData.data.assets.currentAssets.cash)}</span>
+                    </div>
+                    <div className="flex justify-between py-1">
+                      <span className="text-muted-foreground">Investments</span>
+                      <span className="font-medium">{formatCurrency(bsData.data.assets.nonCurrentAssets.investments)}</span>
+                    </div>
+                    <div className="flex justify-between py-1">
+                      <span className="text-muted-foreground">Physical Assets</span>
+                      <span className="font-medium">{formatCurrency(bsData.data.assets.nonCurrentAssets.physical_assets)}</span>
+                    </div>
+                    <div className="flex justify-between py-1">
+                      <span className="text-muted-foreground">Money Lent</span>
+                      <span className="font-medium">{formatCurrency(bsData.data.assets.nonCurrentAssets.money_lent)}</span>
+                    </div>
+                    <div className="flex justify-between py-3 border-t border-border font-bold text-foreground">
+                      <span>Total Assets</span>
+                      <span>{formatCurrency(bsData.data.assets.totalAssets)}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Liabilities Table */}
+                <div>
+                  <h3 className="text-sm font-black text-foreground uppercase tracking-widest border-b-2 border-primary/20 pb-2 mb-4">Liabilities</h3>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between py-1">
+                      <span className="text-muted-foreground">Money Borrowed</span>
+                      <span className="font-medium">{formatCurrency(bsData.data.liabilities.longTermLiabilities.money_borrowed)}</span>
+                    </div>
+                    <div className="flex justify-between py-1">
+                      <span className="text-muted-foreground">EMIs Remaining</span>
+                      <span className="font-medium">{formatCurrency(bsData.data.liabilities.currentLiabilities.emi_remaining)}</span>
+                    </div>
+                    <div className="flex justify-between py-3 border-t border-border font-bold text-foreground">
+                      <span>Total Liabilities</span>
+                      <span>{formatCurrency(bsData.data.liabilities.totalLiabilities)}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Equity Table */}
+                <div>
+                  <h3 className="text-sm font-black text-foreground uppercase tracking-widest border-b-2 border-primary/20 pb-2 mb-4">Equity</h3>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between py-1">
+                      <span className="text-muted-foreground">Net Worth (Retained Earnings)</span>
+                      <span className="font-medium">{formatCurrency(bsData.data.equity.retainedEarnings)}</span>
+                    </div>
+                    <div className="flex justify-between py-3 border-t-2 border-foreground font-black text-lg text-foreground">
+                      <span>Total Liabilities & Equity</span>
+                      <span>{formatCurrency(bsData.data.liabilities.totalLiabilities + bsData.data.equity.totalEquity)}</span>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* CASH FLOW VIEW */}
+        {activeReport === "cash-flow" && (
+          <div className="animate-in fade-in duration-300">
+            <div className="flex items-center justify-between p-6 border-b border-border bg-secondary/30">
+              <div>
+                <h2 className="text-lg font-black tracking-tight">Cash Flow Statement</h2>
+                <p className="text-xs text-muted-foreground">FY {now.getFullYear()}</p>
+              </div>
+              <button onClick={exportCashFlow} className="flex items-center gap-2 px-4 py-2 bg-primary text-white text-xs font-bold rounded-xl hover:opacity-90 transition-opacity">
+                <FileSpreadsheet className="w-4 h-4" /> Export CSV
+              </button>
+            </div>
+            {cfLoading ? renderLoader() : cfData?.data && (
+              <div className="p-6 md:p-8 max-w-3xl mx-auto space-y-8">
+                
+                {/* Inflows */}
+                <div>
+                  <h3 className="text-sm font-black text-emerald-500 uppercase tracking-widest border-b-2 border-emerald-500/20 pb-2 mb-4">Cash Inflows (Operating)</h3>
+                  <div className="space-y-2 text-sm">
+                    {cfData.data.cashFlow.operatingActivities.inflows.map((inf: any, i: number) => (
+                      <div key={i} className="flex justify-between py-1">
+                        <span className="text-muted-foreground">{inf.category}</span>
+                        <span className="font-medium text-emerald-500">+{formatCurrency(inf.amount)}</span>
+                      </div>
+                    ))}
+                    {cfData.data.cashFlow.operatingActivities.inflows.length === 0 && (
+                      <p className="text-xs text-muted-foreground py-2">No inflows recorded.</p>
+                    )}
+                    <div className="flex justify-between py-3 border-t border-border font-bold text-foreground">
+                      <span>Total Inflows</span>
+                      <span className="text-emerald-500">{formatCurrency(cfData.data.summary.totalInflows)}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Outflows */}
+                <div>
+                  <h3 className="text-sm font-black text-rose-500 uppercase tracking-widest border-b-2 border-rose-500/20 pb-2 mb-4">Cash Outflows (Operating)</h3>
+                  <div className="space-y-2 text-sm">
+                    {cfData.data.cashFlow.operatingActivities.outflows.map((out: any, i: number) => (
+                      <div key={i} className="flex justify-between py-1">
+                        <span className="text-muted-foreground">{out.category}</span>
+                        <span className="font-medium text-rose-500">-{formatCurrency(out.amount)}</span>
+                      </div>
+                    ))}
+                    {cfData.data.cashFlow.operatingActivities.outflows.length === 0 && (
+                      <p className="text-xs text-muted-foreground py-2">No outflows recorded.</p>
+                    )}
+                    <div className="flex justify-between py-3 border-t border-border font-bold text-foreground">
+                      <span>Total Outflows</span>
+                      <span className="text-rose-500">-{formatCurrency(cfData.data.summary.totalOutflows)}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Net */}
+                <div>
+                  <div className="flex justify-between py-4 border-t-2 border-foreground font-black text-lg text-foreground">
+                    <span>Net Cash Flow</span>
+                    <span className={cfData.data.summary.netCashFlow >= 0 ? "text-emerald-500" : "text-rose-500"}>
+                      {formatCurrency(cfData.data.summary.netCashFlow)}
+                    </span>
+                  </div>
+                </div>
+
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* TAX REPORT VIEW */}
+        {activeReport === "tax" && (
+          <div className="animate-in fade-in duration-300">
+            <div className="flex items-center justify-between p-6 border-b border-border bg-secondary/30">
+              <div>
+                <h2 className="text-lg font-black tracking-tight">Tax Report (Estimate)</h2>
+                <p className="text-xs text-muted-foreground">FY {now.getFullYear()}</p>
+              </div>
+              <button onClick={exportTaxReport} className="flex items-center gap-2 px-4 py-2 bg-primary text-white text-xs font-bold rounded-xl hover:opacity-90 transition-opacity">
+                <FileSpreadsheet className="w-4 h-4" /> Export CSV
+              </button>
+            </div>
+            {taxLoading ? renderLoader() : taxData?.data && (
+              <div className="p-6 md:p-8 max-w-3xl mx-auto space-y-8">
+                
+                {/* Income Table */}
+                <div>
+                  <h3 className="text-sm font-black text-foreground uppercase tracking-widest border-b-2 border-primary/20 pb-2 mb-4">Gross Income</h3>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between py-1">
+                      <span className="text-muted-foreground">Taxable Income</span>
+                      <span className="font-medium">{formatCurrency(taxData.data.income.taxable)}</span>
+                    </div>
+                    <div className="flex justify-between py-1">
+                      <span className="text-muted-foreground">Non-Taxable Income</span>
+                      <span className="font-medium">{formatCurrency(taxData.data.income.nonTaxable)}</span>
+                    </div>
+                    <div className="flex justify-between py-3 border-t border-border font-bold text-foreground">
+                      <span>Total Income</span>
+                      <span>{formatCurrency(taxData.data.income.total)}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Deductions Table */}
+                <div>
+                  <h3 className="text-sm font-black text-foreground uppercase tracking-widest border-b-2 border-primary/20 pb-2 mb-4">Deductions</h3>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between py-1">
+                      <span className="text-muted-foreground">Eligible Deductions (Health, Edu, Tax)</span>
+                      <span className="font-medium text-rose-500">-{formatCurrency(taxData.data.deductions.eligibleDeductions)}</span>
+                    </div>
+                    <div className="flex justify-between py-3 border-t border-border font-bold text-foreground">
+                      <span>Total Deductions</span>
+                      <span className="text-rose-500">-{formatCurrency(taxData.data.deductions.eligibleDeductions)}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Net */}
+                <div>
+                  <div className="flex justify-between py-4 border-t-2 border-foreground font-black text-lg text-foreground">
+                    <span>Estimated Taxable Amount</span>
+                    <span>{formatCurrency(taxData.data.estimatedTaxableAmount)}</span>
+                  </div>
+                </div>
+
+              </div>
+            )}
+          </div>
+        )}
+
       </div>
     </div>
   );
