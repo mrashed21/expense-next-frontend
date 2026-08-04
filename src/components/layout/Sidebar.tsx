@@ -75,56 +75,95 @@ const bottomItems = [
   { name: "Profile", href: "/profile", icon: User },
 ];
 
+import React, { useMemo } from "react";
+
+const NavItem = React.memo(({
+  item,
+  pathname,
+  sidebarCollapsed,
+}: {
+  item: { name: string; href: string; icon: React.ElementType };
+  pathname: string;
+  sidebarCollapsed: boolean;
+}) => {
+  const isActive =
+    pathname === item.href || pathname.startsWith(`${item.href}/`);
+  const Icon = item.icon;
+
+  const link = (
+    <Link
+      href={item.href}
+      className={cn(
+        "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 group",
+        isActive
+          ? "bg-primary text-primary-foreground"
+          : "text-muted-foreground hover:text-foreground hover:bg-secondary",
+      )}
+    >
+      <Icon
+        className={cn(
+          "w-4 h-4 shrink-0",
+          isActive
+            ? "text-primary-foreground"
+            : "text-muted-foreground group-hover:text-foreground",
+        )}
+      />
+      {!sidebarCollapsed && <span className="truncate">{item.name}</span>}
+    </Link>
+  );
+
+  if (sidebarCollapsed) {
+    return (
+      <Tooltip delayDuration={0}>
+        <TooltipTrigger asChild>{link}</TooltipTrigger>
+        <TooltipContent side="right" className="text-xs">
+          {item.name}
+        </TooltipContent>
+      </Tooltip>
+    );
+  }
+
+  return link;
+});
+NavItem.displayName = "NavItem";
+
 export function Sidebar() {
   const pathname = usePathname();
   const dispatch = useDispatch();
   const { sidebarCollapsed } = useSelector((state: RootState) => state.layout);
   const { user } = useSelector((state: RootState) => state.auth);
 
-  const NavItem = ({
-    item,
-  }: {
-    item: { name: string; href: string; icon: React.ElementType };
-  }) => {
-    const isActive =
-      pathname === item.href || pathname.startsWith(`${item.href}/`);
-    const Icon = item.icon;
-
-    const link = (
-      <Link
-        href={item.href}
-        className={cn(
-          "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 group",
-          isActive
-            ? "bg-primary text-primary-foreground"
-            : "text-muted-foreground hover:text-foreground hover:bg-secondary",
-        )}
-      >
-        <Icon
-          className={cn(
-            "w-4 h-4 shrink-0",
-            isActive
-              ? "text-primary-foreground"
-              : "text-muted-foreground group-hover:text-foreground",
-          )}
-        />
-        {!sidebarCollapsed && <span className="truncate">{item.name}</span>}
-      </Link>
-    );
-
-    if (sidebarCollapsed) {
+  const renderNavItems = useMemo(() => {
+    if (user?.isAdmin) {
       return (
-        <Tooltip delayDuration={0}>
-          <TooltipTrigger asChild>{link}</TooltipTrigger>
-          <TooltipContent side="right" className="text-xs">
-            {item.name}
-          </TooltipContent>
-        </Tooltip>
+        <>
+          <div className="my-2 px-3 text-[10px] font-bold uppercase text-muted-foreground tracking-wider">
+            {!sidebarCollapsed && "Administration"}
+          </div>
+          {adminItems.map((item) => (
+            <NavItem key={item.name} item={item} pathname={pathname} sidebarCollapsed={sidebarCollapsed} />
+          ))}
+          {user?.user_role === "super_admin" &&
+            superAdminItems.map((item) => (
+              <NavItem key={item.name} item={item} pathname={pathname} sidebarCollapsed={sidebarCollapsed} />
+            ))}
+        </>
       );
     }
+    return (
+      <>
+        {navigationItems.map((item) => (
+          <NavItem key={item.name} item={item} pathname={pathname} sidebarCollapsed={sidebarCollapsed} />
+        ))}
+      </>
+    );
+  }, [user, pathname, sidebarCollapsed]);
 
-    return link;
-  };
+  const renderBottomItems = useMemo(() => {
+    return bottomItems.map((item) => (
+      <NavItem key={item.name} item={item} pathname={pathname} sidebarCollapsed={sidebarCollapsed} />
+    ));
+  }, [pathname, sidebarCollapsed]);
 
   return (
     <TooltipProvider>
@@ -185,33 +224,12 @@ export function Sidebar() {
 
         {/* Main Nav */}
         <div className="flex-1 overflow-y-auto py-3 px-2 space-y-0.5">
-          {user?.isAdmin ? (
-            <>
-              <div className="my-2 px-3 text-[10px] font-bold uppercase text-muted-foreground tracking-wider">
-                {!sidebarCollapsed && "Administration"}
-              </div>
-              {adminItems.map((item) => (
-                <NavItem key={item.name} item={item} />
-              ))}
-              {user?.user_role === "super_admin" &&
-                superAdminItems.map((item) => (
-                  <NavItem key={item.name} item={item} />
-                ))}
-            </>
-          ) : (
-            <>
-              {navigationItems.map((item) => (
-                <NavItem key={item.name} item={item} />
-              ))}
-            </>
-          )}
+          {renderNavItems}
         </div>
 
         {/* Bottom Nav */}
         <div className="px-2 py-3 border-t border-border space-y-0.5">
-          {bottomItems.map((item) => (
-            <NavItem key={item.name} item={item} />
-          ))}
+          {renderBottomItems}
         </div>
       </aside>
     </TooltipProvider>

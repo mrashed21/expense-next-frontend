@@ -15,24 +15,30 @@ import {
   Target,
   TrendingUp,
 } from "lucide-react";
-import {
-  Area,
-  AreaChart,
-  Bar,
-  BarChart,
-  Cell,
-  Legend,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+import dynamic from "next/dynamic";
+import { useCallback } from "react";
+
+const Area = dynamic(() => import("recharts").then((mod) => mod.Area), { ssr: false });
+const AreaChart = dynamic(() => import("recharts").then((mod) => mod.AreaChart), { ssr: false });
+const Bar = dynamic(() => import("recharts").then((mod) => mod.Bar), { ssr: false });
+const BarChart = dynamic(() => import("recharts").then((mod) => mod.BarChart), { ssr: false });
+const Cell = dynamic(() => import("recharts").then((mod) => mod.Cell), { ssr: false });
+const Legend = dynamic(() => import("recharts").then((mod) => mod.Legend), { ssr: false });
+const Pie = dynamic(() => import("recharts").then((mod) => mod.Pie), { ssr: false });
+const PieChart = dynamic(() => import("recharts").then((mod) => mod.PieChart), { ssr: false });
+const ResponsiveContainer = dynamic(() => import("recharts").then((mod) => mod.ResponsiveContainer), { ssr: false });
+const Tooltip = dynamic(() => import("recharts").then((mod) => mod.Tooltip), { ssr: false });
+const XAxis = dynamic(() => import("recharts").then((mod) => mod.XAxis), { ssr: false });
+const YAxis = dynamic(() => import("recharts").then((mod) => mod.YAxis), { ssr: false });
 
 export default function AnalyticsPage() {
   const { formatCurrency } = useCurrency();
   const { data: analyticsData, isLoading } = useGetAnalyticsSummaryQuery({});
+
+  const formatCurrencyCallback = useCallback(
+    (value: any) => formatCurrency(value),
+    [formatCurrency]
+  );
 
   if (isLoading) {
     return (
@@ -138,7 +144,7 @@ export default function AnalyticsPage() {
                 <YAxis
                   stroke="#888888"
                   fontSize={11}
-                  tickFormatter={(v) => formatCurrency(v)}
+                  tickFormatter={formatCurrencyCallback}
                 />
                 <Tooltip
                   contentStyle={{
@@ -148,7 +154,7 @@ export default function AnalyticsPage() {
                     color: "var(--foreground)",
                     fontSize: "12px",
                   }}
-                  formatter={(val: any) => formatCurrency(val)}
+                  formatter={formatCurrencyCallback}
                 />
                 <Legend wrapperStyle={{ fontSize: "12px" }} />
                 <Bar dataKey="income" name="Income" fill="#10B981" radius={[4, 4, 0, 0]} />
@@ -224,7 +230,7 @@ export default function AnalyticsPage() {
                 <YAxis
                   stroke="#888888"
                   fontSize={10}
-                  tickFormatter={(v) => formatCurrency(v)}
+                  tickFormatter={formatCurrencyCallback}
                 />
                 <Tooltip
                   contentStyle={{
@@ -234,7 +240,7 @@ export default function AnalyticsPage() {
                     color: "var(--foreground)",
                     fontSize: "12px",
                   }}
-                  formatter={(val: any) => formatCurrency(val)}
+                  formatter={formatCurrencyCallback}
                 />
                 <Area
                   type="monotone"
@@ -266,7 +272,7 @@ export default function AnalyticsPage() {
                 <YAxis
                   stroke="#888888"
                   fontSize={11}
-                  tickFormatter={(v) => formatCurrency(v)}
+                  tickFormatter={formatCurrencyCallback}
                 />
                 <Tooltip
                   contentStyle={{
@@ -276,7 +282,7 @@ export default function AnalyticsPage() {
                     color: "var(--foreground)",
                     fontSize: "12px",
                   }}
-                  formatter={(val: any) => formatCurrency(val)}
+                  formatter={formatCurrencyCallback}
                 />
                 <Bar dataKey="amount" name="Avg Spent" fill="#6366F1" radius={[4, 4, 0, 0]} />
               </BarChart>
@@ -327,7 +333,7 @@ export default function AnalyticsPage() {
                       color: "var(--foreground)",
                       fontSize: "12px",
                     }}
-                    formatter={(val: any) => formatCurrency(val)}
+                    formatter={formatCurrencyCallback}
                   />
                 </PieChart>
               </ResponsiveContainer>
