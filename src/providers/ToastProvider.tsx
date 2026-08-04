@@ -8,7 +8,7 @@ export function ToastProvider() {
 
   return (
     <SonnerToaster
-      position="top-right"
+      position="bottom-right"
       theme={(theme as "light" | "dark" | "system") || "system"}
       richColors
       closeButton
