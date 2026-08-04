@@ -29,21 +29,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           pathname?.startsWith("/admin-login");
 
         let response;
-        if (isAdminRoute) {
-          response = await triggerGetAdminMe(undefined, false).unwrap();
-        } else {
-          response = await triggerGetMe(undefined, false).unwrap();
+        let isAdmin = false;
+
+        try {
+          if (isAdminRoute) {
+            response = await triggerGetAdminMe(undefined, false).unwrap();
+            isAdmin = true;
+          } else {
+            response = await triggerGetMe(undefined, false).unwrap();
+          }
+        } catch (err: any) {
+          // If we fail on a user route, try the admin route as a fallback
+          if (!isAdminRoute && (err.status === 401 || err.status === 403)) {
+            response = await triggerGetAdminMe(undefined, false).unwrap();
+            isAdmin = true;
+          } else {
+            throw err;
+          }
         }
 
         if (response?.success) {
-          const userObj = isAdminRoute
+          const userObj = isAdmin
             ? response?.data?.admin
             : response?.data?.user;
           if (userObj) {
             // Normalize admin object to match user structure in redux
             let normalizedUser = { ...userObj };
 
-            if (isAdminRoute) {
+            if (isAdmin) {
               normalizedUser.user_name = userObj.admin_name;
               normalizedUser.user_email = userObj.admin_email;
               normalizedUser.user_role = userObj.admin_role;
