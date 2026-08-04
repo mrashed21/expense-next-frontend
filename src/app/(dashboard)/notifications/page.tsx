@@ -1,7 +1,6 @@
 "use client";
 
-import { useCurrency } from "@/hooks/useCurrency";
-import { formatDate } from "@/lib/utils";
+import { useMemo, useState } from "react";
 import {
   useGetNotificationsQuery,
   useMarkAllAsReadMutation,
@@ -13,21 +12,61 @@ import {
   Check,
   CheckCircle2,
   Trash2,
-  AlertTriangle,
-  Info,
+  Filter,
+  Shield,
   Clock,
+  AlertTriangle,
+  TrendingDown,
+  TrendingUp,
+  User,
+  Info,
 } from "lucide-react";
 import { toast } from "sonner";
 import { EmptyState } from "@/components/custom/EmptyState";
 import { TableSkeleton } from "@/components/custom/TableSkeleton";
+import { ConfirmDialog } from "@/components/custom/confirm-dialog";
+import { getNotificationIcon, getRelativeTime } from "@/components/layout/NotificationDropdown";
+
+const categories = [
+  { label: "All Categories", value: "all" },
+  { label: "Budget", value: "budget" },
+  { label: "Expense", value: "expense" },
+  { label: "Income", value: "income" },
+  { label: "Reminder", value: "reminder" },
+  { label: "Security", value: "security" },
+  { label: "User", value: "user" },
+  { label: "System", value: "system" },
+];
 
 export default function NotificationsPage() {
-  const { data: notificationsData, isLoading } = useGetNotificationsQuery({});
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [showUnreadOnly, setShowUnreadOnly] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+
+  const { data: notificationsData, isLoading, isError } = useGetNotificationsQuery({});
   const [markAsReadApi] = useMarkAsReadMutation();
   const [markAllAsReadApi, { isLoading: isMarkingAll }] = useMarkAllAsReadMutation();
   const [deleteApi] = useDeleteNotificationMutation();
 
-  const notifications = notificationsData?.data || [];
+  const notifications = useMemo(() => notificationsData?.data || [], [notificationsData]);
+
+  const unreadCount = useMemo(
+    () => notifications.filter((n: any) => !n.is_read).length,
+    [notifications]
+  );
+
+  const filteredNotifications = useMemo(() => {
+    return notifications.filter((n: any) => {
+      const catKey = (n.category || n.type || "").toLowerCase();
+      if (categoryFilter !== "all" && !catKey.includes(categoryFilter)) {
+        return false;
+      }
+      if (showUnreadOnly && n.is_read) {
+        return false;
+      }
+      return true;
+    });
+  }, [notifications, categoryFilter, showUnreadOnly]);
 
   const handleMarkAsRead = async (id: string) => {
     try {
@@ -46,38 +85,26 @@ export default function NotificationsPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const confirmDelete = async () => {
+    if (!deleteId) return;
     try {
-      await deleteApi(id).unwrap();
+      await deleteApi(deleteId).unwrap();
       toast.success("Notification deleted");
     } catch (err: any) {
       toast.error(err?.data?.message || "Failed to delete notification");
+    } finally {
+      setDeleteId(null);
     }
   };
-
-  const getIcon = (type: string) => {
-    switch (type) {
-      case "budget_alert":
-        return <AlertTriangle className="w-5 h-5 text-rose-500" />;
-      case "bill_reminder":
-        return <Clock className="w-5 h-5 text-orange-500" />;
-      case "system":
-        return <Info className="w-5 h-5 text-blue-500" />;
-      default:
-        return <Bell className="w-5 h-5 text-primary" />;
-    }
-  };
-
-  const unreadCount = notifications.filter((n: any) => !n.is_read).length;
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
+    <div className="space-y-6 max-w-4xl mx-auto pb-8">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-extrabold tracking-tight flex items-center gap-2">
             <Bell className="w-6 h-6 text-primary" />
-            Notifications
+            Notifications Center
             {unreadCount > 0 && (
               <span className="bg-primary/10 text-primary text-[10px] px-2 py-0.5 rounded-full font-bold ml-2">
                 {unreadCount} new
@@ -85,7 +112,7 @@ export default function NotificationsPage() {
             )}
           </h1>
           <p className="text-xs text-muted-foreground mt-1">
-            Stay updated with your budgets, upcoming bills, and system alerts.
+            Stay updated with real-time alerts for budgets, recurring bills, security events, and system updates.
           </p>
         </div>
 
@@ -93,7 +120,7 @@ export default function NotificationsPage() {
           <button
             onClick={handleMarkAllAsRead}
             disabled={isMarkingAll}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-secondary/80 border border-border text-foreground font-semibold text-xs hover:bg-secondary transition-colors"
+            className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-primary text-primary-foreground font-semibold text-xs hover:bg-primary/90 transition-colors shadow-md shadow-primary/20 shrink-0"
           >
             <CheckCircle2 className="w-4 h-4" />
             <span>Mark All Read</span>
@@ -101,59 +128,104 @@ export default function NotificationsPage() {
         )}
       </div>
 
-      {/* Notifications List */}
+      {/* Filter Toolbar */}
+      <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-2xl bg-card border border-border">
+        {/* Category Pills */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none max-w-full">
+          {categories.map((cat) => (
+            <button
+              key={cat.value}
+              onClick={() => setCategoryFilter(cat.value)}
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
+                categoryFilter === cat.value
+                  ? "bg-primary text-primary-foreground shadow-xs"
+                  : "bg-secondary/60 text-muted-foreground hover:bg-secondary hover:text-foreground"
+              }`}
+            >
+              {cat.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Unread Only Toggle */}
+        <button
+          onClick={() => setShowUnreadOnly(!showUnreadOnly)}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium border transition-colors ${
+            showUnreadOnly
+              ? "bg-primary/10 border-primary text-primary font-bold"
+              : "border-border text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          <Filter className="w-3.5 h-3.5" />
+          <span>Unread Only</span>
+        </button>
+      </div>
+
+      {/* Notifications List Card */}
       <div className="glass-card rounded-3xl border border-border overflow-hidden">
         {isLoading ? (
           <TableSkeleton columns={1} rows={5} />
-        ) : notifications.length > 0 ? (
+        ) : isError ? (
+          <div className="p-12 text-center text-xs text-rose-500 font-medium">
+            Failed to load notifications. Please refresh the page.
+          </div>
+        ) : filteredNotifications.length > 0 ? (
           <div className="divide-y divide-border">
-            {notifications.map((notification: any) => (
+            {filteredNotifications.map((n: any) => (
               <div
-                key={notification._id}
+                key={n._id}
                 className={`p-4 transition-colors flex items-start gap-4 ${
-                  !notification.is_read ? "bg-primary/5" : "hover:bg-secondary/30"
+                  !n.is_read ? "bg-primary/5 dark:bg-primary/10" : "hover:bg-secondary/30"
                 }`}
               >
+                {/* Category Icon */}
                 <div
                   className={`w-10 h-10 shrink-0 rounded-2xl flex items-center justify-center border ${
-                    !notification.is_read
-                      ? "bg-background border-primary/20 shadow-sm"
+                    !n.is_read
+                      ? "bg-background border-primary/30 shadow-xs"
                       : "bg-secondary/50 border-border"
                   }`}
                 >
-                  {getIcon(notification.type)}
+                  {getNotificationIcon(n.type, n.category)}
                 </div>
 
+                {/* Main Content */}
                 <div className="flex-1 min-w-0 pt-0.5">
                   <div className="flex items-start justify-between gap-2">
-                    <p
-                      className={`text-sm tracking-tight ${
-                        !notification.is_read
-                          ? "font-bold text-foreground"
-                          : "font-semibold text-muted-foreground"
-                      }`}
-                    >
-                      {notification.title}
-                    </p>
-                    <span className="text-[10px] font-medium text-muted-foreground whitespace-nowrap">
-                      {formatDate(notification.createdAt)}
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <p
+                        className={`text-sm tracking-tight ${
+                          !n.is_read
+                            ? "font-bold text-foreground"
+                            : "font-semibold text-muted-foreground"
+                        }`}
+                      >
+                        {n.title}
+                      </p>
+                      {n.category && (
+                        <span className="px-2 py-0.5 rounded-md bg-secondary text-[10px] font-medium text-muted-foreground capitalize">
+                          {n.category}
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-[10px] font-medium text-muted-foreground whitespace-nowrap shrink-0">
+                      {getRelativeTime(n.createdAt)}
                     </span>
                   </div>
                   <p
                     className={`text-xs mt-1 leading-relaxed ${
-                      !notification.is_read
-                        ? "text-foreground"
-                        : "text-muted-foreground"
+                      !n.is_read ? "text-foreground" : "text-muted-foreground"
                     }`}
                   >
-                    {notification.message}
+                    {n.message}
                   </p>
                 </div>
 
-                <div className="flex flex-col sm:flex-row items-center gap-2 shrink-0">
-                  {!notification.is_read && (
+                {/* Actions */}
+                <div className="flex flex-col sm:flex-row items-center gap-1.5 shrink-0">
+                  {!n.is_read && (
                     <button
-                      onClick={() => handleMarkAsRead(notification._id)}
+                      onClick={() => handleMarkAsRead(n._id)}
                       className="w-8 h-8 flex items-center justify-center rounded-xl bg-background border border-border text-muted-foreground hover:text-primary hover:border-primary/30 transition-colors"
                       title="Mark as read"
                     >
@@ -161,9 +233,9 @@ export default function NotificationsPage() {
                     </button>
                   )}
                   <button
-                    onClick={() => handleDelete(notification._id)}
+                    onClick={() => setDeleteId(n._id)}
                     className="w-8 h-8 flex items-center justify-center rounded-xl bg-background border border-border text-muted-foreground hover:text-destructive hover:border-destructive/30 hover:bg-destructive/10 transition-colors"
-                    title="Delete"
+                    title="Delete notification"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -173,12 +245,23 @@ export default function NotificationsPage() {
           </div>
         ) : (
           <EmptyState
-            title="All caught up!"
-            description="You have no notifications right now. When you exceed a budget or have a bill due, it will appear here."
+            title="No notifications found"
+            description="You have no matching notifications right now. Alerts for budget breaches, bills, and account changes will appear here."
             icon={<CheckCircle2 className="w-8 h-8 text-emerald-500" />}
           />
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <ConfirmDialog
+        isOpen={!!deleteId}
+        onClose={() => setDeleteId(null)}
+        onConfirm={confirmDelete}
+        title="Remove Notification"
+        description="Are you sure you want to remove this notification?"
+        confirmText="Remove"
+        variant="destructive"
+      />
     </div>
   );
 }

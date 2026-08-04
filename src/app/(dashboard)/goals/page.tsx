@@ -14,6 +14,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { ConfirmDialog } from "@/components/custom/confirm-dialog";
 
 const goalCategories = [
   "Savings Goal",
@@ -36,6 +37,7 @@ type GoalFormValues = z.infer<typeof goalSchema>;
 
 export default function GoalsPage() {
   const { formatCurrency } = useCurrency();
+  const [deleteId, setDeleteId] = useState<string | null>(null);
   const { data: goalsData } = useGetGoalsQuery({});
   const [createGoalApi, { isLoading: isCreating }] = useCreateGoalMutation();
   const [depositApi, { isLoading: isDepositing }] = useDepositToGoalMutation();
@@ -86,13 +88,19 @@ export default function GoalsPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this goal?")) return;
+  const handleDelete = (id: string) => {
+    setDeleteId(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteId) return;
     try {
-      await deleteGoalApi(id).unwrap();
+      await deleteGoalApi(deleteId).unwrap();
       toast.success("Goal deleted.");
     } catch (err: any) {
       toast.error(err?.data?.message || "Failed to delete goal");
+    } finally {
+      setDeleteId(null);
     }
   };
 
@@ -294,6 +302,16 @@ export default function GoalsPage() {
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        isOpen={!!deleteId}
+        onClose={() => setDeleteId(null)}
+        onConfirm={confirmDelete}
+        title="Delete Savings Goal"
+        description="Are you sure you want to delete this financial goal?"
+        confirmText="Delete"
+        variant="destructive"
+      />
     </div>
   );
 }

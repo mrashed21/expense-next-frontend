@@ -21,6 +21,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { ConfirmDialog } from "@/components/custom/confirm-dialog";
 
 const budgetSchema = z.object({
   category_id: z.string().min(1, "Select a category"),
@@ -32,6 +33,7 @@ type BudgetFormValues = z.infer<typeof budgetSchema>;
 
 export default function BudgetsPage() {
   const { formatCurrency } = useCurrency();
+  const [deleteId, setDeleteId] = useState<string | null>(null);
   const { data: budgetsData } = useGetBudgetsQuery(undefined);
   const { data: categoriesData } = useGetCategoriesQuery({});
   const [createBudgetApi, { isLoading: isCreating }] =
@@ -65,13 +67,19 @@ export default function BudgetsPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this budget rule?")) return;
+  const handleDelete = (id: string) => {
+    setDeleteId(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteId) return;
     try {
-      await deleteBudgetApi(id).unwrap();
+      await deleteBudgetApi(deleteId).unwrap();
       toast.success("Budget rule removed.");
     } catch (err: any) {
       toast.error(err?.data?.message || "Failed to delete budget");
+    } finally {
+      setDeleteId(null);
     }
   };
 
@@ -259,6 +267,16 @@ export default function BudgetsPage() {
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        isOpen={!!deleteId}
+        onClose={() => setDeleteId(null)}
+        onConfirm={confirmDelete}
+        title="Delete Budget Rule"
+        description="Are you sure you want to delete this category budget limit?"
+        confirmText="Delete"
+        variant="destructive"
+      />
     </div>
   );
 }

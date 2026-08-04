@@ -31,6 +31,8 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { EmptyState } from "@/components/custom/EmptyState";
 import { TableSkeleton } from "@/components/custom/TableSkeleton";
+import { ConfirmDialog } from "@/components/custom/confirm-dialog";
+import { PromptDialog } from "@/components/custom/prompt-dialog";
 
 const transactionSchema = z.object({
   account_id: z.string().min(1, "Select an account"),
@@ -63,6 +65,9 @@ export default function TransactionsPage() {
   const [isBulkEditOpen, setIsBulkEditOpen] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [activeFilterId, setActiveFilterId] = useState<string>("none");
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [showBulkDeleteConfirm, setShowBulkDeleteConfirm] = useState(false);
+  const [showSaveFilterPrompt, setShowSaveFilterPrompt] = useState(false);
 
   useEffect(() => {
     setPage(1);
@@ -119,17 +124,22 @@ export default function TransactionsPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this transaction?")) return;
+  const handleDelete = (id: string) => {
+    setDeleteId(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteId) return;
+    const targetId = deleteId;
     try {
-      await deleteTransactionApi(id).unwrap();
+      await deleteTransactionApi(targetId).unwrap();
       
       toast.success("Transaction deleted.", {
         action: {
           label: "Undo",
           onClick: async () => {
             try {
-              await restoreApi(id).unwrap();
+              await restoreApi(targetId).unwrap();
               toast.success("Transaction restored.");
             } catch (err: any) {
               toast.error("Failed to restore transaction");
@@ -140,11 +150,17 @@ export default function TransactionsPage() {
       });
     } catch (err: any) {
       toast.error(err?.data?.message || "Failed to delete transaction");
+    } finally {
+      setDeleteId(null);
     }
   };
 
-  const handleBulkDelete = async () => {
-    if (!confirm(`Are you sure you want to delete ${selectedIds.length} transactions?`)) return;
+  const handleBulkDelete = () => {
+    if (selectedIds.length === 0) return;
+    setShowBulkDeleteConfirm(true);
+  };
+
+  const confirmBulkDelete = async () => {
     try {
       await bulkDeleteApi(selectedIds).unwrap();
       const idsToRestore = [...selectedIds];
@@ -166,6 +182,8 @@ export default function TransactionsPage() {
       });
     } catch (err: any) {
       toast.error(err?.data?.message || "Failed to bulk delete");
+    } finally {
+      setShowBulkDeleteConfirm(false);
     }
   };
 
@@ -194,9 +212,11 @@ export default function TransactionsPage() {
     );
   };
 
-  const handleSaveFilter = async () => {
-    const name = prompt("Enter a name for this filter:");
-    if (!name) return;
+  const handleSaveFilter = () => {
+    setShowSaveFilterPrompt(true);
+  };
+
+  const confirmSaveFilter = async (name: string) => {
     try {
       await createSavedFilterApi({
         name,
@@ -206,6 +226,8 @@ export default function TransactionsPage() {
       toast.success("Filter saved successfully!");
     } catch (err) {
       toast.error("Failed to save filter");
+    } finally {
+      setShowSaveFilterPrompt(false);
     }
   };
 
@@ -318,8 +340,8 @@ export default function TransactionsPage() {
         ) : transactions.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-secondary/60 text-muted-foreground text-[11px] font-bold uppercase tracking-wider border-b border-border">
+            <thead className="sticky top-0 z-10 bg-secondary/95 backdrop-blur-md">
+              <tr className="text-muted-foreground text-[11px] font-bold uppercase tracking-wider border-b border-border">
                 <th scope="col" className="p-4 w-10">
                   <input 
                     type="checkbox" 
@@ -624,6 +646,40 @@ export default function TransactionsPage() {
           </div>
         </div>
       )}
+
+      {/* Delete Single Confirmation */}
+      <ConfirmDialog
+        isOpen={!!deleteId}
+        onClose={() => setDeleteId(null)}
+        onConfirm={confirmDelete}
+        title="Delete Transaction"
+        description="Are you sure you want to delete this transaction? You can undo this action shortly after."
+        confirmText="Delete"
+        variant="destructive"
+      />
+
+      {/* Delete Bulk Confirmation */}
+      <ConfirmDialog
+        isOpen={showBulkDeleteConfirm}
+        onClose={() => setShowBulkDeleteConfirm(false)}
+        onConfirm={confirmBulkDelete}
+        title="Delete Multiple Transactions"
+        description={`Are you sure you want to delete ${selectedIds.length} selected transactions?`}
+        confirmText={`Delete ${selectedIds.length} Items`}
+        variant="destructive"
+      />
+
+      {/* Save Filter Prompt */}
+      <PromptDialog
+        isOpen={showSaveFilterPrompt}
+        onClose={() => setShowSaveFilterPrompt(false)}
+        onSubmit={confirmSaveFilter}
+        title="Save Filter Preset"
+        description="Save your current search, date range, and category filters for quick access later."
+        label="Filter Name"
+        placeholder="e.g. Monthly Expenses, Grocery Purchases"
+        submitText="Save Preset"
+      />
     </div>
   );
 }

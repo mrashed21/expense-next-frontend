@@ -16,6 +16,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { ConfirmDialog } from "@/components/custom/confirm-dialog";
 
 const debtTypes = [
   { label: "Lent (Money owed to you)", value: "lent" },
@@ -42,6 +43,7 @@ type PaymentFormValues = z.infer<typeof paymentSchema>;
 
 export default function DebtsPage() {
   const { formatCurrency } = useCurrency();
+  const [deleteId, setDeleteId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   
   const { data: debtsData, isLoading: debtsLoading } = useGetDebtsQuery({
@@ -129,13 +131,19 @@ export default function DebtsPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this debt?")) return;
+  const handleDelete = (id: string) => {
+    setDeleteId(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteId) return;
     try {
-      await deleteDebtApi(id).unwrap();
+      await deleteDebtApi(deleteId).unwrap();
       toast.success("Debt deleted.");
     } catch (err: any) {
       toast.error(err?.data?.message || "Failed to delete debt.");
+    } finally {
+      setDeleteId(null);
     }
   };
 
@@ -231,7 +239,7 @@ export default function DebtsPage() {
       <div className="glass-card rounded-3xl overflow-hidden border border-border">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="bg-secondary/50 text-muted-foreground border-b border-border">
+            <thead className="sticky top-0 z-10 bg-secondary/95 backdrop-blur-md text-muted-foreground border-b border-border">
               <tr>
                 <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider">Details</th>
                 <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">Principal</th>
@@ -521,6 +529,16 @@ export default function DebtsPage() {
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        isOpen={!!deleteId}
+        onClose={() => setDeleteId(null)}
+        onConfirm={confirmDelete}
+        title="Delete Debt Record"
+        description="Are you sure you want to delete this debt/loan record?"
+        confirmText="Delete"
+        variant="destructive"
+      />
     </div>
   );
 }

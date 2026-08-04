@@ -19,6 +19,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { ConfirmDialog } from "@/components/custom/confirm-dialog";
 
 const accountTypes = [
   "Cash",
@@ -57,6 +58,7 @@ type TransferFormValues = z.infer<typeof transferSchema>;
 
 export default function AccountsPage() {
   const { formatCurrency } = useCurrency();
+  const [archiveId, setArchiveId] = useState<string | null>(null);
   const { data: accountsData, isLoading: accountsLoading } =
     useGetAccountsQuery({});
   const { data: transfersData } = useGetTransfersQuery({});
@@ -161,13 +163,19 @@ export default function AccountsPage() {
     }
   };
 
-  const handleDeleteAccount = async (id: string) => {
-    if (!confirm("Are you sure you want to archive this account?")) return;
+  const handleDeleteAccount = (id: string) => {
+    setArchiveId(id);
+  };
+
+  const confirmArchive = async () => {
+    if (!archiveId) return;
     try {
-      await deleteAccountApi(id).unwrap();
+      await deleteAccountApi(archiveId).unwrap();
       toast.success("Account archived.");
     } catch (err: any) {
       toast.error(err?.data?.message || "Failed to delete account.");
+    } finally {
+      setArchiveId(null);
     }
   };
 
@@ -634,6 +642,16 @@ export default function AccountsPage() {
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        isOpen={!!archiveId}
+        onClose={() => setArchiveId(null)}
+        onConfirm={confirmArchive}
+        title="Archive Account"
+        description="Are you sure you want to archive this financial account?"
+        confirmText="Archive Account"
+        variant="warning"
+      />
     </div>
   );
 }

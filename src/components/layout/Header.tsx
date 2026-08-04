@@ -35,6 +35,7 @@ import { useSocket } from "@/hooks/useSocket";
 import { useGetNotificationsQuery } from "@/services/notificationApi";
 import { ThemeToggle } from "./ThemeToggle";
 import { CommandPalette } from "./CommandPalette";
+import { NotificationDropdown } from "./NotificationDropdown";
 
 export function Header() {
   const router = useRouter();
@@ -122,22 +123,8 @@ export function Header() {
           </Link>
         </Button>
 
-        {/* Notifications */}
-        <Button
-          variant="ghost"
-          size="icon"
-          asChild
-          className="h-8 w-8 relative text-muted-foreground"
-        >
-          <Link href="/notifications">
-            <Bell className="w-4 h-4" />
-            {unreadCount > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 min-w-4 h-4 flex items-center justify-center rounded-full bg-primary text-primary-foreground text-[9px] font-bold px-1 leading-none">
-                {unreadCount > 99 ? "99+" : unreadCount}
-              </span>
-            )}
-          </Link>
-        </Button>
+        {/* Notifications Dropdown */}
+        <NotificationDropdown />
 
         {/* Theme Toggle */}
         <ThemeToggle />

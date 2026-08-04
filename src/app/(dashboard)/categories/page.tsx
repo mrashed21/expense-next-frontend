@@ -13,6 +13,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { ConfirmDialog } from "@/components/custom/confirm-dialog";
 
 const categorySchema = z.object({
   name: z.string().min(1, "Category name is required"),
@@ -23,6 +24,7 @@ const categorySchema = z.object({
 type CategoryFormValues = z.infer<typeof categorySchema>;
 
 export default function CategoriesPage() {
+  const [deleteId, setDeleteId] = useState<string | null>(null);
   const { data: categoriesData, isLoading } = useGetCategoriesQuery({});
   const [createCategoryApi, { isLoading: isCreating }] =
     useCreateCategoryMutation();
@@ -91,13 +93,19 @@ export default function CategoriesPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this category?")) return;
+  const handleDelete = (id: string) => {
+    setDeleteId(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteId) return;
     try {
-      await deleteCategoryApi(id).unwrap();
+      await deleteCategoryApi(deleteId).unwrap();
       toast.success("Category deleted.");
     } catch (err: any) {
       toast.error(err?.data?.message || "Failed to delete category");
+    } finally {
+      setDeleteId(null);
     }
   };
 
@@ -380,6 +388,16 @@ export default function CategoriesPage() {
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        isOpen={!!deleteId}
+        onClose={() => setDeleteId(null)}
+        onConfirm={confirmDelete}
+        title="Delete Category"
+        description="Are you sure you want to delete this category? Existing transactions using this category will remain."
+        confirmText="Delete"
+        variant="destructive"
+      />
     </div>
   );
 }

@@ -18,6 +18,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { ConfirmDialog } from "@/components/custom/confirm-dialog";
 
 const billTypes = [
   "Electricity", "Internet", "Gas", "Water", "Rent", "Credit Card", "EMI", "Subscriptions"
@@ -34,6 +35,7 @@ type BillFormValues = z.infer<typeof billSchema>;
 
 export default function BillsPage() {
   const { formatCurrency } = useCurrency();
+  const [deleteId, setDeleteId] = useState<string | null>(null);
   const { data: billsData } = useGetBillsQuery({});
   const { data: accountsData } = useGetAccountsQuery({});
   const [createBillApi, { isLoading: isCreating }] = useCreateBillMutation();
@@ -83,13 +85,19 @@ export default function BillsPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this bill reminder?")) return;
+  const handleDelete = (id: string) => {
+    setDeleteId(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteId) return;
     try {
-      await deleteBillApi(id).unwrap();
+      await deleteBillApi(deleteId).unwrap();
       toast.success("Bill deleted.");
     } catch (err: any) {
       toast.error(err?.data?.message || "Failed to delete bill");
+    } finally {
+      setDeleteId(null);
     }
   };
 
@@ -277,6 +285,16 @@ export default function BillsPage() {
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        isOpen={!!deleteId}
+        onClose={() => setDeleteId(null)}
+        onConfirm={confirmDelete}
+        title="Delete Bill Reminder"
+        description="Are you sure you want to delete this upcoming bill reminder?"
+        confirmText="Delete"
+        variant="destructive"
+      />
     </div>
   );
 }

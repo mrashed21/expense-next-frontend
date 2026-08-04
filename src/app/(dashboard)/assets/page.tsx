@@ -15,6 +15,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { ConfirmDialog } from "@/components/custom/confirm-dialog";
 
 const assetTypes = [
   { label: "Real Estate", value: "real_estate" },
@@ -36,6 +37,7 @@ type AssetFormValues = z.infer<typeof assetSchema>;
 
 export default function AssetsPage() {
   const { formatCurrency } = useCurrency();
+  const [deleteId, setDeleteId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   
   const { data: assetsData, isLoading: assetsLoading } = useGetAssetsQuery({
@@ -122,13 +124,19 @@ export default function AssetsPage() {
     }
   };
 
-  const handleDeleteAsset = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this asset?")) return;
+  const handleDeleteAsset = (id: string) => {
+    setDeleteId(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteId) return;
     try {
-      await deleteAssetApi(id).unwrap();
+      await deleteAssetApi(deleteId).unwrap();
       toast.success("Asset deleted.");
     } catch (err: any) {
       toast.error(err?.data?.message || "Failed to delete asset.");
+    } finally {
+      setDeleteId(null);
     }
   };
 
@@ -500,6 +508,16 @@ export default function AssetsPage() {
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        isOpen={!!deleteId}
+        onClose={() => setDeleteId(null)}
+        onConfirm={confirmDelete}
+        title="Delete Asset"
+        description="Are you sure you want to delete this asset entry from your net worth overview?"
+        confirmText="Delete"
+        variant="destructive"
+      />
     </div>
   );
 }

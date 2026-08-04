@@ -18,8 +18,9 @@ import {
   Trash2,
 } from "lucide-react";
 import { useState } from "react";
-import toast from "react-hot-toast";
-import { RecurringModal } from "./RecurringModal"; // We will create this
+import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/custom/confirm-dialog";
+import { RecurringModal } from "./RecurringModal";
 
 export default function RecurringPage() {
   const { formatCurrency } = useCurrency();
@@ -28,6 +29,7 @@ export default function RecurringPage() {
   const [deleteRecurring] = useDeleteRecurringMutation();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [deleteId, setDeleteId] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<any>(null);
 
   const items = recurringData?.data || [];
@@ -41,13 +43,19 @@ export default function RecurringPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this automation?")) return;
+  const handleDelete = (id: string) => {
+    setDeleteId(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteId) return;
     try {
-      await deleteRecurring(id).unwrap();
+      await deleteRecurring(deleteId).unwrap();
       toast.success("Automation deleted");
     } catch (error: any) {
       toast.error(error?.data?.message || "Failed to delete");
+    } finally {
+      setDeleteId(null);
     }
   };
 
@@ -154,6 +162,16 @@ export default function RecurringPage() {
       </div>
 
       <RecurringModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} item={selectedItem} />
+
+      <ConfirmDialog
+        isOpen={!!deleteId}
+        onClose={() => setDeleteId(null)}
+        onConfirm={confirmDelete}
+        title="Delete Automation"
+        description="Are you sure you want to delete this recurring automation? Future scheduled transactions will not be automatically generated."
+        confirmText="Delete"
+        variant="destructive"
+      />
     </div>
   );
 }

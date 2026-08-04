@@ -14,6 +14,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { ConfirmDialog } from "@/components/custom/confirm-dialog";
 import {
   BarChart,
   Bar,
@@ -48,6 +49,7 @@ type InvestmentFormValues = z.infer<typeof investmentSchema>;
 
 export default function InvestmentsPage() {
   const { formatCurrency } = useCurrency();
+  const [deleteId, setDeleteId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   
   const { data: investmentsData, isLoading: investmentsLoading } = useGetInvestmentsQuery({
@@ -135,13 +137,19 @@ export default function InvestmentsPage() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this investment?")) return;
+  const handleDelete = (id: string) => {
+    setDeleteId(id);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteId) return;
     try {
-      await deleteInvestmentApi(id).unwrap();
+      await deleteInvestmentApi(deleteId).unwrap();
       toast.success("Investment deleted.");
     } catch (err: any) {
       toast.error(err?.data?.message || "Failed to delete investment.");
+    } finally {
+      setDeleteId(null);
     }
   };
 
@@ -244,7 +252,7 @@ export default function InvestmentsPage() {
       <div className="glass-card rounded-3xl overflow-hidden border border-border">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="bg-secondary/50 text-muted-foreground border-b border-border">
+            <thead className="sticky top-0 z-10 bg-secondary/95 backdrop-blur-md text-muted-foreground border-b border-border">
               <tr>
                 <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider">Asset</th>
                 <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">Holdings</th>
@@ -457,6 +465,16 @@ export default function InvestmentsPage() {
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        isOpen={!!deleteId}
+        onClose={() => setDeleteId(null)}
+        onConfirm={confirmDelete}
+        title="Delete Investment"
+        description="Are you sure you want to delete this investment holding? This action cannot be undone."
+        confirmText="Delete"
+        variant="destructive"
+      />
     </div>
   );
 }
