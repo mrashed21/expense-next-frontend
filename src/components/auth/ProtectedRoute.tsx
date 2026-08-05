@@ -19,12 +19,11 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!isLoading) {
-      if (!isAuthenticated) {
-        router.replace(`/login?redirect=${encodeURIComponent(pathname || "/")}`);
-      } else if (
-        user?.isAdmin && 
-        !pathname?.startsWith("/admin") && 
-        !pathname?.startsWith("/profile") && 
+      if (
+        isAuthenticated &&
+        user?.isAdmin &&
+        !pathname?.startsWith("/admin") &&
+        !pathname?.startsWith("/profile") &&
         !pathname?.startsWith("/settings")
       ) {
         router.replace("/admin");

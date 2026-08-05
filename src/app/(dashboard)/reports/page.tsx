@@ -15,6 +15,13 @@ import {
   PieChart as PieIcon,
   Receipt,
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { exportToCsv, exportToPdf } from "@/lib/export";
 import { useState } from "react";
 
 export default function ReportsPage() {
@@ -31,18 +38,7 @@ export default function ReportsPage() {
   
   const { data: taxData, isLoading: taxLoading } = useGetTaxReportQuery(now.getFullYear(), { skip: activeReport !== "tax" });
 
-  const handleExportCSV = (filename: string, rows: string[][]) => {
-    const csvContent = "data:text/csv;charset=utf-8," + rows.map(e => e.join(",")).join("\n");
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `${filename}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
-  const exportBalanceSheet = () => {
+  const exportBalanceSheetCsv = () => {
     if (!bsData?.data) return;
     const d = bsData.data;
     const rows = [
@@ -63,10 +59,27 @@ export default function ReportsPage() {
       ["EQUITY", ""],
       ["Total Equity (Net Worth)", d.equity.totalEquity],
     ];
-    handleExportCSV("balance-sheet", rows);
+    exportToCsv("balance-sheet", rows[0], rows.slice(1));
   };
 
-  const exportCashFlow = () => {
+  const exportBalanceSheetPdf = () => {
+    if (!bsData?.data) return;
+    const d = bsData.data;
+    const rows = [
+      ["Cash", d.assets.currentAssets.cash],
+      ["Investments", d.assets.nonCurrentAssets.investments],
+      ["Physical Assets", d.assets.nonCurrentAssets.physical_assets],
+      ["Money Lent", d.assets.nonCurrentAssets.money_lent],
+      ["Total Assets", d.assets.totalAssets],
+      ["Money Borrowed", d.liabilities.longTermLiabilities.money_borrowed],
+      ["EMIs Remaining", d.liabilities.currentLiabilities.emi_remaining],
+      ["Total Liabilities", d.liabilities.totalLiabilities],
+      ["Total Equity (Net Worth)", d.equity.totalEquity],
+    ];
+    exportToPdf("balance-sheet", "Balance Sheet", ["Item", "Amount"], rows);
+  };
+
+  const exportCashFlowCsv = () => {
     if (!cfData?.data) return;
     const d = cfData.data;
     const rows = [
@@ -82,10 +95,21 @@ export default function ReportsPage() {
       [],
       ["NET CASH FLOW", d.summary.netCashFlow],
     ];
-    handleExportCSV("cash-flow", rows);
+    exportToCsv("cash-flow", rows[0], rows.slice(1));
   };
 
-  const exportTaxReport = () => {
+  const exportCashFlowPdf = () => {
+    if (!cfData?.data) return;
+    const d = cfData.data;
+    const rows = [
+      ...d.cashFlow.operatingActivities.inflows.map((i: any) => [i.category, `+${i.amount}`]),
+      ...d.cashFlow.operatingActivities.outflows.map((o: any) => [o.category, `-${o.amount}`]),
+      ["Net Cash Flow", d.summary.netCashFlow],
+    ];
+    exportToPdf("cash-flow", "Cash Flow Statement", ["Category", "Amount"], rows);
+  };
+
+  const exportTaxReportCsv = () => {
     if (!taxData?.data) return;
     const d = taxData.data;
     const rows = [
@@ -101,7 +125,20 @@ export default function ReportsPage() {
       [],
       ["ESTIMATED TAXABLE AMOUNT", d.estimatedTaxableAmount],
     ];
-    handleExportCSV("tax-report", rows);
+    exportToCsv("tax-report", rows[0], rows.slice(1));
+  };
+
+  const exportTaxReportPdf = () => {
+    if (!taxData?.data) return;
+    const d = taxData.data;
+    const rows = [
+      ["Taxable Income", d.income.taxable],
+      ["Non-Taxable Income", d.income.nonTaxable],
+      ["Total Income", d.income.total],
+      ["Eligible Deductions", `-${d.deductions.eligibleDeductions}`],
+      ["Estimated Taxable Amount", d.estimatedTaxableAmount],
+    ];
+    exportToPdf("tax-report", "Tax Report", ["Item", "Amount"], rows);
   };
 
   const renderLoader = () => (
@@ -178,9 +215,21 @@ export default function ReportsPage() {
                 <h2 className="text-lg font-black tracking-tight">Balance Sheet</h2>
                 <p className="text-xs text-muted-foreground">Snapshot as of {formatDate(new Date())}</p>
               </div>
-              <button onClick={exportBalanceSheet} className="flex items-center gap-2 px-4 py-2 bg-primary text-white text-xs font-bold rounded-xl hover:opacity-90 transition-opacity">
-                <FileSpreadsheet className="w-4 h-4" /> Export CSV
-              </button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="flex items-center gap-2 px-4 py-2 bg-primary text-white text-xs font-bold rounded-xl hover:opacity-90 transition-opacity">
+                    <Download className="w-4 h-4" /> Export
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={exportBalanceSheetCsv}>
+                    <FileSpreadsheet className="w-4 h-4 mr-2" /> Export CSV
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={exportBalanceSheetPdf}>
+                    <Download className="w-4 h-4 mr-2" /> Export PDF
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
             {bsLoading ? renderLoader() : bsData?.data && (
               <div className="p-6 md:p-8 max-w-3xl mx-auto space-y-8">
@@ -259,9 +308,21 @@ export default function ReportsPage() {
                 <h2 className="text-lg font-black tracking-tight">Cash Flow Statement</h2>
                 <p className="text-xs text-muted-foreground">FY {now.getFullYear()}</p>
               </div>
-              <button onClick={exportCashFlow} className="flex items-center gap-2 px-4 py-2 bg-primary text-white text-xs font-bold rounded-xl hover:opacity-90 transition-opacity">
-                <FileSpreadsheet className="w-4 h-4" /> Export CSV
-              </button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="flex items-center gap-2 px-4 py-2 bg-primary text-white text-xs font-bold rounded-xl hover:opacity-90 transition-opacity">
+                    <Download className="w-4 h-4" /> Export
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={exportCashFlowCsv}>
+                    <FileSpreadsheet className="w-4 h-4 mr-2" /> Export CSV
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={exportCashFlowPdf}>
+                    <Download className="w-4 h-4 mr-2" /> Export PDF
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
             {cfLoading ? renderLoader() : cfData?.data && (
               <div className="p-6 md:p-8 max-w-3xl mx-auto space-y-8">
@@ -329,9 +390,21 @@ export default function ReportsPage() {
                 <h2 className="text-lg font-black tracking-tight">Tax Report (Estimate)</h2>
                 <p className="text-xs text-muted-foreground">FY {now.getFullYear()}</p>
               </div>
-              <button onClick={exportTaxReport} className="flex items-center gap-2 px-4 py-2 bg-primary text-white text-xs font-bold rounded-xl hover:opacity-90 transition-opacity">
-                <FileSpreadsheet className="w-4 h-4" /> Export CSV
-              </button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="flex items-center gap-2 px-4 py-2 bg-primary text-white text-xs font-bold rounded-xl hover:opacity-90 transition-opacity">
+                    <Download className="w-4 h-4" /> Export
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={exportTaxReportCsv}>
+                    <FileSpreadsheet className="w-4 h-4 mr-2" /> Export CSV
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={exportTaxReportPdf}>
+                    <Download className="w-4 h-4 mr-2" /> Export PDF
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
             {taxLoading ? renderLoader() : taxData?.data && (
               <div className="p-6 md:p-8 max-w-3xl mx-auto space-y-8">

@@ -821,7 +821,7 @@ export default function HomePage() {
                   <h3 className="font-extrabold text-lg">Free Starter</h3>
                   <p className="text-xs text-muted-foreground">Essential tracking for individuals.</p>
                   <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-black">$0</span>
+                    <span className="text-4xl font-black">৳0</span>
                     <span className="text-xs text-muted-foreground">/ month</span>
                   </div>
                   <ul className="space-y-2 text-xs pt-4 border-t border-border">
@@ -860,7 +860,7 @@ export default function HomePage() {
                   <p className="text-xs text-muted-foreground">For active savers & freelancers.</p>
                   <div className="flex items-baseline gap-1">
                     <span className="text-4xl font-black">
-                      {billingCycle === "monthly" ? "$9" : "$7.20"}
+                      {billingCycle === "monthly" ? "৳299" : "৳239"}
                     </span>
                     <span className="text-xs text-muted-foreground">/ month</span>
                   </div>
@@ -902,7 +902,7 @@ export default function HomePage() {
                   <p className="text-xs text-muted-foreground">For business teams & accountants.</p>
                   <div className="flex items-baseline gap-1">
                     <span className="text-4xl font-black">
-                      {billingCycle === "monthly" ? "$29" : "$23.20"}
+                      {billingCycle === "monthly" ? "৳999" : "৳799"}
                     </span>
                     <span className="text-xs text-muted-foreground">/ month</span>
                   </div>
@@ -1045,7 +1045,7 @@ export default function HomePage() {
             <p>© 2026 Expense Tracker SaaS. All rights reserved.</p>
             <div className="flex items-center gap-4">
               <span>English (US)</span>
-              <span>USD ($)</span>
+              <span>BDT (৳)</span>
               <ThemeToggle />
             </div>
           </div>

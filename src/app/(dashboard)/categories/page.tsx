@@ -14,6 +14,8 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { ConfirmDialog } from "@/components/custom/confirm-dialog";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 
 const categorySchema = z.object({
   name: z.string().min(1, "Category name is required"),
@@ -24,6 +26,7 @@ const categorySchema = z.object({
 type CategoryFormValues = z.infer<typeof categorySchema>;
 
 export default function CategoriesPage() {
+  const user = useSelector((state: RootState) => state.auth.user);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const { data: categoriesData, isLoading } = useGetCategoriesQuery({});
   const [createCategoryApi, { isLoading: isCreating }] =
@@ -128,21 +131,23 @@ export default function CategoriesPage() {
         )}
       </div>
       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-        <button
-          onClick={() => openEdit(cat)}
-          className="p-1 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-          title="Edit"
-        >
-          <Pencil className="w-3.5 h-3.5" />
-        </button>
-        {!cat.is_default && (
-          <button
-            onClick={() => handleDelete(cat._id)}
-            className="p-1 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
-            title="Delete"
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-          </button>
+        {(!cat.is_default || user?.isAdmin) && (
+          <>
+            <button
+              onClick={() => openEdit(cat)}
+              className="p-1 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+              title="Edit"
+            >
+              <Pencil className="w-3.5 h-3.5" />
+            </button>
+            <button
+              onClick={() => handleDelete(cat._id)}
+              className="p-1 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+              title="Delete"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+            </button>
+          </>
         )}
       </div>
     </div>

@@ -5,11 +5,13 @@ export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const isPublicRoute =
+    pathname === "/" ||
     pathname.startsWith("/login") ||
     pathname.startsWith("/register") ||
     pathname.startsWith("/verify-otp") ||
     pathname.startsWith("/forgot-password") ||
     pathname.startsWith("/reset-password") ||
+    pathname.startsWith("/pricing") ||
     pathname.startsWith("/admin-login");
 
   const isApiRoute = pathname.startsWith("/api");
@@ -39,7 +41,7 @@ export function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Apply proxy to all routes except api, _next, and static files
+    // Apply middleware to all routes except api, _next, and static files
     "/((?!api|_next/static|_next/image|favicon.ico).*)",
   ],
 };
