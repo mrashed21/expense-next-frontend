@@ -1,6 +1,10 @@
 "use client";
 
+import { ConfirmDialog } from "@/components/custom/confirm-dialog";
+import { EmptyState } from "@/components/custom/empty-state";
 import FormSelect from "@/components/custom/form-select";
+import { PromptDialog } from "@/components/custom/prompt-dialog";
+import { TableSkeleton } from "@/components/custom/table-skeleton";
 import {
   Select,
   SelectContent,
@@ -8,31 +12,49 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { useCurrency } from "@/hooks/use-currency";
+import { useDebounce } from "@/hooks/use-debounce";
 import { formatDate } from "@/lib/utils";
 import { useGetAccountsQuery } from "@/services/account-api";
 import { useGetCategoriesQuery } from "@/services/category-api";
-import { useGetSavedFiltersQuery, useCreateSavedFilterMutation } from "@/services/saved-filter-api";
 import {
-  useDeleteTransactionMutation,
-  useGetTransactionsQuery,
+  useCreateSavedFilterMutation,
+  useGetSavedFiltersQuery,
+} from "@/services/saved-filter-api";
+import {
   useBulkDeleteTransactionsMutation,
-  useRestoreTransactionMutation,
+  useBulkEditTransactionsMutation,
   useBulkRestoreTransactionsMutation,
   useCreateTransactionMutation,
-  useBulkEditTransactionsMutation,
+  useDeleteTransactionMutation,
+  useGetTransactionsQuery,
+  useRestoreTransactionMutation,
 } from "@/services/transaction-api";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useDebounce } from "@/hooks/use-debounce";
-import { Bookmark, ChevronLeft, ChevronRight, Loader2, Plus, Save, Search, Trash2, X, Receipt } from "lucide-react";
+import {
+  Bookmark,
+  ChevronLeft,
+  ChevronRight,
+  Loader2,
+  Plus,
+  Receipt,
+  Save,
+  Search,
+  Trash2,
+  X,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { EmptyState } from "@/components/custom/empty-state";
-import { TableSkeleton } from "@/components/custom/table-skeleton";
-import { ConfirmDialog } from "@/components/custom/confirm-dialog";
-import { PromptDialog } from "@/components/custom/prompt-dialog";
 
 const transactionSchema = z.object({
   account_id: z.string().min(1, "Select an account"),
@@ -89,8 +111,10 @@ export default function TransactionsPage() {
   const [createTransactionApi, { isLoading: isCreating }] =
     useCreateTransactionMutation();
   const [deleteTransactionApi] = useDeleteTransactionMutation();
-  const [bulkDeleteApi, { isLoading: isBulkDeleting }] = useBulkDeleteTransactionsMutation();
-  const [bulkEditApi, { isLoading: isBulkEditing }] = useBulkEditTransactionsMutation();
+  const [bulkDeleteApi, { isLoading: isBulkDeleting }] =
+    useBulkDeleteTransactionsMutation();
+  const [bulkEditApi, { isLoading: isBulkEditing }] =
+    useBulkEditTransactionsMutation();
   const [restoreApi] = useRestoreTransactionMutation();
   const [bulkRestoreApi] = useBulkRestoreTransactionsMutation();
   const [createSavedFilterApi] = useCreateSavedFilterMutation();
@@ -133,7 +157,7 @@ export default function TransactionsPage() {
     const targetId = deleteId;
     try {
       await deleteTransactionApi(targetId).unwrap();
-      
+
       toast.success("Transaction deleted.", {
         action: {
           label: "Undo",
@@ -144,7 +168,7 @@ export default function TransactionsPage() {
             } catch (err: any) {
               toast.error("Failed to restore transaction");
             }
-          }
+          },
         },
         duration: 5000,
       });
@@ -165,7 +189,7 @@ export default function TransactionsPage() {
       await bulkDeleteApi(selectedIds).unwrap();
       const idsToRestore = [...selectedIds];
       setSelectedIds([]);
-      
+
       toast.success(`${idsToRestore.length} transactions deleted.`, {
         action: {
           label: "Undo All",
@@ -176,7 +200,7 @@ export default function TransactionsPage() {
             } catch (err: any) {
               toast.error("Failed to restore some transactions");
             }
-          }
+          },
         },
         duration: 6000,
       });
@@ -207,8 +231,8 @@ export default function TransactionsPage() {
   };
 
   const toggleSelect = (id: string) => {
-    setSelectedIds(prev => 
-      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
     );
   };
 
@@ -262,7 +286,7 @@ export default function TransactionsPage() {
 
         <button
           onClick={() => setIsAddOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-primary-foreground font-semibold text-xs shadow-md shadow-primary/20 hover:bg-primary/90 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-primary-foreground font-semibold text-xs hover:bg-primary/90 transition-colors"
         >
           <Plus className="w-4 h-4" />
           <span>Record Transaction</span>
@@ -318,12 +342,14 @@ export default function TransactionsPage() {
             <SelectContent>
               <SelectItem value="none">No Filter</SelectItem>
               {savedFilters.map((f: any) => (
-                <SelectItem key={f._id} value={f._id}>{f.name}</SelectItem>
+                <SelectItem key={f._id} value={f._id}>
+                  {f.name}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
 
-          <button 
+          <button
             onClick={handleSaveFilter}
             className="p-2 rounded-xl bg-secondary border border-border hover:bg-secondary/80 text-muted-foreground transition-colors"
             title="Save current filters"
@@ -334,65 +360,68 @@ export default function TransactionsPage() {
       </div>
 
       {/* Transactions Data Table */}
-      <div className="glass-card rounded-3xl overflow-hidden border border-border shadow-xl">
+      <div className="glass-card rounded-3xl overflow-hidden border border-border">
         {isLoading ? (
           <TableSkeleton columns={7} rows={10} />
         ) : transactions.length > 0 ? (
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-            <thead className="sticky top-0 z-10 bg-secondary/95 backdrop-blur-md">
-              <tr className="text-muted-foreground text-[11px] font-bold uppercase tracking-wider border-b border-border">
-                <th scope="col" className="p-4 w-10">
-                  <input 
-                    type="checkbox" 
-                    className="rounded border-border bg-background accent-primary"
-                    checked={transactions.length > 0 && selectedIds.length === transactions.length}
-                    onChange={toggleSelectAll}
-                  />
-                </th>
-                <th scope="col" className="p-4">Date</th>
-                <th scope="col" className="p-4">Description / Notes</th>
-                <th scope="col" className="p-4">Category</th>
-                <th scope="col" className="p-4">Account</th>
-                <th scope="col" className="p-4">Type</th>
-                <th scope="col" className="p-4 text-right">Amount</th>
-                <th scope="col" className="p-4 text-center">Action</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border text-xs font-medium">
-              {transactions.map((tx: any) => (
-                <tr
-                  key={tx._id}
-                    className={`transition-colors ${selectedIds.includes(tx._id) ? 'bg-primary/5 hover:bg-primary/10' : 'hover:bg-secondary/30'}`}
+            <Table>
+              <TableHeader className="sticky top-0 z-10 bg-secondary/95 backdrop-blur-md">
+                <TableRow className="text-muted-foreground text-[11px] font-bold uppercase tracking-wider border-b border-border">
+                  <TableHead className="p-4 w-10">
+                    <input
+                      type="checkbox"
+                      className="rounded border-border bg-background accent-primary"
+                      checked={
+                        transactions.length > 0 &&
+                        selectedIds.length === transactions.length
+                      }
+                      onChange={toggleSelectAll}
+                    />
+                  </TableHead>
+                  <TableHead className="p-4">Date</TableHead>
+                  <TableHead className="p-4">Description / Notes</TableHead>
+                  <TableHead className="p-4">Category</TableHead>
+                  <TableHead className="p-4">Account</TableHead>
+                  <TableHead className="p-4">Type</TableHead>
+                  <TableHead className="p-4 text-right">Amount</TableHead>
+                  <TableHead className="p-4 text-center">Action</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody className="divide-y divide-border text-xs font-medium">
+                {transactions.map((tx: any) => (
+                  <TableRow
+                    key={tx._id}
+                    className={`transition-colors ${selectedIds.includes(tx._id) ? "bg-primary/5 hover:bg-primary/10" : "hover:bg-secondary/30"}`}
                   >
-                    <td className="p-4">
-                      <input 
-                        type="checkbox" 
+                    <TableCell className="p-4">
+                      <input
+                        type="checkbox"
                         className="rounded border-border bg-background accent-primary"
                         checked={selectedIds.includes(tx._id)}
                         onChange={() => toggleSelect(tx._id)}
                       />
-                    </td>
-                    <td className="p-4 whitespace-nowrap text-muted-foreground font-semibold">
+                    </TableCell>
+                    <TableCell className="p-4 whitespace-nowrap text-muted-foreground font-semibold">
                       {formatDate(tx.date)}
-                    </td>
-                    <td className="p-4 font-bold text-foreground">
+                    </TableCell>
+                    <TableCell className="p-4 font-bold text-foreground">
                       {tx.notes || tx.category_id?.name || "Transaction"}
                       {tx.reference_number && (
                         <span className="block text-[10px] text-muted-foreground font-normal">
                           Ref: {tx.reference_number}
                         </span>
                       )}
-                    </td>
-                    <td className="p-4 whitespace-nowrap">
+                    </TableCell>
+                    <TableCell className="p-4 whitespace-nowrap">
                       <span className="px-2.5 py-1 rounded-full bg-secondary border border-border font-semibold text-[11px] text-foreground">
                         {tx.category_id?.name || "General"}
                       </span>
-                    </td>
-                    <td className="p-4 whitespace-nowrap text-foreground font-semibold">
+                    </TableCell>
+                    <TableCell className="p-4 whitespace-nowrap text-foreground font-semibold">
                       {tx.account_id?.name || "Account"}
-                    </td>
-                    <td className="p-4 whitespace-nowrap">
+                    </TableCell>
+                    <TableCell className="p-4 whitespace-nowrap">
                       <span
                         className={`px-2 py-0.5 rounded-full text-[10px] uppercase font-bold ${
                           tx.type === "income"
@@ -402,8 +431,8 @@ export default function TransactionsPage() {
                       >
                         {tx.type}
                       </span>
-                    </td>
-                    <td
+                    </TableCell>
+                    <TableCell
                       className={`p-4 text-right whitespace-nowrap font-black text-sm ${
                         tx.type === "income"
                           ? "text-emerald-500"
@@ -412,8 +441,8 @@ export default function TransactionsPage() {
                     >
                       {tx.type === "income" ? "+" : "-"}
                       {formatCurrency(tx.amount)}
-                    </td>
-                    <td className="p-4 text-center whitespace-nowrap">
+                    </TableCell>
+                    <TableCell className="p-4 text-center whitespace-nowrap">
                       <button
                         onClick={() => handleDelete(tx._id)}
                         className="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
@@ -421,15 +450,15 @@ export default function TransactionsPage() {
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 ))}
-            </tbody>
-          </table>
-        </div>
+              </TableBody>
+            </Table>
+          </div>
         ) : (
-          <EmptyState 
-            title="No transactions found" 
+          <EmptyState
+            title="No transactions found"
             description="We couldn't find any transactions matching your current filters."
             icon={<Receipt className="w-8 h-8" />}
             actionLabel="Record Transaction"
@@ -440,9 +469,11 @@ export default function TransactionsPage() {
 
       {/* Pagination Controls */}
       {meta && meta.totalPage > 1 && (
-        <div className="flex items-center justify-between p-4 bg-card rounded-2xl border border-border shadow-sm">
+        <div className="flex items-center justify-between p-4 bg-card rounded-2xl border border-border">
           <div className="text-xs text-muted-foreground font-medium">
-            Showing page <span className="text-foreground font-bold">{meta.page}</span> of <span className="text-foreground font-bold">{meta.totalPage}</span>
+            Showing page{" "}
+            <span className="text-foreground font-bold">{meta.page}</span> of{" "}
+            <span className="text-foreground font-bold">{meta.totalPage}</span>
           </div>
           <div className="flex items-center gap-2">
             <button
@@ -465,26 +496,30 @@ export default function TransactionsPage() {
 
       {/* Floating Bulk Action Bar */}
       {selectedIds.length > 0 && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-card border border-border shadow-2xl rounded-full px-6 py-3 flex items-center gap-4 animate-in slide-in-from-bottom-10 fade-in duration-300">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-card border border-border rounded-full px-6 py-3 flex items-center gap-4 animate-in slide-in-from-bottom-10 fade-in duration-300">
           <span className="text-sm font-bold bg-primary/10 text-primary px-2.5 py-0.5 rounded-full">
             {selectedIds.length} selected
           </span>
           <div className="w-px h-6 bg-border mx-2"></div>
-          <button 
+          <button
             onClick={() => setIsBulkEditOpen(true)}
             className="flex items-center gap-2 text-sm font-medium text-foreground hover:bg-secondary px-3 py-1.5 rounded-xl transition-colors"
           >
             Edit All
           </button>
-          <button 
+          <button
             onClick={handleBulkDelete}
             disabled={isBulkDeleting}
             className="flex items-center gap-2 text-sm font-medium text-destructive hover:bg-destructive/10 px-3 py-1.5 rounded-xl transition-colors disabled:opacity-50"
           >
-            {isBulkDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+            {isBulkDeleting ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Trash2 className="w-4 h-4" />
+            )}
             Delete All
           </button>
-          <button 
+          <button
             onClick={() => setSelectedIds([])}
             className="p-1.5 rounded-full hover:bg-secondary text-muted-foreground transition-colors ml-2"
           >
@@ -496,9 +531,17 @@ export default function TransactionsPage() {
       {/* Add Transaction Modal */}
       {isAddOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-          <div role="dialog" aria-modal="true" aria-labelledby="modal-title" className="w-full max-w-md bg-card border border-border p-6 rounded-3xl space-y-4 shadow-2xl">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="modal-title"
+            className="w-full max-w-md bg-card border border-border p-6 rounded-3xl space-y-4"
+          >
             <div className="flex items-center justify-between border-b border-border pb-3">
-              <h3 id="modal-title" className="text-base font-bold text-foreground">
+              <h3
+                id="modal-title"
+                className="text-base font-bold text-foreground"
+              >
                 Record New Transaction
               </h3>
               <button
@@ -584,7 +627,7 @@ export default function TransactionsPage() {
               <button
                 type="submit"
                 disabled={isCreating}
-                className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-xs shadow-md shadow-primary/20 hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
+                className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-xs hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
               >
                 {isCreating ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -600,9 +643,17 @@ export default function TransactionsPage() {
       {/* Bulk Edit Modal */}
       {isBulkEditOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-          <div role="dialog" aria-modal="true" aria-labelledby="bulk-modal-title" className="w-full max-w-sm bg-card border border-border p-6 rounded-3xl space-y-4 shadow-2xl">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="bulk-modal-title"
+            className="w-full max-w-sm bg-card border border-border p-6 rounded-3xl space-y-4"
+          >
             <div className="flex items-center justify-between border-b border-border pb-3">
-              <h3 id="bulk-modal-title" className="text-base font-bold text-foreground">
+              <h3
+                id="bulk-modal-title"
+                className="text-base font-bold text-foreground"
+              >
                 Bulk Edit ({selectedIds.length} selected)
               </h3>
               <button
@@ -612,35 +663,49 @@ export default function TransactionsPage() {
                 <X className="w-5 h-5" />
               </button>
             </div>
-            
-            <form onSubmit={(e) => {
-              e.preventDefault();
-              const formData = new FormData(e.currentTarget);
-              const catId = formData.get("category_id") as string;
-              if (!catId || catId === "none") return;
-              handleBulkEdit({ category_id: catId });
-            }} className="space-y-4">
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const formData = new FormData(e.currentTarget);
+                const catId = formData.get("category_id") as string;
+                if (!catId || catId === "none") return;
+                handleBulkEdit({ category_id: catId });
+              }}
+              className="space-y-4"
+            >
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">Update Category</label>
-                <select 
+                <label className="text-xs font-semibold text-foreground">
+                  Update Category
+                </label>
+                <select
                   name="category_id"
                   className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                   required
                 >
                   <option value="">Select a new category...</option>
                   {categories.map((c: any) => (
-                    <option key={c._id} value={c._id}>{c.name} ({c.type})</option>
+                    <option key={c._id} value={c._id}>
+                      {c.name} ({c.type})
+                    </option>
                   ))}
                 </select>
               </div>
-              <p className="text-[10px] text-muted-foreground italic">Note: Only category updating is supported in MVP for bulk operations.</p>
-              
+              <p className="text-[10px] text-muted-foreground italic">
+                Note: Only category updating is supported in MVP for bulk
+                operations.
+              </p>
+
               <button
                 type="submit"
                 disabled={isBulkEditing}
-                className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-xs shadow-md hover:bg-primary/90 transition-colors flex justify-center"
+                className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-xs hover:bg-primary/90 transition-colors flex justify-center"
               >
-                {isBulkEditing ? <Loader2 className="w-4 h-4 animate-spin" /> : "Apply Changes"}
+                {isBulkEditing ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  "Apply Changes"
+                )}
               </button>
             </form>
           </div>

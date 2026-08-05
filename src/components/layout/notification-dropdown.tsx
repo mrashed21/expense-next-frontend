@@ -1,23 +1,5 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
-import Link from "next/link";
-import { formatDistanceToNow, parseISO } from "date-fns";
-import {
-  Bell,
-  Check,
-  CheckCircle2,
-  Trash2,
-  AlertTriangle,
-  Info,
-  Clock,
-  Shield,
-  TrendingDown,
-  TrendingUp,
-  User,
-  Wallet,
-  ArrowRight,
-} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -25,11 +7,29 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  useGetNotificationsQuery,
-  useMarkAsReadMutation,
-  useMarkAllAsReadMutation,
   useDeleteNotificationMutation,
+  useGetNotificationsQuery,
+  useMarkAllAsReadMutation,
+  useMarkAsReadMutation,
 } from "@/services/notification-api";
+import { formatDistanceToNow, parseISO } from "date-fns";
+import {
+  AlertTriangle,
+  ArrowRight,
+  Bell,
+  Check,
+  CheckCircle2,
+  Clock,
+  Info,
+  Shield,
+  Trash2,
+  TrendingDown,
+  TrendingUp,
+  User,
+  Wallet,
+} from "lucide-react";
+import Link from "next/link";
+import React, { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 export function getRelativeTime(dateStr: string | Date) {
@@ -43,7 +43,7 @@ export function getRelativeTime(dateStr: string | Date) {
 
 export function getNotificationIcon(type?: string, category?: string) {
   const catKey = (category || type || "").toLowerCase();
-  
+
   if (catKey.includes("budget")) {
     return <AlertTriangle className="w-4 h-4 text-amber-500" />;
   }
@@ -72,20 +72,28 @@ export function NotificationDropdown() {
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"all" | "unread">("all");
 
-  const { data: notificationsData, isLoading, isError } = useGetNotificationsQuery(undefined, {
+  const {
+    data: notificationsData,
+    isLoading,
+    isError,
+  } = useGetNotificationsQuery(undefined, {
     refetchOnFocus: false,
     refetchOnReconnect: true,
   });
 
   const [markAsReadApi] = useMarkAsReadMutation();
-  const [markAllAsReadApi, { isLoading: isMarkingAll }] = useMarkAllAsReadMutation();
+  const [markAllAsReadApi, { isLoading: isMarkingAll }] =
+    useMarkAllAsReadMutation();
   const [deleteNotificationApi] = useDeleteNotificationMutation();
 
-  const notifications = useMemo(() => notificationsData?.data || [], [notificationsData]);
+  const notifications = useMemo(
+    () => notificationsData?.data || [],
+    [notificationsData],
+  );
 
   const unreadCount = useMemo(
     () => notifications.filter((n: any) => !n.is_read).length,
-    [notifications]
+    [notifications],
   );
 
   const filteredNotifications = useMemo(() => {
@@ -221,7 +229,9 @@ export function NotificationDropdown() {
               <div
                 key={n._id}
                 className={`p-3 transition-colors flex items-start gap-3 relative group ${
-                  !n.is_read ? "bg-primary/5 dark:bg-primary/10" : "hover:bg-secondary/40"
+                  !n.is_read
+                    ? "bg-primary/5 dark:bg-primary/10"
+                    : "hover:bg-secondary/40"
                 }`}
               >
                 {/* Category Icon */}
@@ -232,7 +242,9 @@ export function NotificationDropdown() {
                 {/* Content */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-1">
-                    <p className={`text-xs truncate ${!n.is_read ? "font-bold text-foreground" : "font-medium text-muted-foreground"}`}>
+                    <p
+                      className={`text-xs truncate ${!n.is_read ? "font-bold text-foreground" : "font-medium text-muted-foreground"}`}
+                    >
                       {n.title}
                     </p>
                     <span className="text-[9px] text-muted-foreground shrink-0 font-medium">
@@ -270,9 +282,12 @@ export function NotificationDropdown() {
               <div className="w-10 h-10 rounded-full bg-emerald-500/10 text-emerald-500 mx-auto flex items-center justify-center">
                 <CheckCircle2 className="w-5 h-5" />
               </div>
-              <p className="text-xs font-semibold text-foreground">All caught up!</p>
+              <p className="text-xs font-semibold text-foreground">
+                All caught up!
+              </p>
               <p className="text-[11px] text-muted-foreground max-w-xs mx-auto">
-                No {activeTab === "unread" ? "unread" : ""} notifications right now.
+                No {activeTab === "unread" ? "unread" : ""} notifications right
+                now.
               </p>
             </div>
           )}

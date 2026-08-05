@@ -1,5 +1,6 @@
 "use client";
 
+import { PasswordStrength } from "@/components/auth/password-strength";
 import PhonesInput from "@/components/custom/phone-input";
 import { Button } from "@/components/ui/button";
 import {
@@ -40,7 +41,6 @@ import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
 import { toast } from "sonner";
-import { PasswordStrength } from "@/components/auth/password-strength";
 import { z } from "zod";
 
 const passwordSchema = z
@@ -50,21 +50,26 @@ const passwordSchema = z
   .regex(/[a-z]/, "Password must contain at least one lowercase letter")
   .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
   .regex(/[0-9]/, "Password must contain at least one number")
-  .regex(/[^a-zA-Z0-9]/, "Password must contain at least one special character");
+  .regex(
+    /[^a-zA-Z0-9]/,
+    "Password must contain at least one special character",
+  );
 
-const registerSchema = z.object({
-  user_name: z.string().min(2, "Name must be at least 2 characters"),
-  user_email: z.string().email("Please enter a valid email address"),
-  user_password: passwordSchema,
-  user_confirm_password: z.string(),
-  user_phone: z.string().optional(),
-  user_city: z.string().optional(),
-  user_area: z.string().optional(),
-  user_country: z.string().optional(),
-}).refine((data) => data.user_password === data.user_confirm_password, {
-  message: "Passwords do not match",
-  path: ["user_confirm_password"],
-});
+const registerSchema = z
+  .object({
+    user_name: z.string().min(2, "Name must be at least 2 characters"),
+    user_email: z.string().email("Please enter a valid email address"),
+    user_password: passwordSchema,
+    user_confirm_password: z.string(),
+    user_phone: z.string().optional(),
+    user_city: z.string().optional(),
+    user_area: z.string().optional(),
+    user_country: z.string().optional(),
+  })
+  .refine((data) => data.user_password === data.user_confirm_password, {
+    message: "Passwords do not match",
+    path: ["user_confirm_password"],
+  });
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
@@ -207,7 +212,9 @@ export default function RegisterPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    aria-label={
+                      showPassword ? "Hide password" : "Show password"
+                    }
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
                   >
                     {showPassword ? (
@@ -245,7 +252,9 @@ export default function RegisterPage() {
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                    aria-label={
+                      showConfirmPassword ? "Hide password" : "Show password"
+                    }
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
                   >
                     {showConfirmPassword ? (

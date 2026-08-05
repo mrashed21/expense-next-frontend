@@ -17,8 +17,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, ArrowRight, Loader2, Mail } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -147,12 +147,18 @@ export default function ForgotPasswordPage() {
                   <h3 className="text-sm font-medium">Check your email</h3>
                   <p className="text-xs text-muted-foreground">
                     We sent a password reset link to <br />
-                    <span className="font-medium text-foreground">{submittedEmail}</span>
+                    <span className="font-medium text-foreground">
+                      {submittedEmail}
+                    </span>
                   </p>
                 </div>
                 <Button
                   className="w-full h-9 text-sm font-medium mt-4"
-                  onClick={() => router.push(`/reset-password?email=${encodeURIComponent(submittedEmail)}`)}
+                  onClick={() =>
+                    router.push(
+                      `/reset-password?email=${encodeURIComponent(submittedEmail)}`,
+                    )
+                  }
                 >
                   Enter Reset Code
                 </Button>

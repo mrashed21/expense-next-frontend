@@ -1,10 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import { useGetCalendarEventsQuery } from "@/services/calendar-api";
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Loader2 } from "lucide-react";
 import { useCurrency } from "@/hooks/use-currency";
-import { formatCurrency } from "@/lib/utils"; // If it exports formatCurrency separately, otherwise use hook
+import { useGetCalendarEventsQuery } from "@/services/calendar-api";
+import {
+  Calendar as CalendarIcon,
+  ChevronLeft,
+  ChevronRight,
+  Loader2,
+} from "lucide-react";
+import { useState } from "react";
 
 const DAYS_OF_WEEK = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -23,22 +27,27 @@ export default function CalendarPage() {
   const startDate = new Date(currentYear, currentMonth, -7).toISOString();
   const endDate = new Date(currentYear, currentMonth + 1, 7).toISOString();
 
-  const { data: calendarData, isLoading } = useGetCalendarEventsQuery({ startDate, endDate });
+  const { data: calendarData, isLoading } = useGetCalendarEventsQuery({
+    startDate,
+    endDate,
+  });
   const events = calendarData?.data || [];
 
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
   // Navigation handlers
-  const prevMonth = () => setCurrentDate(new Date(currentYear, currentMonth - 1, 1));
-  const nextMonth = () => setCurrentDate(new Date(currentYear, currentMonth + 1, 1));
+  const prevMonth = () =>
+    setCurrentDate(new Date(currentYear, currentMonth - 1, 1));
+  const nextMonth = () =>
+    setCurrentDate(new Date(currentYear, currentMonth + 1, 1));
   const goToday = () => setCurrentDate(new Date());
 
   // Generate grid cells
   const daysInMonth = lastDayOfMonth.getDate();
   const startingDayOfWeek = firstDayOfMonth.getDay(); // 0 = Sunday
-  
+
   const gridCells = [];
-  
+
   // Padding days from previous month
   const prevMonthDays = new Date(currentYear, currentMonth, 0).getDate();
   for (let i = startingDayOfWeek - 1; i >= 0; i--) {
@@ -84,20 +93,34 @@ export default function CalendarPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-extrabold tracking-tight">Calendar</h1>
-          <p className="text-xs text-muted-foreground">Master chronological view of your finances.</p>
+          <p className="text-xs text-muted-foreground">
+            Master chronological view of your finances.
+          </p>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={goToday} className="px-3 py-1.5 text-xs font-bold rounded-lg border border-border hover:bg-secondary">
+          <button
+            onClick={goToday}
+            className="px-3 py-1.5 text-xs font-bold rounded-lg border border-border hover:bg-secondary"
+          >
             Today
           </button>
           <div className="flex items-center gap-1 bg-secondary rounded-lg p-1">
-            <button onClick={prevMonth} className="p-1.5 rounded-md hover:bg-background">
+            <button
+              onClick={prevMonth}
+              className="p-1.5 rounded-md hover:bg-background"
+            >
               <ChevronLeft className="w-4 h-4" />
             </button>
             <span className="text-sm font-bold w-32 text-center">
-              {currentDate.toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+              {currentDate.toLocaleDateString("en-US", {
+                month: "long",
+                year: "numeric",
+              })}
             </span>
-            <button onClick={nextMonth} className="p-1.5 rounded-md hover:bg-background">
+            <button
+              onClick={nextMonth}
+              className="p-1.5 rounded-md hover:bg-background"
+            >
               <ChevronRight className="w-4 h-4" />
             </button>
           </div>
@@ -109,12 +132,15 @@ export default function CalendarPage() {
         <div className="flex-1 glass-card rounded-3xl border border-border flex flex-col overflow-hidden min-h-0">
           <div className="grid grid-cols-7 border-b border-border bg-secondary/30 shrink-0">
             {DAYS_OF_WEEK.map((day) => (
-              <div key={day} className="py-3 text-center text-xs font-bold text-muted-foreground uppercase tracking-widest">
+              <div
+                key={day}
+                className="py-3 text-center text-xs font-bold text-muted-foreground uppercase tracking-widest"
+              >
                 {day}
               </div>
             ))}
           </div>
-          
+
           <div className="flex-1 grid grid-cols-7 grid-rows-6 min-h-0 relative">
             {isLoading && (
               <div className="absolute inset-0 bg-background/50 backdrop-blur-sm flex items-center justify-center z-10">
@@ -123,8 +149,10 @@ export default function CalendarPage() {
             )}
             {gridCells.map((cell, idx) => {
               const cellEvents = getEventsForDate(cell.date);
-              const isToday = new Date().toDateString() === cell.date.toDateString();
-              const isSelected = selectedDate?.toDateString() === cell.date.toDateString();
+              const isToday =
+                new Date().toDateString() === cell.date.toDateString();
+              const isSelected =
+                selectedDate?.toDateString() === cell.date.toDateString();
 
               return (
                 <div
@@ -136,9 +164,11 @@ export default function CalendarPage() {
                   `}
                 >
                   <div className="flex justify-between items-start shrink-0 mb-1">
-                    <span className={`text-xs font-bold w-6 h-6 flex items-center justify-center rounded-full
+                    <span
+                      className={`text-xs font-bold w-6 h-6 flex items-center justify-center rounded-full
                       ${isToday ? "bg-primary text-primary-foreground" : "text-foreground"}
-                    `}>
+                    `}
+                    >
                       {cell.date.getDate()}
                     </span>
                     {cellEvents.length > 0 && (
@@ -153,14 +183,21 @@ export default function CalendarPage() {
                       <div
                         key={e.id}
                         className={`text-[10px] sm:text-xs truncate px-1.5 py-1 rounded border-l-2
-                          ${e.type === "income" ? "bg-emerald-500/10 border-emerald-500 text-emerald-700 dark:text-emerald-400" :
-                            e.type === "expense" ? "bg-rose-500/10 border-rose-500 text-rose-700 dark:text-rose-400" :
-                            e.type === "bill" ? "bg-purple-500/10 border-purple-500 text-purple-700 dark:text-purple-400" :
-                            "bg-amber-500/10 border-amber-500 text-amber-700 dark:text-amber-400"
+                          ${
+                            e.type === "income"
+                              ? "bg-emerald-500/10 border-emerald-500 text-emerald-700 dark:text-emerald-400"
+                              : e.type === "expense"
+                                ? "bg-rose-500/10 border-rose-500 text-rose-700 dark:text-rose-400"
+                                : e.type === "bill"
+                                  ? "bg-purple-500/10 border-purple-500 text-purple-700 dark:text-purple-400"
+                                  : "bg-amber-500/10 border-amber-500 text-amber-700 dark:text-amber-400"
                           }
                         `}
                       >
-                        <span className="font-semibold">{formatCurrency(e.amount)}</span> {e.title}
+                        <span className="font-semibold">
+                          {formatCurrency(e.amount)}
+                        </span>{" "}
+                        {e.title}
                       </div>
                     ))}
                     {cellEvents.length > 3 && (
@@ -176,40 +213,68 @@ export default function CalendarPage() {
         </div>
 
         {/* Side Panel for Selected Date */}
-        <div className="w-full lg:w-80 glass-card rounded-3xl border border-border flex flex-col shrink-0 min-h-[300px] lg:min-h-0">
+        <div className="w-full lg:w-80 glass-card rounded-3xl border border-border flex flex-col shrink-0 min-h-75 lg:min-h-0">
           <div className="p-4 border-b border-border bg-secondary/30 shrink-0">
             <h3 className="font-bold text-foreground flex items-center gap-2">
               <CalendarIcon className="w-4 h-4 text-primary" />
-              {selectedDate ? selectedDate.toLocaleDateString("en-US", { weekday: 'short', month: 'long', day: 'numeric' }) : "Select a date"}
+              {selectedDate
+                ? selectedDate.toLocaleDateString("en-US", {
+                    weekday: "short",
+                    month: "long",
+                    day: "numeric",
+                  })
+                : "Select a date"}
             </h3>
           </div>
           <div className="p-4 flex-1 overflow-y-auto space-y-3">
             {!selectedDate ? (
-              <p className="text-xs text-muted-foreground text-center mt-10">Click on any date in the calendar to view its events.</p>
+              <p className="text-xs text-muted-foreground text-center mt-10">
+                Click on any date in the calendar to view its events.
+              </p>
             ) : selectedEvents.length === 0 ? (
-              <p className="text-xs text-muted-foreground text-center mt-10">No financial events on this day.</p>
+              <p className="text-xs text-muted-foreground text-center mt-10">
+                No financial events on this day.
+              </p>
             ) : (
               selectedEvents.map((e: any) => (
-                <div key={e.id} className="p-3 rounded-xl border border-border bg-card shadow-xs flex justify-between items-center gap-2">
+                <div
+                  key={e.id}
+                  className="p-3 rounded-xl border border-border bg-card shadow-xs flex justify-between items-center gap-2"
+                >
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0
-                      ${e.type === "income" ? "bg-emerald-500/10 text-emerald-500" :
-                        e.type === "expense" ? "bg-rose-500/10 text-rose-500" :
-                        e.type === "bill" ? "bg-purple-500/10 text-purple-500" :
-                        "bg-amber-500/10 text-amber-500"
+                    <div
+                      className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0
+                      ${
+                        e.type === "income"
+                          ? "bg-emerald-500/10 text-emerald-500"
+                          : e.type === "expense"
+                            ? "bg-rose-500/10 text-rose-500"
+                            : e.type === "bill"
+                              ? "bg-purple-500/10 text-purple-500"
+                              : "bg-amber-500/10 text-amber-500"
                       }
-                    `}>
-                      <span className="text-xs font-black uppercase">{e.type[0]}</span>
+                    `}
+                    >
+                      <span className="text-xs font-black uppercase">
+                        {e.type[0]}
+                      </span>
                     </div>
                     <div className="min-w-0">
-                      <p className="text-xs font-bold text-foreground truncate">{e.title}</p>
-                      <p className="text-[10px] text-muted-foreground uppercase tracking-widest mt-0.5">{e.source}</p>
+                      <p className="text-xs font-bold text-foreground truncate">
+                        {e.title}
+                      </p>
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-widest mt-0.5">
+                        {e.source}
+                      </p>
                     </div>
                   </div>
-                  <span className={`text-sm font-black shrink-0
+                  <span
+                    className={`text-sm font-black shrink-0
                     ${e.type === "income" ? "text-emerald-500" : "text-foreground"}
-                  `}>
-                    {e.type === "income" ? "+" : ""}{formatCurrency(e.amount)}
+                  `}
+                  >
+                    {e.type === "income" ? "+" : ""}
+                    {formatCurrency(e.amount)}
                   </span>
                 </div>
               ))

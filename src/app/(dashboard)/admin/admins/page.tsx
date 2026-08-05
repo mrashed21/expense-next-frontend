@@ -3,33 +3,39 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { RootState } from "@/redux/store";
 import {
+  useCreateAdminMutation,
   useGetAdminsQuery,
   useUpdateAdminStatusMutation,
-  useCreateAdminMutation,
 } from "@/services/admin-api";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Ban,
   CheckCircle,
   Loader2,
   MoreVertical,
+  Plus,
   ShieldAlert,
   UserCog,
-  Plus,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
 import { toast } from "sonner";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
 const adminSchema = z.object({
@@ -122,7 +128,7 @@ export default function AdminAdminsPage() {
               <Plus className="w-4 h-4" /> Add Admin
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px] rounded-3xl border-border bg-card">
+          <DialogContent className="sm:max-w-106.25 rounded-3xl border-border bg-card">
             <DialogHeader>
               <DialogTitle className="text-xl font-extrabold">
                 Create New Admin
@@ -130,19 +136,25 @@ export default function AdminAdminsPage() {
             </DialogHeader>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-4">
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">Name</label>
+                <label className="text-xs font-semibold text-foreground">
+                  Name
+                </label>
                 <input
                   {...register("admin_name")}
                   className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-sm focus:outline-none focus:border-primary"
                   placeholder="John Doe"
                 />
                 {errors.admin_name && (
-                  <p className="text-[10px] text-destructive">{errors.admin_name.message}</p>
+                  <p className="text-[10px] text-destructive">
+                    {errors.admin_name.message}
+                  </p>
                 )}
               </div>
-              
+
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">Email</label>
+                <label className="text-xs font-semibold text-foreground">
+                  Email
+                </label>
                 <input
                   {...register("admin_email")}
                   type="email"
@@ -150,12 +162,16 @@ export default function AdminAdminsPage() {
                   placeholder="admin@example.com"
                 />
                 {errors.admin_email && (
-                  <p className="text-[10px] text-destructive">{errors.admin_email.message}</p>
+                  <p className="text-[10px] text-destructive">
+                    {errors.admin_email.message}
+                  </p>
                 )}
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">Password</label>
+                <label className="text-xs font-semibold text-foreground">
+                  Password
+                </label>
                 <input
                   {...register("admin_password")}
                   type="password"
@@ -163,12 +179,16 @@ export default function AdminAdminsPage() {
                   placeholder="••••••••"
                 />
                 {errors.admin_password && (
-                  <p className="text-[10px] text-destructive">{errors.admin_password.message}</p>
+                  <p className="text-[10px] text-destructive">
+                    {errors.admin_password.message}
+                  </p>
                 )}
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">Role</label>
+                <label className="text-xs font-semibold text-foreground">
+                  Role
+                </label>
                 <select
                   {...register("admin_role")}
                   className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-sm focus:outline-none focus:border-primary"
@@ -177,7 +197,9 @@ export default function AdminAdminsPage() {
                   <option value="super_admin">Super Admin</option>
                 </select>
                 {errors.admin_role && (
-                  <p className="text-[10px] text-destructive">{errors.admin_role.message}</p>
+                  <p className="text-[10px] text-destructive">
+                    {errors.admin_role.message}
+                  </p>
                 )}
               </div>
 
@@ -186,7 +208,11 @@ export default function AdminAdminsPage() {
                 disabled={isCreating}
                 className="w-full rounded-xl font-bold py-5 mt-4"
               >
-                {isCreating ? <Loader2 className="w-5 h-5 animate-spin" /> : "Create Admin"}
+                {isCreating ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  "Create Admin"
+                )}
               </Button>
             </form>
           </DialogContent>
@@ -249,7 +275,9 @@ export default function AdminAdminsPage() {
                     <DropdownMenuContent align="end" className="rounded-xl">
                       {a.admin_status !== "active" && (
                         <DropdownMenuItem
-                          onClick={() => handleUpdateAdminStatus(a._id, "active")}
+                          onClick={() =>
+                            handleUpdateAdminStatus(a._id, "active")
+                          }
                           className="rounded-lg cursor-pointer"
                         >
                           <CheckCircle className="h-4 w-4 mr-2 text-emerald-500" />{" "}
@@ -258,7 +286,9 @@ export default function AdminAdminsPage() {
                       )}
                       {a.admin_status !== "deactive" && (
                         <DropdownMenuItem
-                          onClick={() => handleUpdateAdminStatus(a._id, "deactive")}
+                          onClick={() =>
+                            handleUpdateAdminStatus(a._id, "deactive")
+                          }
                           className="rounded-lg cursor-pointer"
                         >
                           <UserCog className="h-4 w-4 mr-2 text-orange-500" />{" "}
@@ -267,7 +297,9 @@ export default function AdminAdminsPage() {
                       )}
                       {a.admin_status !== "banned" && (
                         <DropdownMenuItem
-                          onClick={() => handleUpdateAdminStatus(a._id, "banned")}
+                          onClick={() =>
+                            handleUpdateAdminStatus(a._id, "banned")
+                          }
                           className="rounded-lg cursor-pointer text-destructive focus:text-destructive"
                         >
                           <Ban className="h-4 w-4 mr-2 text-destructive" /> Ban

@@ -10,17 +10,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useSocket } from "@/hooks/use-socket";
 import { logout } from "@/redux/slices/auth-slice";
 import { RootState } from "@/redux/store";
 import {
   useLogoutAllDevicesMutation,
   useLogoutMutation,
 } from "@/services/auth-api";
+import { useGetNotificationsQuery } from "@/services/notification-api";
 import {
-  Bell,
   LogOut,
   Plus,
-  Search,
   Settings,
   ShieldAlert,
   TrendingUp,
@@ -28,14 +28,12 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
-import { useSocket } from "@/hooks/use-socket";
-import { useGetNotificationsQuery } from "@/services/notification-api";
-import { ThemeToggle } from "./theme-toggle";
 import { CommandPalette } from "./command-palette";
 import { NotificationDropdown } from "./notification-dropdown";
+import { ThemeToggle } from "./theme-toggle";
 
 export function Header() {
   const router = useRouter();
@@ -105,7 +103,7 @@ export function Header() {
 
         {/* Desktop Search */}
         <div className="hidden sm:flex items-center gap-2">
-            <CommandPalette />
+          <CommandPalette />
         </div>
       </div>
 

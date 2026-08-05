@@ -1,5 +1,6 @@
 "use client";
 
+import { PasswordStrength } from "@/components/auth/password-strength";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -24,7 +25,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { PasswordStrength } from "@/components/auth/password-strength";
 import { z } from "zod";
 
 const passwordSchema = z
@@ -34,16 +34,21 @@ const passwordSchema = z
   .regex(/[a-z]/, "Password must contain at least one lowercase letter")
   .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
   .regex(/[0-9]/, "Password must contain at least one number")
-  .regex(/[^a-zA-Z0-9]/, "Password must contain at least one special character");
+  .regex(
+    /[^a-zA-Z0-9]/,
+    "Password must contain at least one special character",
+  );
 
-const resetSchema = z.object({
-  otp_code: z.string().length(6, "OTP must be 6 digits"),
-  new_password: passwordSchema,
-  confirm_password: z.string(),
-}).refine((data) => data.new_password === data.confirm_password, {
-  message: "Passwords do not match",
-  path: ["confirm_password"],
-});
+const resetSchema = z
+  .object({
+    otp_code: z.string().length(6, "OTP must be 6 digits"),
+    new_password: passwordSchema,
+    confirm_password: z.string(),
+  })
+  .refine((data) => data.new_password === data.confirm_password, {
+    message: "Passwords do not match",
+    path: ["confirm_password"],
+  });
 
 type ResetFormValues = z.infer<typeof resetSchema>;
 
@@ -128,7 +133,7 @@ function ResetPasswordContent() {
                     {...register("otp_code", {
                       onChange: (e) => {
                         e.target.value = e.target.value.replace(/[^0-9]/g, "");
-                      }
+                      },
                     })}
                     type="text"
                     inputMode="numeric"
@@ -165,7 +170,9 @@ function ResetPasswordContent() {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    aria-label={
+                      showPassword ? "Hide password" : "Show password"
+                    }
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
                   >
                     {showPassword ? (
@@ -203,7 +210,9 @@ function ResetPasswordContent() {
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                    aria-label={
+                      showConfirmPassword ? "Hide password" : "Show password"
+                    }
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
                   >
                     {showConfirmPassword ? (

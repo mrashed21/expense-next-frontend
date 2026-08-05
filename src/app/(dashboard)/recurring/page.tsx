@@ -1,11 +1,12 @@
 "use client";
 
+import { ConfirmDialog } from "@/components/custom/confirm-dialog";
 import { useCurrency } from "@/hooks/use-currency";
 import { formatDate } from "@/lib/utils";
 import {
+  useDeleteRecurringMutation,
   useGetRecurringQuery,
   useToggleRecurringStatusMutation,
-  useDeleteRecurringMutation,
 } from "@/services/recurring-api";
 import {
   CalendarClock,
@@ -19,7 +20,6 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { ConfirmDialog } from "@/components/custom/confirm-dialog";
 import { RecurringModal } from "./recurring-modal";
 
 export default function RecurringPage() {
@@ -92,7 +92,9 @@ export default function RecurringPage() {
         ) : items.length === 0 ? (
           <div className="text-center py-12">
             <CalendarClock className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-50" />
-            <p className="text-sm text-muted-foreground">No automations configured.</p>
+            <p className="text-sm text-muted-foreground">
+              No automations configured.
+            </p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -100,23 +102,37 @@ export default function RecurringPage() {
               <div
                 key={item._id}
                 className={`p-4 rounded-2xl border transition-all flex flex-col md:flex-row md:items-center justify-between gap-4 ${
-                  item.status === "active" ? "bg-card border-border shadow-sm hover:border-primary/50" : "bg-secondary/30 border-dashed border-border opacity-70"
+                  item.status === "active"
+                    ? "bg-card border-border shadow-sm hover:border-primary/50"
+                    : "bg-secondary/30 border-dashed border-border opacity-70"
                 }`}
               >
                 <div className="flex items-center gap-4">
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-inner ${
-                    item.type === "income" ? "bg-emerald-500/10 text-emerald-500" :
-                    item.type === "expense" ? "bg-rose-500/10 text-rose-500" :
-                    item.type === "bill" ? "bg-purple-500/10 text-purple-500" : "bg-blue-500/10 text-blue-500"
-                  }`}>
-                    <RefreshCw className={`w-6 h-6 ${item.status === "active" ? "animate-spin-slow" : ""}`} />
+                  <div
+                    className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-inner ${
+                      item.type === "income"
+                        ? "bg-emerald-500/10 text-emerald-500"
+                        : item.type === "expense"
+                          ? "bg-rose-500/10 text-rose-500"
+                          : item.type === "bill"
+                            ? "bg-purple-500/10 text-purple-500"
+                            : "bg-blue-500/10 text-blue-500"
+                    }`}
+                  >
+                    <RefreshCw
+                      className={`w-6 h-6 ${item.status === "active" ? "animate-spin-slow" : ""}`}
+                    />
                   </div>
                   <div>
                     <h3 className="font-bold text-foreground text-sm flex items-center gap-2">
                       {item.title}
-                      <span className={`text-[9px] px-1.5 py-0.5 rounded font-black uppercase tracking-wider ${
-                        item.status === "active" ? "bg-emerald-500/20 text-emerald-500" : "bg-muted text-muted-foreground"
-                      }`}>
+                      <span
+                        className={`text-[9px] px-1.5 py-0.5 rounded font-black uppercase tracking-wider ${
+                          item.status === "active"
+                            ? "bg-emerald-500/20 text-emerald-500"
+                            : "bg-muted text-muted-foreground"
+                        }`}
+                      >
                         {item.status}
                       </span>
                     </h3>
@@ -140,11 +156,17 @@ export default function RecurringPage() {
                     <button
                       onClick={() => handleToggle(item._id)}
                       className={`p-2 rounded-lg transition-colors ${
-                        item.status === "active" ? "bg-amber-500/10 text-amber-500 hover:bg-amber-500/20" : "bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20"
+                        item.status === "active"
+                          ? "bg-amber-500/10 text-amber-500 hover:bg-amber-500/20"
+                          : "bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20"
                       }`}
                       title={item.status === "active" ? "Pause" : "Resume"}
                     >
-                      {item.status === "active" ? <PauseCircle className="w-4 h-4" /> : <PlayCircle className="w-4 h-4" />}
+                      {item.status === "active" ? (
+                        <PauseCircle className="w-4 h-4" />
+                      ) : (
+                        <PlayCircle className="w-4 h-4" />
+                      )}
                     </button>
                     <button
                       onClick={() => handleDelete(item._id)}
@@ -161,7 +183,11 @@ export default function RecurringPage() {
         )}
       </div>
 
-      <RecurringModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} item={selectedItem} />
+      <RecurringModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        item={selectedItem}
+      />
 
       <ConfirmDialog
         isOpen={!!deleteId}

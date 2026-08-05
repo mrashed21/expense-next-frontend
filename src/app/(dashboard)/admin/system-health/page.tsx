@@ -1,18 +1,18 @@
 "use client";
 
-import dynamic from "next/dynamic";
-const SystemHealthChart = dynamic(
-  () =>
-    import("@/components/admin/system-health-chart").then(
-      (mod) => mod.SystemHealthChart
-    ),
-  { ssr: false }
-);
 import { RootState } from "@/redux/store";
 import { ShieldAlert } from "lucide-react";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
+const SystemHealthChart = dynamic(
+  () =>
+    import("@/components/admin/system-health-chart").then(
+      (mod) => mod.SystemHealthChart,
+    ),
+  { ssr: false },
+);
 
 export default function AdminSystemHealthPage() {
   const router = useRouter();
@@ -43,8 +43,8 @@ export default function AdminSystemHealthPage() {
           System Health
         </h1>
         <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-          Real-time metrics and historical performance data for the Expense Tracker
-          backend.
+          Real-time metrics and historical performance data for the Expense
+          Tracker backend.
         </p>
       </div>
 

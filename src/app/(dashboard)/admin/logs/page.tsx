@@ -1,8 +1,19 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { RootState } from "@/redux/store";
-import { useGetAuditLogsQuery, useGetErrorLogsQuery } from "@/services/admin-api";
+import {
+  useGetAuditLogsQuery,
+  useGetErrorLogsQuery,
+} from "@/services/admin-api";
 import { format } from "date-fns";
 import { Loader2, ShieldAlert } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -20,8 +31,12 @@ export default function AdminLogsPage() {
     }
   }, [user, router]);
 
-  const { data: auditData, isLoading: auditLoading } = useGetAuditLogsQuery({ limit: 100 });
-  const { data: errorData, isLoading: errorLoading } = useGetErrorLogsQuery({ limit: 100 });
+  const { data: auditData, isLoading: auditLoading } = useGetAuditLogsQuery({
+    limit: 100,
+  });
+  const { data: errorData, isLoading: errorLoading } = useGetErrorLogsQuery({
+    limit: 100,
+  });
 
   if (!user || user.user_role !== "super_admin") {
     return (
@@ -84,28 +99,39 @@ export default function AdminLogsPage() {
                 No audit logs found.
               </div>
             ) : (
-              <table className="w-full text-sm text-left">
-                <thead className="bg-secondary/50 text-muted-foreground text-xs uppercase">
-                  <tr>
-                    <th scope="col" className="px-6 py-4 font-semibold">Timestamp</th>
-                    <th scope="col" className="px-6 py-4 font-semibold">Admin</th>
-                    <th scope="col" className="px-6 py-4 font-semibold">Action</th>
-                    <th scope="col" className="px-6 py-4 font-semibold">Target / Details</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
+              <Table>
+                <TableHeader className="bg-secondary/50 text-muted-foreground text-xs uppercase">
+                  <TableRow>
+                    <TableHead className="px-6 py-4 font-semibold">
+                      Timestamp
+                    </TableHead>
+                    <TableHead className="px-6 py-4 font-semibold">
+                      Admin
+                    </TableHead>
+                    <TableHead className="px-6 py-4 font-semibold">
+                      Action
+                    </TableHead>
+                    <TableHead className="px-6 py-4 font-semibold">
+                      Target / Details
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody className="divide-y divide-border">
                   {auditLogs.map((log: any) => (
-                    <tr key={log._id} className="hover:bg-secondary/30 transition-colors">
-                      <td className="px-6 py-4 whitespace-nowrap text-muted-foreground">
+                    <TableRow
+                      key={log._id}
+                      className="hover:bg-secondary/30 transition-colors"
+                    >
+                      <TableCell className="px-6 py-4 whitespace-nowrap text-muted-foreground">
                         {format(new Date(log.createdAt), "MMM d, yyyy HH:mm")}
-                      </td>
-                      <td className="px-6 py-4 font-medium">
+                      </TableCell>
+                      <TableCell className="px-6 py-4 font-medium">
                         {log.admin_id?.admin_email || log.admin_id}
-                      </td>
-                      <td className="px-6 py-4 font-medium text-primary">
+                      </TableCell>
+                      <TableCell className="px-6 py-4 font-medium text-primary">
                         {log.action}
-                      </td>
-                      <td className="px-6 py-4">
+                      </TableCell>
+                      <TableCell className="px-6 py-4">
                         <div className="text-xs text-muted-foreground">
                           {log.target_id && <div>Target: {log.target_id}</div>}
                           {log.details && (
@@ -114,11 +140,11 @@ export default function AdminLogsPage() {
                             </pre>
                           )}
                         </div>
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   ))}
-                </tbody>
-              </table>
+                </TableBody>
+              </Table>
             )}
           </div>
         )}
@@ -134,29 +160,44 @@ export default function AdminLogsPage() {
                 No system errors captured.
               </div>
             ) : (
-              <table className="w-full text-sm text-left">
-                <thead className="bg-secondary/50 text-muted-foreground text-xs uppercase">
-                  <tr>
-                    <th scope="col" className="px-6 py-4 font-semibold">Timestamp</th>
-                    <th scope="col" className="px-6 py-4 font-semibold">Path / Method</th>
-                    <th scope="col" className="px-6 py-4 font-semibold">Error Message</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
+              <Table>
+                <TableHeader className="bg-secondary/50 text-muted-foreground text-xs uppercase">
+                  <TableRow>
+                    <TableHead className="px-6 py-4 font-semibold">
+                      Timestamp
+                    </TableHead>
+                    <TableHead className="px-6 py-4 font-semibold">
+                      Path / Method
+                    </TableHead>
+                    <TableHead className="px-6 py-4 font-semibold">
+                      Error Message
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody className="divide-y divide-border">
                   {errorLogs.map((log: any) => (
-                    <tr key={log._id} className="hover:bg-secondary/30 transition-colors">
-                      <td className="px-6 py-4 whitespace-nowrap text-muted-foreground align-top">
-                        {format(new Date(log.timestamp), "MMM d, yyyy HH:mm:ss")}
-                      </td>
-                      <td className="px-6 py-4 align-top">
+                    <TableRow
+                      key={log._id}
+                      className="hover:bg-secondary/30 transition-colors"
+                    >
+                      <TableCell className="px-6 py-4 whitespace-nowrap text-muted-foreground align-top">
+                        {format(
+                          new Date(log.timestamp),
+                          "MMM d, yyyy HH:mm:ss",
+                        )}
+                      </TableCell>
+                      <TableCell className="px-6 py-4 align-top">
                         <div className="font-mono text-xs mb-1 bg-secondary inline-block px-2 py-0.5 rounded">
                           {log.method}
                         </div>
-                        <div className="text-xs text-muted-foreground truncate max-w-[200px]" title={log.path}>
+                        <div
+                          className="text-xs text-muted-foreground truncate"
+                          title={log.path}
+                        >
                           {log.path}
                         </div>
-                      </td>
-                      <td className="px-6 py-4 max-w-lg">
+                      </TableCell>
+                      <TableCell className="px-6 py-4 max-w-lg">
                         <div className="font-semibold text-destructive mb-2">
                           {log.message}
                         </div>
@@ -170,11 +211,11 @@ export default function AdminLogsPage() {
                             </pre>
                           </details>
                         )}
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   ))}
-                </tbody>
-              </table>
+                </TableBody>
+              </Table>
             )}
           </div>
         )}

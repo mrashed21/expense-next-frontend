@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -8,8 +8,8 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { AlertTriangle, Info, Trash2 } from "lucide-react";
+import React from "react";
 
 interface ConfirmDialogProps {
   isOpen: boolean;

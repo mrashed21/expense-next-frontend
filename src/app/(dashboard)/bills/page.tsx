@@ -1,5 +1,6 @@
 "use client";
 
+import { ConfirmDialog } from "@/components/custom/confirm-dialog";
 import FormSelect from "@/components/custom/form-select";
 import {
   Select,
@@ -11,17 +12,36 @@ import {
 import { useCurrency } from "@/hooks/use-currency";
 import { formatDate } from "@/lib/utils";
 import { useGetAccountsQuery } from "@/services/account-api";
-import { useCreateBillMutation, useDeleteBillMutation, useGetBillsQuery, usePayBillMutation } from "@/services/bill-api";
+import {
+  useCreateBillMutation,
+  useDeleteBillMutation,
+  useGetBillsQuery,
+  usePayBillMutation,
+} from "@/services/bill-api";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CheckCircle2, CreditCard, FileCheck, Loader2, Plus, Trash2, X } from "lucide-react";
+import {
+  CheckCircle2,
+  CreditCard,
+  FileCheck,
+  Loader2,
+  Plus,
+  Trash2,
+  X,
+} from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { ConfirmDialog } from "@/components/custom/confirm-dialog";
 
 const billTypes = [
-  "Electricity", "Internet", "Gas", "Water", "Rent", "Credit Card", "EMI", "Subscriptions"
+  "Electricity",
+  "Internet",
+  "Gas",
+  "Water",
+  "Rent",
+  "Credit Card",
+  "EMI",
+  "Subscriptions",
 ];
 
 const billSchema = z.object({
@@ -76,7 +96,10 @@ export default function BillsPage() {
     e.preventDefault();
     if (!payBillId || !selectedAccountId) return;
     try {
-      await payBillApi({ id: payBillId, account_id: selectedAccountId }).unwrap();
+      await payBillApi({
+        id: payBillId,
+        account_id: selectedAccountId,
+      }).unwrap();
       toast.success("Bill paid and recorded as expense transaction!");
       setPayBillId(null);
       setSelectedAccountId("");
@@ -105,8 +128,13 @@ export default function BillsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight">Bills & Subscriptions Tracker</h1>
-          <p className="text-xs text-muted-foreground">Keep track of utility bills, EMIs, and monthly recurring subscriptions</p>
+          <h1 className="text-2xl font-extrabold tracking-tight">
+            Bills & Subscriptions Tracker
+          </h1>
+          <p className="text-xs text-muted-foreground">
+            Keep track of utility bills, EMIs, and monthly recurring
+            subscriptions
+          </p>
         </div>
 
         <button
@@ -123,18 +151,25 @@ export default function BillsPage() {
           const isPaid = b.status === "paid";
 
           return (
-            <div key={b._id} className="glass-card p-5 rounded-3xl space-y-3 relative group">
+            <div
+              key={b._id}
+              className="glass-card p-5 rounded-3xl space-y-3 relative group"
+            >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div
                     className={`w-10 h-10 rounded-2xl flex items-center justify-center font-bold text-sm ${
-                      isPaid ? "bg-emerald-500/10 text-emerald-500" : "bg-amber-500/10 text-amber-500"
+                      isPaid
+                        ? "bg-emerald-500/10 text-emerald-500"
+                        : "bg-amber-500/10 text-amber-500"
                     }`}
                   >
                     <FileCheck className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-bold text-foreground">{b.title}</h3>
+                    <h3 className="text-sm font-bold text-foreground">
+                      {b.title}
+                    </h3>
                     <span className="text-[10px] px-2 py-0.5 rounded-full bg-secondary border border-border text-muted-foreground font-semibold">
                       {b.type}
                     </span>
@@ -151,13 +186,21 @@ export default function BillsPage() {
 
               <div className="flex items-end justify-between pt-2 border-t border-border">
                 <div>
-                  <span className="text-[10px] font-semibold text-muted-foreground uppercase">Due Date</span>
-                  <p className="text-xs font-bold text-foreground">{formatDate(b.due_date)}</p>
+                  <span className="text-[10px] font-semibold text-muted-foreground uppercase">
+                    Due Date
+                  </span>
+                  <p className="text-xs font-bold text-foreground">
+                    {formatDate(b.due_date)}
+                  </p>
                 </div>
 
                 <div className="text-right">
-                  <span className="text-[10px] font-semibold text-muted-foreground uppercase">Amount</span>
-                  <p className="text-base font-black text-foreground">{formatCurrency(b.amount)}</p>
+                  <span className="text-[10px] font-semibold text-muted-foreground uppercase">
+                    Amount
+                  </span>
+                  <p className="text-base font-black text-foreground">
+                    {formatCurrency(b.amount)}
+                  </p>
                 </div>
               </div>
 
@@ -183,17 +226,32 @@ export default function BillsPage() {
       {/* Add Bill Modal */}
       {isAddOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-          <div role="dialog" aria-modal="true" aria-labelledby="modal-title" className="w-full max-w-md bg-card border border-border p-6 rounded-3xl space-y-4 shadow-2xl">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="modal-title"
+            className="w-full max-w-md bg-card border border-border p-6 rounded-3xl space-y-4 shadow-2xl"
+          >
             <div className="flex items-center justify-between border-b border-border pb-3">
-              <h3 id="modal-title" className="text-base font-bold text-foreground">Add Bill Reminder</h3>
-              <button onClick={() => setIsAddOpen(false)} className="text-muted-foreground hover:text-foreground">
+              <h3
+                id="modal-title"
+                className="text-base font-bold text-foreground"
+              >
+                Add Bill Reminder
+              </h3>
+              <button
+                onClick={() => setIsAddOpen(false)}
+                className="text-muted-foreground hover:text-foreground"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">Bill Title</label>
+                <label className="text-xs font-semibold text-foreground">
+                  Bill Title
+                </label>
                 <input
                   {...register("title")}
                   placeholder="e.g. WiFi Fiber Internet, Electricity Bill"
@@ -215,7 +273,9 @@ export default function BillsPage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">Amount</label>
+                  <label className="text-xs font-semibold text-foreground">
+                    Amount
+                  </label>
                   <input
                     {...register("amount", { valueAsNumber: true })}
                     type="number"
@@ -225,7 +285,9 @@ export default function BillsPage() {
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">Due Date</label>
+                  <label className="text-xs font-semibold text-foreground">
+                    Due Date
+                  </label>
                   <input
                     {...register("due_date")}
                     type="date"
@@ -239,7 +301,11 @@ export default function BillsPage() {
                 disabled={isCreating}
                 className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-xs shadow-md shadow-primary/20 hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
               >
-                {isCreating ? <Loader2 className="w-4 h-4 animate-spin" /> : "Save Bill"}
+                {isCreating ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  "Save Bill"
+                )}
               </button>
             </form>
           </div>
@@ -251,16 +317,26 @@ export default function BillsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="w-full max-w-sm bg-card border border-border p-6 rounded-3xl space-y-4 shadow-2xl">
             <div className="flex items-center justify-between border-b border-border pb-3">
-              <h3 className="text-base font-bold text-foreground">Select Payment Account</h3>
-              <button onClick={() => setPayBillId(null)} className="text-muted-foreground hover:text-foreground">
+              <h3 className="text-base font-bold text-foreground">
+                Select Payment Account
+              </h3>
+              <button
+                onClick={() => setPayBillId(null)}
+                className="text-muted-foreground hover:text-foreground"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <form onSubmit={handlePaySubmit} className="space-y-3">
               <div className="space-y-1">
-                <label className="mb-1 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">Pay From Account</label>
-                <Select value={selectedAccountId} onValueChange={setSelectedAccountId}>
+                <label className="mb-1 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  Pay From Account
+                </label>
+                <Select
+                  value={selectedAccountId}
+                  onValueChange={setSelectedAccountId}
+                >
                   <SelectTrigger className="w-full h-10 py-5!">
                     <SelectValue placeholder="-- Choose Account --" />
                   </SelectTrigger>
@@ -279,7 +355,11 @@ export default function BillsPage() {
                 disabled={isPaying || !selectedAccountId}
                 className="w-full py-2.5 rounded-xl bg-emerald-600 text-white font-semibold text-xs shadow-md shadow-emerald-600/20 hover:bg-emerald-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
               >
-                {isPaying ? <Loader2 className="w-4 h-4 animate-spin" /> : "Confirm Bill Payment"}
+                {isPaying ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  "Confirm Bill Payment"
+                )}
               </button>
             </form>
           </div>

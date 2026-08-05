@@ -1,6 +1,6 @@
-import React from "react";
-import { FolderOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { FolderOpen } from "lucide-react";
+import React from "react";
 
 interface EmptyStateProps {
   title: string;
@@ -23,7 +23,9 @@ export function EmptyState({
         {icon || <FolderOpen className="w-8 h-8" />}
       </div>
       <h3 className="text-lg font-bold text-foreground mb-1">{title}</h3>
-      <p className="text-sm text-muted-foreground max-w-sm mb-6">{description}</p>
+      <p className="text-sm text-muted-foreground max-w-sm mb-6">
+        {description}
+      </p>
       {actionLabel && onAction && (
         <Button onClick={onAction} className="rounded-xl shadow-md">
           {actionLabel}

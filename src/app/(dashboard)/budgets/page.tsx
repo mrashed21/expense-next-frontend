@@ -1,5 +1,6 @@
 "use client";
 
+import { ConfirmDialog } from "@/components/custom/confirm-dialog";
 import FormSelect from "@/components/custom/form-select";
 import { useCurrency } from "@/hooks/use-currency";
 import {
@@ -21,7 +22,6 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { ConfirmDialog } from "@/components/custom/confirm-dialog";
 
 const budgetSchema = z.object({
   category_id: z.string().min(1, "Select a category"),
@@ -192,9 +192,17 @@ export default function BudgetsPage() {
       {/* Modal */}
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-          <div role="dialog" aria-modal="true" aria-labelledby="modal-title" className="w-full max-w-md bg-card border border-border p-6 rounded-3xl space-y-4 shadow-2xl">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="modal-title"
+            className="w-full max-w-md bg-card border border-border p-6 rounded-3xl space-y-4 shadow-2xl"
+          >
             <div className="flex items-center justify-between border-b border-border pb-3">
-              <h3 id="modal-title" className="text-base font-bold text-foreground">
+              <h3
+                id="modal-title"
+                className="text-base font-bold text-foreground"
+              >
                 Configure Category Budget
               </h3>
               <button

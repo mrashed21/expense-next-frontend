@@ -1,5 +1,5 @@
 import { useLazySearchDataQuery } from "@/services/data-api";
-import { ArrowRight, FileText, Folder, Loader2, Search, Wallet, X } from "lucide-react";
+import { ArrowRight, Folder, Loader2, Search, Wallet, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
@@ -42,7 +42,11 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
 
   if (!isOpen) return null;
 
-  const results = data?.data || { transactions: [], accounts: [], categories: [] };
+  const results = data?.data || {
+    transactions: [],
+    accounts: [],
+    categories: [],
+  };
   const hasResults =
     results.transactions.length > 0 ||
     results.accounts.length > 0 ||
@@ -55,12 +59,11 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-[15vh] px-4 sm:px-0">
-      <div 
-        className="fixed inset-0 bg-background/80 backdrop-blur-sm transition-opacity" 
+      <div
+        className="fixed inset-0 bg-background/80 backdrop-blur-sm transition-opacity"
         onClick={onClose}
       />
       <div className="relative w-full max-w-2xl bg-card border border-border shadow-2xl rounded-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-        
         {/* Input area */}
         <div className="flex items-center px-4 py-3 border-b border-border">
           <Search className="w-5 h-5 text-muted-foreground mr-3" />
@@ -71,8 +74,10 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
-          {isFetching && <Loader2 className="w-5 h-5 animate-spin text-muted-foreground ml-3" />}
-          <button 
+          {isFetching && (
+            <Loader2 className="w-5 h-5 animate-spin text-muted-foreground ml-3" />
+          )}
+          <button
             onClick={onClose}
             className="ml-3 p-1 rounded-md hover:bg-secondary text-muted-foreground transition-colors"
           >
@@ -100,11 +105,17 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
                   {results.accounts.map((acc: any) => (
                     <button
                       key={acc._id}
-                      onClick={() => handleNavigate('/accounts')}
+                      onClick={() => handleNavigate("/accounts")}
                       className="w-full flex items-center justify-between p-2 rounded-xl hover:bg-secondary transition-colors text-left"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: acc.color + "20", color: acc.color }}>
+                        <div
+                          className="w-8 h-8 rounded-full flex items-center justify-center"
+                          style={{
+                            backgroundColor: acc.color + "20",
+                            color: acc.color,
+                          }}
+                        >
                           <Wallet className="w-4 h-4" />
                         </div>
                         <span className="text-sm font-medium">{acc.name}</span>
@@ -123,11 +134,17 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
                   {results.categories.map((cat: any) => (
                     <button
                       key={cat._id}
-                      onClick={() => handleNavigate('/categories')}
+                      onClick={() => handleNavigate("/categories")}
                       className="w-full flex items-center justify-between p-2 rounded-xl hover:bg-secondary transition-colors text-left"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: cat.color + "20", color: cat.color }}>
+                        <div
+                          className="w-8 h-8 rounded-full flex items-center justify-center"
+                          style={{
+                            backgroundColor: cat.color + "20",
+                            color: cat.color,
+                          }}
+                        >
                           <Folder className="w-4 h-4" />
                         </div>
                         <span className="text-sm font-medium">{cat.name}</span>
@@ -146,18 +163,24 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
                   {results.transactions.map((tx: any) => (
                     <button
                       key={tx._id}
-                      onClick={() => handleNavigate('/transactions')}
+                      onClick={() => handleNavigate("/transactions")}
                       className="w-full flex items-center justify-between p-2 rounded-xl hover:bg-secondary transition-colors text-left"
                     >
                       <div className="flex flex-col">
-                        <span className="text-sm font-medium">{tx.notes || "Unnamed Transaction"}</span>
+                        <span className="text-sm font-medium">
+                          {tx.notes || "Unnamed Transaction"}
+                        </span>
                         <span className="text-xs text-muted-foreground">
-                          {tx.category_id?.name || "Uncategorized"} • {new Date(tx.date).toLocaleDateString()}
+                          {tx.category_id?.name || "Uncategorized"} •{" "}
+                          {new Date(tx.date).toLocaleDateString()}
                         </span>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className={`text-sm font-bold ${tx.type === 'expense' ? 'text-rose-500' : 'text-emerald-500'}`}>
-                          {tx.type === 'expense' ? '-' : '+'}{tx.amount}
+                        <span
+                          className={`text-sm font-bold ${tx.type === "expense" ? "text-rose-500" : "text-emerald-500"}`}
+                        >
+                          {tx.type === "expense" ? "-" : "+"}
+                          {tx.amount}
                         </span>
                         <ArrowRight className="w-4 h-4 text-muted-foreground" />
                       </div>
@@ -168,24 +191,31 @@ export function CommandPalette({ isOpen, onClose }: CommandPaletteProps) {
             </div>
           )}
         </div>
-        
+
         {/* Footer shortcuts helper */}
         <div className="bg-secondary/50 px-4 py-2 flex items-center justify-between border-t border-border">
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <span>Use</span>
-            <kbd className="px-1.5 py-0.5 bg-background border border-border rounded-md shadow-sm">↑</kbd>
-            <kbd className="px-1.5 py-0.5 bg-background border border-border rounded-md shadow-sm">↓</kbd>
+            <kbd className="px-1.5 py-0.5 bg-background border border-border rounded-md shadow-sm">
+              ↑
+            </kbd>
+            <kbd className="px-1.5 py-0.5 bg-background border border-border rounded-md shadow-sm">
+              ↓
+            </kbd>
             <span>to navigate</span>
             <span className="mx-2">•</span>
-            <kbd className="px-1.5 py-0.5 bg-background border border-border rounded-md shadow-sm">Enter</kbd>
+            <kbd className="px-1.5 py-0.5 bg-background border border-border rounded-md shadow-sm">
+              Enter
+            </kbd>
             <span>to select</span>
           </div>
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <span>Close</span>
-            <kbd className="px-1.5 py-0.5 bg-background border border-border rounded-md shadow-sm">Esc</kbd>
+            <kbd className="px-1.5 py-0.5 bg-background border border-border rounded-md shadow-sm">
+              Esc
+            </kbd>
           </div>
         </div>
-
       </div>
     </div>
   );

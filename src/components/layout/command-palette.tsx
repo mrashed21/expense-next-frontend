@@ -1,15 +1,15 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
-import { useRouter } from "next/navigation";
-import { Search, Loader2, X, Command, CreditCard, Folder, Wallet, FileText } from "lucide-react";
-import { useLazyGlobalSearchQuery } from "@/services/search-api";
-import { useLazyGlobalAdminSearchQuery } from "@/services/admin-api";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useDebounce } from "@/hooks/use-debounce"; // Need to make sure this hook exists or use inline debounce
+import { useLazyGlobalAdminSearchQuery } from "@/services/admin-api";
+import { useLazyGlobalSearchQuery } from "@/services/search-api";
+import { Command, CreditCard, FileText, Folder, Loader2, Search, Wallet, X } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 
-import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
+import { useSelector } from "react-redux";
 
 export function CommandPalette() {
   const [isOpen, setIsOpen] = useState(false);
@@ -81,7 +81,7 @@ export function CommandPalette() {
       </button>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="sm:max-w-[550px] p-0 overflow-hidden border border-border bg-card shadow-2xl rounded-2xl gap-0">
+        <DialogContent className="sm:max-w-137.5 p-0 overflow-hidden border border-border bg-card shadow-2xl rounded-2xl gap-0">
           <div className="flex items-center border-b border-border px-4 py-3">
             <Search className="w-5 h-5 text-muted-foreground shrink-0" />
             <input

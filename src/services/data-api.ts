@@ -34,4 +34,8 @@ export const dataApi = apiSlice.injectEndpoints({
   }),
 });
 
-export const { useLazyExportBackupQuery, useRestoreBackupMutation, useLazySearchDataQuery } = dataApi;
+export const {
+  useLazyExportBackupQuery,
+  useRestoreBackupMutation,
+  useLazySearchDataQuery,
+} = dataApi;

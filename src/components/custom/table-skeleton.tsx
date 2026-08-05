@@ -1,5 +1,3 @@
-import React from "react";
-
 interface TableSkeletonProps {
   columns?: number;
   rows?: number;
@@ -20,9 +18,11 @@ export function TableSkeleton({ columns = 5, rows = 5 }: TableSkeletonProps) {
           <div key={`row-${rowIndex}`} className="flex items-center px-4 py-4">
             {Array.from({ length: columns }).map((_, colIndex) => (
               <div key={`cell-${rowIndex}-${colIndex}`} className="flex-1 px-2">
-                <div 
-                  className="h-4 bg-secondary rounded animate-pulse" 
-                  style={{ width: `${Math.floor(Math.random() * (90 - 40 + 1) + 40)}%` }}
+                <div
+                  className="h-4 bg-secondary rounded animate-pulse"
+                  style={{
+                    width: `${Math.floor(Math.random() * (90 - 40 + 1) + 40)}%`,
+                  }}
                 ></div>
               </div>
             ))}

@@ -25,7 +25,7 @@ const baseQuery = fetchBaseQuery({
     };
 
     let token = getCsrfFromCookie();
-    
+
     // Fetch if missing
     if (!token && typeof window !== "undefined") {
       if (!csrfPromise) {
@@ -74,20 +74,25 @@ const baseQueryWithReauth: BaseQueryFn<
 
     isRefreshing = true;
     const state = api.getState() as RootState;
-    const isLocalAdmin = typeof window !== "undefined" ? localStorage.getItem("isAdmin") === "true" : false;
+    const isLocalAdmin =
+      typeof window !== "undefined"
+        ? localStorage.getItem("isAdmin") === "true"
+        : false;
     const isAdmin = state.auth.user?.isAdmin || isLocalAdmin;
     const refreshUrl = isAdmin
       ? "/admin/auth/refresh-token"
       : "/auth/refresh-token";
 
-    refreshPromise = Promise.resolve(baseQuery(
-      {
-        url: refreshUrl,
-        method: "POST",
-      },
-      api,
-      extraOptions,
-    ));
+    refreshPromise = Promise.resolve(
+      baseQuery(
+        {
+          url: refreshUrl,
+          method: "POST",
+        },
+        api,
+        extraOptions,
+      ),
+    );
 
     const refreshResult: any = await refreshPromise;
 
@@ -96,7 +101,7 @@ const baseQueryWithReauth: BaseQueryFn<
         refreshResult.data.data.user ||
         refreshResult.data.data.admin ||
         state.auth.user;
-        
+
       if (refreshResult.data.data.admin) {
         user = {
           ...user,

@@ -1,6 +1,8 @@
 "use client";
 
+import { ConfirmDialog } from "@/components/custom/confirm-dialog";
 import FormSelect from "@/components/custom/form-select";
+import { RootState } from "@/redux/store";
 import {
   useCreateCategoryMutation,
   useDeleteCategoryMutation,
@@ -11,11 +13,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Pencil, Plus, Trash2, X } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { useSelector } from "react-redux";
 import { toast } from "sonner";
 import { z } from "zod";
-import { ConfirmDialog } from "@/components/custom/confirm-dialog";
-import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
 
 const categorySchema = z.object({
   name: z.string().min(1, "Category name is required"),
@@ -243,9 +243,17 @@ export default function CategoriesPage() {
       {/* Add Category Modal */}
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-          <div role="dialog" aria-modal="true" aria-labelledby="modal-title" className="w-full max-w-md bg-card border border-border p-6 rounded-3xl space-y-4 shadow-2xl">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="modal-title"
+            className="w-full max-w-md bg-card border border-border p-6 rounded-3xl space-y-4 shadow-2xl"
+          >
             <div className="flex items-center justify-between border-b border-border pb-3">
-              <h3 id="modal-title" className="text-base font-bold text-foreground">
+              <h3
+                id="modal-title"
+                className="text-base font-bold text-foreground"
+              >
                 Add Custom Category
               </h3>
               <button
@@ -319,9 +327,17 @@ export default function CategoriesPage() {
       {/* Edit Category Modal */}
       {editCategory && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-          <div role="dialog" aria-modal="true" aria-labelledby="modal-title" className="w-full max-w-md bg-card border border-border p-6 rounded-3xl space-y-4 shadow-2xl">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="modal-title"
+            className="w-full max-w-md bg-card border border-border p-6 rounded-3xl space-y-4 shadow-2xl"
+          >
             <div className="flex items-center justify-between border-b border-border pb-3">
-              <h3 id="modal-title" className="text-base font-bold text-foreground">
+              <h3
+                id="modal-title"
+                className="text-base font-bold text-foreground"
+              >
                 Edit Category
               </h3>
               <button

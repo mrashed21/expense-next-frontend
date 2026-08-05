@@ -7,9 +7,12 @@ export function useCurrency() {
   const { user } = useSelector((state: RootState) => state.auth);
   const currencyCode = user?.currency || "BDT";
 
-  const formatCurrency = useCallback((amount: number, locale = "en-US") => {
-    return utilFormatCurrency(amount, currencyCode, locale);
-  }, [currencyCode]);
+  const formatCurrency = useCallback(
+    (amount: number, locale = "en-US") => {
+      return utilFormatCurrency(amount, currencyCode, locale);
+    },
+    [currencyCode],
+  );
 
   return { currencyCode, formatCurrency };
 }

@@ -14,7 +14,10 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { setCredentials } from "@/redux/slices/auth-slice";
 import { RootState } from "@/redux/store";
-import { useLoginMutation, useVerifyLogin2FAMutation } from "@/services/auth-api";
+import {
+  useLoginMutation,
+  useVerifyLogin2FAMutation,
+} from "@/services/auth-api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   ArrowRight,
@@ -39,7 +42,7 @@ const loginSchema = z.object({
 });
 
 const twoFaSchema = z.object({
-  code: z.string().min(6, "Code must be at least 6 digits")
+  code: z.string().min(6, "Code must be at least 6 digits"),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -53,7 +56,8 @@ function LoginContent() {
     (state: RootState) => state.auth,
   );
   const [loginApi, { isLoading }] = useLoginMutation();
-  const [verify2FA, { isLoading: isVerifying2FA }] = useVerifyLogin2FAMutation();
+  const [verify2FA, { isLoading: isVerifying2FA }] =
+    useVerifyLogin2FAMutation();
   const [showPassword, setShowPassword] = useState(false);
   const [requires2FA, setRequires2FA] = useState(false);
   const [tempToken, setTempToken] = useState<string | null>(null);
@@ -85,7 +89,7 @@ function LoginContent() {
   const onSubmit = async (data: LoginFormValues) => {
     try {
       const response: any = await loginApi(data).unwrap();
-      
+
       if (response.data?.requires2FA) {
         setRequires2FA(true);
         setTempToken(response.data.tempToken);
@@ -113,7 +117,10 @@ function LoginContent() {
   const on2FASubmit = async (data: TwoFaFormValues) => {
     if (!tempToken) return;
     try {
-      const response: any = await verify2FA({ tempToken, code: data.code }).unwrap();
+      const response: any = await verify2FA({
+        tempToken,
+        code: data.code,
+      }).unwrap();
       if (response.success) {
         localStorage.removeItem("isAdmin");
         dispatch(
@@ -211,7 +218,9 @@ function LoginContent() {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      aria-label={showPassword ? "Hide password" : "Show password"}
+                      aria-label={
+                        showPassword ? "Hide password" : "Show password"
+                      }
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
                     >
                       {showPassword ? (
@@ -244,7 +253,10 @@ function LoginContent() {
                 </Button>
               </form>
             ) : (
-              <form onSubmit={handleSubmit2FA(on2FASubmit)} className="space-y-4">
+              <form
+                onSubmit={handleSubmit2FA(on2FASubmit)}
+                className="space-y-4"
+              >
                 <div className="space-y-1.5">
                   <Label
                     htmlFor="code"
@@ -258,8 +270,11 @@ function LoginContent() {
                       id="code"
                       {...register2FA("code", {
                         onChange: (e) => {
-                          e.target.value = e.target.value.replace(/[^0-9a-zA-Z-]/g, "");
-                        }
+                          e.target.value = e.target.value.replace(
+                            /[^0-9a-zA-Z-]/g,
+                            "",
+                          );
+                        },
                       })}
                       type="text"
                       inputMode="text"
@@ -274,7 +289,7 @@ function LoginContent() {
                     </p>
                   )}
                 </div>
-                
+
                 <Button
                   type="submit"
                   disabled={isVerifying2FA}
@@ -289,7 +304,7 @@ function LoginContent() {
                     </>
                   )}
                 </Button>
-                
+
                 <Button
                   type="button"
                   variant="ghost"

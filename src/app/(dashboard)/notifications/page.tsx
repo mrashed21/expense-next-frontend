@@ -1,31 +1,21 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { ConfirmDialog } from "@/components/custom/confirm-dialog";
+import { EmptyState } from "@/components/custom/empty-state";
+import { TableSkeleton } from "@/components/custom/table-skeleton";
 import {
+  getNotificationIcon,
+  getRelativeTime,
+} from "@/components/layout/notification-dropdown";
+import {
+  useDeleteNotificationMutation,
   useGetNotificationsQuery,
   useMarkAllAsReadMutation,
   useMarkAsReadMutation,
-  useDeleteNotificationMutation,
 } from "@/services/notification-api";
-import {
-  Bell,
-  Check,
-  CheckCircle2,
-  Trash2,
-  Filter,
-  Shield,
-  Clock,
-  AlertTriangle,
-  TrendingDown,
-  TrendingUp,
-  User,
-  Info,
-} from "lucide-react";
+import { Bell, Check, CheckCircle2, Filter, Trash2 } from "lucide-react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import { EmptyState } from "@/components/custom/empty-state";
-import { TableSkeleton } from "@/components/custom/table-skeleton";
-import { ConfirmDialog } from "@/components/custom/confirm-dialog";
-import { getNotificationIcon, getRelativeTime } from "@/components/layout/notification-dropdown";
 
 const categories = [
   { label: "All Categories", value: "all" },
@@ -43,16 +33,24 @@ export default function NotificationsPage() {
   const [showUnreadOnly, setShowUnreadOnly] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  const { data: notificationsData, isLoading, isError } = useGetNotificationsQuery({});
+  const {
+    data: notificationsData,
+    isLoading,
+    isError,
+  } = useGetNotificationsQuery({});
   const [markAsReadApi] = useMarkAsReadMutation();
-  const [markAllAsReadApi, { isLoading: isMarkingAll }] = useMarkAllAsReadMutation();
+  const [markAllAsReadApi, { isLoading: isMarkingAll }] =
+    useMarkAllAsReadMutation();
   const [deleteApi] = useDeleteNotificationMutation();
 
-  const notifications = useMemo(() => notificationsData?.data || [], [notificationsData]);
+  const notifications = useMemo(
+    () => notificationsData?.data || [],
+    [notificationsData],
+  );
 
   const unreadCount = useMemo(
     () => notifications.filter((n: any) => !n.is_read).length,
-    [notifications]
+    [notifications],
   );
 
   const filteredNotifications = useMemo(() => {
@@ -112,7 +110,8 @@ export default function NotificationsPage() {
             )}
           </h1>
           <p className="text-xs text-muted-foreground mt-1">
-            Stay updated with real-time alerts for budgets, recurring bills, security events, and system updates.
+            Stay updated with real-time alerts for budgets, recurring bills,
+            security events, and system updates.
           </p>
         </div>
 
@@ -175,7 +174,9 @@ export default function NotificationsPage() {
               <div
                 key={n._id}
                 className={`p-4 transition-colors flex items-start gap-4 ${
-                  !n.is_read ? "bg-primary/5 dark:bg-primary/10" : "hover:bg-secondary/30"
+                  !n.is_read
+                    ? "bg-primary/5 dark:bg-primary/10"
+                    : "hover:bg-secondary/30"
                 }`}
               >
                 {/* Category Icon */}

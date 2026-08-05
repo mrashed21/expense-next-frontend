@@ -7,7 +7,8 @@ import { io, Socket } from "socket.io-client";
 import { toast } from "sonner";
 import { RootState } from "../redux/store";
 
-const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:5005";
+const SOCKET_URL =
+  process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:5005";
 
 let globalSocket: Socket | null = null;
 let subscriberCount = 0;
@@ -41,10 +42,13 @@ export const useSocket = (): Socket | null => {
         console.error("[Socket] Connection error:", error.message);
       });
 
-      globalSocket.on("new_notification", (data: { title: string; message: string }) => {
-        toast.info(`🔔 ${data.title}`, { description: data.message });
-        dispatch(apiSlice.util.invalidateTags(["Notifications"]));
-      });
+      globalSocket.on(
+        "new_notification",
+        (data: { title: string; message: string }) => {
+          toast.info(`🔔 ${data.title}`, { description: data.message });
+          dispatch(apiSlice.util.invalidateTags(["Notifications"]));
+        },
+      );
     }
 
     return () => {

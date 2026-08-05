@@ -1,5 +1,6 @@
 "use client";
 
+import { ConfirmDialog } from "@/components/custom/confirm-dialog";
 import FormSelect from "@/components/custom/form-select";
 import { useCurrency } from "@/hooks/use-currency";
 import {
@@ -9,22 +10,31 @@ import {
   useUpdateInvestmentMutation,
 } from "@/services/investment-api";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, Pencil, Plus, Trash2, X, Search, TrendingUp, TrendingDown, Activity } from "lucide-react";
+import {
+  Activity,
+  Loader2,
+  Pencil,
+  Plus,
+  Search,
+  Trash2,
+  TrendingDown,
+  TrendingUp,
+  X,
+} from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
-import { z } from "zod";
-import { ConfirmDialog } from "@/components/custom/confirm-dialog";
 import {
-  BarChart,
   Bar,
-  XAxis,
-  YAxis,
+  BarChart,
   CartesianGrid,
+  Cell,
   Tooltip as RechartsTooltip,
   ResponsiveContainer,
-  Cell
-} from 'recharts';
+  XAxis,
+  YAxis,
+} from "recharts";
+import { toast } from "sonner";
+import { z } from "zod";
 
 const investmentTypes = [
   { label: "Stock", value: "stock" },
@@ -51,30 +61,40 @@ export default function InvestmentsPage() {
   const { formatCurrency } = useCurrency();
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  
-  const { data: investmentsData, isLoading: investmentsLoading } = useGetInvestmentsQuery({
-    search: searchTerm,
-  });
-  
-  const [createInvestmentApi, { isLoading: isCreating }] = useCreateInvestmentMutation();
-  const [updateInvestmentApi, { isLoading: isUpdating }] = useUpdateInvestmentMutation();
+
+  const { data: investmentsData, isLoading: investmentsLoading } =
+    useGetInvestmentsQuery({
+      search: searchTerm,
+    });
+
+  const [createInvestmentApi, { isLoading: isCreating }] =
+    useCreateInvestmentMutation();
+  const [updateInvestmentApi, { isLoading: isUpdating }] =
+    useUpdateInvestmentMutation();
   const [deleteInvestmentApi] = useDeleteInvestmentMutation();
 
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editItem, setEditItem] = useState<any>(null);
 
   const investments = investmentsData?.data || [];
-  const metrics = investmentsData?.meta?.metrics || { totalInvested: 0, totalCurrentValue: 0, totalPnL: 0 };
-  const pnlPercentage = metrics.totalInvested > 0 
-    ? (metrics.totalPnL / metrics.totalInvested) * 100 
-    : 0;
+  const metrics = investmentsData?.meta?.metrics || {
+    totalInvested: 0,
+    totalCurrentValue: 0,
+    totalPnL: 0,
+  };
+  const pnlPercentage =
+    metrics.totalInvested > 0
+      ? (metrics.totalPnL / metrics.totalInvested) * 100
+      : 0;
 
-  const chartData = investments.map((inv: any) => ({
-    name: inv.symbol || inv.name,
-    invested: inv.purchase_price * inv.quantity,
-    current: inv.current_price * inv.quantity,
-    isProfit: (inv.current_price - inv.purchase_price) >= 0
-  })).slice(0, 10); // Show top 10 in chart
+  const chartData = investments
+    .map((inv: any) => ({
+      name: inv.symbol || inv.name,
+      invested: inv.purchase_price * inv.quantity,
+      current: inv.current_price * inv.quantity,
+      isProfit: inv.current_price - inv.purchase_price >= 0,
+    }))
+    .slice(0, 10); // Show top 10 in chart
 
   const {
     register: registerForm,
@@ -85,7 +105,16 @@ export default function InvestmentsPage() {
     formState: { errors },
   } = useForm<InvestmentFormValues>({
     resolver: zodResolver(investmentSchema),
-    defaultValues: { quantity: 0, purchase_price: 0, current_price: 0, name: "", symbol: "", type: "", purchase_date: "", notes: "" },
+    defaultValues: {
+      quantity: 0,
+      purchase_price: 0,
+      current_price: 0,
+      name: "",
+      symbol: "",
+      type: "",
+      purchase_date: "",
+      notes: "",
+    },
   });
 
   const onAddSubmit = async (data: InvestmentFormValues) => {
@@ -96,7 +125,7 @@ export default function InvestmentsPage() {
       } else {
         delete payload.purchase_date;
       }
-      
+
       await createInvestmentApi(payload).unwrap();
       toast.success("Investment recorded successfully!");
       setIsAddOpen(false);
@@ -115,7 +144,9 @@ export default function InvestmentsPage() {
       quantity: item.quantity,
       purchase_price: item.purchase_price,
       current_price: item.current_price,
-      purchase_date: item.purchase_date ? new Date(item.purchase_date).toISOString().split('T')[0] : "",
+      purchase_date: item.purchase_date
+        ? new Date(item.purchase_date).toISOString().split("T")[0]
+        : "",
       notes: item.notes || "",
     });
   };
@@ -178,7 +209,10 @@ export default function InvestmentsPage() {
             />
           </div>
           <button
-            onClick={() => { reset(); setIsAddOpen(true); }}
+            onClick={() => {
+              reset();
+              setIsAddOpen(true);
+            }}
             className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-primary-foreground font-semibold text-xs shadow-md shadow-primary/20 hover:bg-primary/90 transition-colors shrink-0"
           >
             <Plus className="w-4 h-4" />
@@ -205,18 +239,29 @@ export default function InvestmentsPage() {
             {formatCurrency(metrics.totalCurrentValue)}
           </p>
         </div>
-        <div className={`p-5 rounded-2xl border ${metrics.totalPnL >= 0 ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-destructive/10 border-destructive/20'}`}>
+        <div
+          className={`p-5 rounded-2xl border ${metrics.totalPnL >= 0 ? "bg-emerald-500/10 border-emerald-500/20" : "bg-destructive/10 border-destructive/20"}`}
+        >
           <div className="flex justify-between items-start">
             <div>
               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                 Total Profit / Loss
               </p>
-              <p className={`text-2xl font-black mt-1 ${metrics.totalPnL >= 0 ? 'text-emerald-500' : 'text-destructive'}`}>
-                {metrics.totalPnL > 0 ? '+' : ''}{formatCurrency(metrics.totalPnL)}
+              <p
+                className={`text-2xl font-black mt-1 ${metrics.totalPnL >= 0 ? "text-emerald-500" : "text-destructive"}`}
+              >
+                {metrics.totalPnL > 0 ? "+" : ""}
+                {formatCurrency(metrics.totalPnL)}
               </p>
             </div>
-            <div className={`flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full ${metrics.totalPnL >= 0 ? 'bg-emerald-500/20 text-emerald-500' : 'bg-destructive/20 text-destructive'}`}>
-              {metrics.totalPnL >= 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+            <div
+              className={`flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full ${metrics.totalPnL >= 0 ? "bg-emerald-500/20 text-emerald-500" : "bg-destructive/20 text-destructive"}`}
+            >
+              {metrics.totalPnL >= 0 ? (
+                <TrendingUp className="w-3 h-3" />
+              ) : (
+                <TrendingDown className="w-3 h-3" />
+              )}
               {pnlPercentage.toFixed(2)}%
             </div>
           </div>
@@ -226,20 +271,49 @@ export default function InvestmentsPage() {
       {/* Chart Section */}
       {investments.length > 0 && (
         <div className="glass-card p-6 rounded-3xl space-y-4">
-          <h2 className="text-base font-bold text-foreground">Top Holdings Value</h2>
+          <h2 className="text-base font-bold text-foreground">
+            Top Holdings Value
+          </h2>
           <div className="h-64 w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#333" opacity={0.2} />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#888' }} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: '#888' }} tickFormatter={(val) => `$${val/1000}k`} />
-                <RechartsTooltip 
-                  cursor={{ fill: 'transparent' }}
-                  contentStyle={{ borderRadius: '12px', border: 'none', backgroundColor: '#1f2937', color: '#fff', fontSize: '12px' }}
+              <BarChart
+                data={chartData}
+                margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+              >
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  vertical={false}
+                  stroke="#333"
+                  opacity={0.2}
+                />
+                <XAxis
+                  dataKey="name"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fontSize: 10, fill: "#888" }}
+                />
+                <YAxis
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fontSize: 10, fill: "#888" }}
+                  tickFormatter={(val) => `$${val / 1000}k`}
+                />
+                <RechartsTooltip
+                  cursor={{ fill: "transparent" }}
+                  contentStyle={{
+                    borderRadius: "12px",
+                    border: "none",
+                    backgroundColor: "#1f2937",
+                    color: "#fff",
+                    fontSize: "12px",
+                  }}
                 />
                 <Bar dataKey="current" radius={[4, 4, 0, 0]}>
                   {chartData.map((entry: any, index: number) => (
-                    <Cell key={`cell-${index}`} fill={entry.isProfit ? '#10b981' : '#ef4444'} />
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={entry.isProfit ? "#10b981" : "#ef4444"}
+                    />
                   ))}
                 </Bar>
               </BarChart>
@@ -254,12 +328,24 @@ export default function InvestmentsPage() {
           <table className="w-full text-left text-sm">
             <thead className="sticky top-0 z-10 bg-secondary/95 backdrop-blur-md text-muted-foreground border-b border-border">
               <tr>
-                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider">Asset</th>
-                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">Holdings</th>
-                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">Avg Price</th>
-                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">Market Price</th>
-                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">Return</th>
-                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">Actions</th>
+                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider">
+                  Asset
+                </th>
+                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">
+                  Holdings
+                </th>
+                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">
+                  Avg Price
+                </th>
+                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">
+                  Market Price
+                </th>
+                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">
+                  Return
+                </th>
+                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -276,8 +362,12 @@ export default function InvestmentsPage() {
                       <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
                         <Activity className="w-6 h-6 text-primary" />
                       </div>
-                      <p className="text-sm font-semibold text-foreground">No Investments Found</p>
-                      <p className="text-xs text-muted-foreground max-w-xs">Start building your portfolio by adding a new holding.</p>
+                      <p className="text-sm font-semibold text-foreground">
+                        No Investments Found
+                      </p>
+                      <p className="text-xs text-muted-foreground max-w-xs">
+                        Start building your portfolio by adding a new holding.
+                      </p>
                     </div>
                   </td>
                 </tr>
@@ -290,36 +380,62 @@ export default function InvestmentsPage() {
                   const isProfit = pnl >= 0;
 
                   return (
-                    <tr key={inv._id} className="hover:bg-secondary/30 transition-colors">
+                    <tr
+                      key={inv._id}
+                      className="hover:bg-secondary/30 transition-colors"
+                    >
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold text-xs uppercase shadow-sm">
                             {inv.symbol || inv.name.substring(0, 3)}
                           </div>
                           <div>
-                            <p className="font-bold text-foreground line-clamp-1">{inv.name}</p>
-                            <p className="text-[10px] text-muted-foreground uppercase">{inv.type.replace('_', ' ')}</p>
+                            <p className="font-bold text-foreground line-clamp-1">
+                              {inv.name}
+                            </p>
+                            <p className="text-[10px] text-muted-foreground uppercase">
+                              {inv.type.replace("_", " ")}
+                            </p>
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <p className="font-semibold text-foreground">{inv.quantity.toLocaleString()}</p>
+                        <p className="font-semibold text-foreground">
+                          {inv.quantity.toLocaleString()}
+                        </p>
                         <p className="text-[10px] text-muted-foreground">Qty</p>
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <p className="font-semibold text-foreground">{formatCurrency(inv.purchase_price)}</p>
-                        <p className="text-[10px] text-muted-foreground">Total: {formatCurrency(invested)}</p>
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <p className="font-semibold text-foreground">{formatCurrency(inv.current_price)}</p>
-                        <p className="text-[10px] text-muted-foreground">Total: {formatCurrency(current)}</p>
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <p className={`font-bold ${isProfit ? 'text-emerald-500' : 'text-destructive'}`}>
-                          {isProfit ? '+' : ''}{formatCurrency(pnl)}
+                        <p className="font-semibold text-foreground">
+                          {formatCurrency(inv.purchase_price)}
                         </p>
-                        <div className={`inline-flex items-center gap-1 text-[10px] font-bold mt-1 ${isProfit ? 'text-emerald-500' : 'text-destructive'}`}>
-                          {isProfit ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+                        <p className="text-[10px] text-muted-foreground">
+                          Total: {formatCurrency(invested)}
+                        </p>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <p className="font-semibold text-foreground">
+                          {formatCurrency(inv.current_price)}
+                        </p>
+                        <p className="text-[10px] text-muted-foreground">
+                          Total: {formatCurrency(current)}
+                        </p>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <p
+                          className={`font-bold ${isProfit ? "text-emerald-500" : "text-destructive"}`}
+                        >
+                          {isProfit ? "+" : ""}
+                          {formatCurrency(pnl)}
+                        </p>
+                        <div
+                          className={`inline-flex items-center gap-1 text-[10px] font-bold mt-1 ${isProfit ? "text-emerald-500" : "text-destructive"}`}
+                        >
+                          {isProfit ? (
+                            <TrendingUp className="w-3 h-3" />
+                          ) : (
+                            <TrendingDown className="w-3 h-3" />
+                          )}
                           {pnlPercent.toFixed(2)}%
                         </div>
                       </td>
@@ -351,13 +467,19 @@ export default function InvestmentsPage() {
       {/* Form Modal (Shared Add/Edit) */}
       {(isAddOpen || editItem) && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-          <div role="dialog" className="w-full max-w-lg bg-card border border-border p-6 rounded-3xl space-y-4 shadow-2xl overflow-y-auto max-h-[90vh]">
+          <div
+            role="dialog"
+            className="w-full max-w-lg bg-card border border-border p-6 rounded-3xl space-y-4 shadow-2xl overflow-y-auto max-h-[90vh]"
+          >
             <div className="flex items-center justify-between border-b border-border pb-3 sticky top-0 bg-card z-10">
               <h3 className="text-base font-bold text-foreground">
                 {editItem ? "Edit Holding" : "Add New Holding"}
               </h3>
               <button
-                onClick={() => { setIsAddOpen(false); setEditItem(null); }}
+                onClick={() => {
+                  setIsAddOpen(false);
+                  setEditItem(null);
+                }}
                 className="text-muted-foreground hover:text-foreground"
               >
                 <X className="w-5 h-5" />
@@ -370,16 +492,24 @@ export default function InvestmentsPage() {
             >
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">Asset Name</label>
+                  <label className="text-xs font-semibold text-foreground">
+                    Asset Name
+                  </label>
                   <input
                     {...registerForm("name")}
                     placeholder="e.g. Apple Inc."
                     className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                   />
-                  {errors.name && <p className="text-[10px] text-destructive">{errors.name.message}</p>}
+                  {errors.name && (
+                    <p className="text-[10px] text-destructive">
+                      {errors.name.message}
+                    </p>
+                  )}
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">Ticker Symbol (Opt)</label>
+                  <label className="text-xs font-semibold text-foreground">
+                    Ticker Symbol (Opt)
+                  </label>
                   <input
                     {...registerForm("symbol")}
                     placeholder="e.g. AAPL"
@@ -402,39 +532,59 @@ export default function InvestmentsPage() {
 
               <div className="grid grid-cols-3 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">Quantity</label>
+                  <label className="text-xs font-semibold text-foreground">
+                    Quantity
+                  </label>
                   <input
                     {...registerForm("quantity", { valueAsNumber: true })}
                     type="number"
                     step="0.00000001"
                     className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                   />
-                  {errors.quantity && <p className="text-[10px] text-destructive">{errors.quantity.message}</p>}
+                  {errors.quantity && (
+                    <p className="text-[10px] text-destructive">
+                      {errors.quantity.message}
+                    </p>
+                  )}
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">Avg Buy Price</label>
+                  <label className="text-xs font-semibold text-foreground">
+                    Avg Buy Price
+                  </label>
                   <input
                     {...registerForm("purchase_price", { valueAsNumber: true })}
                     type="number"
                     step="0.01"
                     className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                   />
-                  {errors.purchase_price && <p className="text-[10px] text-destructive">{errors.purchase_price.message}</p>}
+                  {errors.purchase_price && (
+                    <p className="text-[10px] text-destructive">
+                      {errors.purchase_price.message}
+                    </p>
+                  )}
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">Market Price</label>
+                  <label className="text-xs font-semibold text-foreground">
+                    Market Price
+                  </label>
                   <input
                     {...registerForm("current_price", { valueAsNumber: true })}
                     type="number"
                     step="0.01"
                     className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                   />
-                  {errors.current_price && <p className="text-[10px] text-destructive">{errors.current_price.message}</p>}
+                  {errors.current_price && (
+                    <p className="text-[10px] text-destructive">
+                      {errors.current_price.message}
+                    </p>
+                  )}
                 </div>
               </div>
-              
+
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">Purchase Date (Opt)</label>
+                <label className="text-xs font-semibold text-foreground">
+                  Purchase Date (Opt)
+                </label>
                 <input
                   {...registerForm("purchase_date")}
                   type="date"
@@ -443,7 +593,9 @@ export default function InvestmentsPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">Notes (Optional)</label>
+                <label className="text-xs font-semibold text-foreground">
+                  Notes (Optional)
+                </label>
                 <input
                   {...registerForm("notes")}
                   className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
@@ -457,8 +609,10 @@ export default function InvestmentsPage() {
               >
                 {isCreating || isUpdating ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
+                ) : editItem ? (
+                  "Update Holding"
                 ) : (
-                  editItem ? "Update Holding" : "Save Holding"
+                  "Save Holding"
                 )}
               </button>
             </form>

@@ -8,7 +8,10 @@ import {
   setAuthLoading,
   setCredentials,
 } from "../redux/slices/auth-slice";
-import { useLazyGetAdminMeQuery, useLazyGetMeQuery } from "../services/auth-api";
+import {
+  useLazyGetAdminMeQuery,
+  useLazyGetMeQuery,
+} from "../services/auth-api";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const dispatch = useDispatch();
@@ -20,7 +23,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (hasInitialized.current) return;
-    
+
     const initializeAuth = async () => {
       hasInitialized.current = true;
       try {

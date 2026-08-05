@@ -1,21 +1,57 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { formatDate } from "@/lib/utils";
 import { RootState } from "@/redux/store";
-import { useGetUsersQuery, useUpdateUserStatusMutation } from "@/services/admin-api";
-import { Ban, CheckCircle, Loader2, MoreVertical, ShieldAlert, UserCog, Users, Search, Trash2, ArrowUpDown } from "lucide-react";
+import {
+  useGetUsersQuery,
+  useUpdateUserStatusMutation,
+} from "@/services/admin-api";
+import {
+  Ban,
+  CheckCircle,
+  Loader2,
+  MoreVertical,
+  Search,
+  ShieldAlert,
+  Trash2,
+  UserCog,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "sonner";
-import { formatDate } from "@/lib/utils";
 
 export default function AdminUsersPage() {
   const router = useRouter();
@@ -24,10 +60,12 @@ export default function AdminUsersPage() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
-  
+
   // Action Dialog State
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [actionType, setActionType] = useState<"active" | "deactive" | "banned" | "delete" | null>(null);
+  const [actionType, setActionType] = useState<
+    "active" | "deactive" | "banned" | "delete" | null
+  >(null);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -36,37 +74,51 @@ export default function AdminUsersPage() {
     }
   }, [user, router]);
 
-  const { data: usersResponse, isLoading: usersLoading, refetch } = useGetUsersQuery({
+  const {
+    data: usersResponse,
+    isLoading: usersLoading,
+    refetch,
+  } = useGetUsersQuery({
     limit: 10,
     page,
     search,
-    filter
+    filter,
   });
 
-  const [updateUserStatus, { isLoading: updatingStatus }] = useUpdateUserStatusMutation();
+  const [updateUserStatus, { isLoading: updatingStatus }] =
+    useUpdateUserStatusMutation();
 
   if (!user || !user.isAdmin) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
         <ShieldAlert className="w-16 h-16 text-destructive" />
         <h1 className="text-2xl font-bold text-foreground">Access Denied</h1>
-        <p className="text-muted-foreground">You do not have permission to view this page.</p>
+        <p className="text-muted-foreground">
+          You do not have permission to view this page.
+        </p>
       </div>
     );
   }
 
   const users = usersResponse?.data?.users || [];
-  const pagination = usersResponse?.data?.pagination || { total: 0, page: 1, totalPages: 1 };
+  const pagination = usersResponse?.data?.pagination || {
+    total: 0,
+    page: 1,
+    totalPages: 1,
+  };
 
   const handleActionConfirm = async () => {
     if (!selectedUserId || !actionType) return;
-    
+
     try {
       if (actionType === "delete") {
         // Implement delete mutation here if needed (e.g. useDeleteUserMutation)
         toast.info("Delete user API not implemented here yet.");
       } else {
-        await updateUserStatus({ id: selectedUserId, status: actionType }).unwrap();
+        await updateUserStatus({
+          id: selectedUserId,
+          status: actionType,
+        }).unwrap();
         toast.success(`User status updated successfully`);
       }
       setIsDialogOpen(false);
@@ -85,18 +137,21 @@ export default function AdminUsersPage() {
   return (
     <div className="space-y-6 pb-8">
       <div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">User Management</h1>
-        <p className="text-xs sm:text-sm text-muted-foreground mt-1">Manage system users, view activity, and update roles.</p>
+        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+          User Management
+        </h1>
+        <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+          Manage system users, view activity, and update roles.
+        </p>
       </div>
 
       <Card className="p-4 sm:p-6 space-y-6 border border-border shadow-sm bg-card/50">
-        
         {/* Filters & Search */}
         <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
           <div className="relative w-full sm:max-w-xs">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input 
-              placeholder="Search by name or email..." 
+            <Input
+              placeholder="Search by name or email..."
               className="pl-9 bg-background/50"
               value={search}
               onChange={(e) => {
@@ -106,7 +161,13 @@ export default function AdminUsersPage() {
             />
           </div>
           <div className="w-full sm:w-48">
-            <Select value={filter} onValueChange={(val) => { setFilter(val); setPage(1); }}>
+            <Select
+              value={filter}
+              onValueChange={(val) => {
+                setFilter(val);
+                setPage(1);
+              }}
+            >
               <SelectTrigger className="bg-background/50">
                 <SelectValue placeholder="Filter Status" />
               </SelectTrigger>
@@ -127,7 +188,9 @@ export default function AdminUsersPage() {
                 <TableHead className="font-bold">User Details</TableHead>
                 <TableHead className="font-bold">Status</TableHead>
                 <TableHead className="font-bold text-center">Txns</TableHead>
-                <TableHead className="font-bold text-center">Categories</TableHead>
+                <TableHead className="font-bold text-center">
+                  Categories
+                </TableHead>
                 <TableHead className="font-bold">Joined Date</TableHead>
                 <TableHead className="font-bold text-right">Actions</TableHead>
               </TableRow>
@@ -141,7 +204,10 @@ export default function AdminUsersPage() {
                 </TableRow>
               ) : users.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">
+                  <TableCell
+                    colSpan={6}
+                    className="h-32 text-center text-muted-foreground"
+                  >
                     No users found matching your search.
                   </TableCell>
                 </TableRow>
@@ -155,42 +221,80 @@ export default function AdminUsersPage() {
                         </div>
                         <div>
                           <p className="text-sm font-bold">{u.user_name}</p>
-                          <p className="text-xs text-muted-foreground">{u.user_email}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {u.user_email}
+                          </p>
                         </div>
                       </div>
                     </TableCell>
                     <TableCell>
-                      {u.user_status === 'active' && <span className="px-2 py-1 bg-emerald-500/10 text-emerald-500 text-[10px] font-bold rounded-md uppercase tracking-wider border border-emerald-500/20">Active</span>}
-                      {u.user_status === 'deactive' && <span className="px-2 py-1 bg-orange-500/10 text-orange-500 text-[10px] font-bold rounded-md uppercase tracking-wider border border-orange-500/20">Inactive</span>}
-                      {u.user_status === 'banned' && <span className="px-2 py-1 bg-destructive/10 text-destructive text-[10px] font-bold rounded-md uppercase tracking-wider border border-destructive/20">Banned</span>}
+                      {u.user_status === "active" && (
+                        <span className="px-2 py-1 bg-emerald-500/10 text-emerald-500 text-[10px] font-bold rounded-md uppercase tracking-wider border border-emerald-500/20">
+                          Active
+                        </span>
+                      )}
+                      {u.user_status === "deactive" && (
+                        <span className="px-2 py-1 bg-orange-500/10 text-orange-500 text-[10px] font-bold rounded-md uppercase tracking-wider border border-orange-500/20">
+                          Inactive
+                        </span>
+                      )}
+                      {u.user_status === "banned" && (
+                        <span className="px-2 py-1 bg-destructive/10 text-destructive text-[10px] font-bold rounded-md uppercase tracking-wider border border-destructive/20">
+                          Banned
+                        </span>
+                      )}
                     </TableCell>
-                    <TableCell className="text-center font-mono text-sm">{u.total_transactions || 0}</TableCell>
-                    <TableCell className="text-center font-mono text-sm">{u.total_categories || 0}</TableCell>
-                    <TableCell className="text-xs text-muted-foreground">{formatDate(u.createdAt)}</TableCell>
+                    <TableCell className="text-center font-mono text-sm">
+                      {u.total_transactions || 0}
+                    </TableCell>
+                    <TableCell className="text-center font-mono text-sm">
+                      {u.total_categories || 0}
+                    </TableCell>
+                    <TableCell className="text-xs text-muted-foreground">
+                      {formatDate(u.createdAt)}
+                    </TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                          >
                             <MoreVertical className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           {u.user_status !== "active" && (
-                            <DropdownMenuItem onClick={() => openActionDialog(u._id, "active")}>
-                              <CheckCircle className="h-4 w-4 mr-2 text-emerald-500" /> Activate
+                            <DropdownMenuItem
+                              onClick={() => openActionDialog(u._id, "active")}
+                            >
+                              <CheckCircle className="h-4 w-4 mr-2 text-emerald-500" />{" "}
+                              Activate
                             </DropdownMenuItem>
                           )}
                           {u.user_status !== "deactive" && (
-                            <DropdownMenuItem onClick={() => openActionDialog(u._id, "deactive")}>
-                              <UserCog className="h-4 w-4 mr-2 text-orange-500" /> Inactivate
+                            <DropdownMenuItem
+                              onClick={() =>
+                                openActionDialog(u._id, "deactive")
+                              }
+                            >
+                              <UserCog className="h-4 w-4 mr-2 text-orange-500" />{" "}
+                              Inactivate
                             </DropdownMenuItem>
                           )}
                           {u.user_status !== "banned" && (
-                            <DropdownMenuItem onClick={() => openActionDialog(u._id, "banned")}>
-                              <Ban className="h-4 w-4 mr-2 text-destructive" /> Ban User
+                            <DropdownMenuItem
+                              onClick={() => openActionDialog(u._id, "banned")}
+                            >
+                              <Ban className="h-4 w-4 mr-2 text-destructive" />{" "}
+                              Ban User
                             </DropdownMenuItem>
                           )}
-                          <DropdownMenuItem onClick={() => openActionDialog(u._id, "delete")} className="text-destructive focus:text-destructive">
+                          <DropdownMenuItem
+                            onClick={() => openActionDialog(u._id, "delete")}
+                            className="text-destructive focus:text-destructive"
+                          >
                             <Trash2 className="h-4 w-4 mr-2" /> Delete User
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -221,7 +325,9 @@ export default function AdminUsersPage() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setPage((p) => Math.min(pagination.totalPages, p + 1))}
+                onClick={() =>
+                  setPage((p) => Math.min(pagination.totalPages, p + 1))
+                }
                 disabled={page === pagination.totalPages}
               >
                 Next
@@ -237,18 +343,33 @@ export default function AdminUsersPage() {
           <DialogHeader>
             <DialogTitle>Confirm Action</DialogTitle>
             <DialogDescription>
-              Are you sure you want to {actionType === 'delete' ? 'delete this user permanently' : `change this user's status to ${actionType}`}?
-              This action cannot be undone.
+              Are you sure you want to{" "}
+              {actionType === "delete"
+                ? "delete this user permanently"
+                : `change this user's status to ${actionType}`}
+              ? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="mt-4">
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)} disabled={updatingStatus}>Cancel</Button>
-            <Button 
-              variant={actionType === 'delete' || actionType === 'banned' ? 'destructive' : 'default'} 
+            <Button
+              variant="outline"
+              onClick={() => setIsDialogOpen(false)}
+              disabled={updatingStatus}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant={
+                actionType === "delete" || actionType === "banned"
+                  ? "destructive"
+                  : "default"
+              }
               onClick={handleActionConfirm}
               disabled={updatingStatus}
             >
-              {updatingStatus ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+              {updatingStatus ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : null}
               Confirm
             </Button>
           </DialogFooter>

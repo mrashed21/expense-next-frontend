@@ -4,7 +4,8 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Expense Tracker - Personal & Business Expense Tracker",
     short_name: "Expense Tracker",
-    description: "Modern, secure financial management, budgeting, and analytics platform.",
+    description:
+      "Modern, secure financial management, budgeting, and analytics platform.",
     start_url: "/",
     display: "standalone",
     background_color: "#090d16",

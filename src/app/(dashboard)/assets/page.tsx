@@ -1,8 +1,8 @@
 "use client";
 
+import { ConfirmDialog } from "@/components/custom/confirm-dialog";
 import FormSelect from "@/components/custom/form-select";
 import { useCurrency } from "@/hooks/use-currency";
-import { formatDate } from "@/lib/utils";
 import {
   useCreateAssetMutation,
   useDeleteAssetMutation,
@@ -10,12 +10,11 @@ import {
   useUpdateAssetMutation,
 } from "@/services/asset-api";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Home, Loader2, Pencil, Plus, Trash2, X, Search } from "lucide-react";
+import { Home, Loader2, Pencil, Plus, Search, Trash2, X } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { ConfirmDialog } from "@/components/custom/confirm-dialog";
 
 const assetTypes = [
   { label: "Real Estate", value: "real_estate" },
@@ -39,13 +38,15 @@ export default function AssetsPage() {
   const { formatCurrency } = useCurrency();
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  
+
   const { data: assetsData, isLoading: assetsLoading } = useGetAssetsQuery({
     search: searchTerm,
   });
-  
-  const [createAssetApi, { isLoading: isCreatingAsset }] = useCreateAssetMutation();
-  const [updateAssetApi, { isLoading: isUpdatingAsset }] = useUpdateAssetMutation();
+
+  const [createAssetApi, { isLoading: isCreatingAsset }] =
+    useCreateAssetMutation();
+  const [updateAssetApi, { isLoading: isUpdatingAsset }] =
+    useUpdateAssetMutation();
   const [deleteAssetApi] = useDeleteAssetMutation();
 
   const [isAddAssetOpen, setIsAddAssetOpen] = useState(false);
@@ -62,7 +63,14 @@ export default function AssetsPage() {
     formState: { errors: assetErrors },
   } = useForm<AssetFormValues>({
     resolver: zodResolver(assetSchema),
-    defaultValues: { value: 0, name: "", type: "", purchase_price: 0, purchase_date: "", notes: "" },
+    defaultValues: {
+      value: 0,
+      name: "",
+      type: "",
+      purchase_price: 0,
+      purchase_date: "",
+      notes: "",
+    },
   });
 
   const {
@@ -74,7 +82,14 @@ export default function AssetsPage() {
     formState: { errors: editErrors },
   } = useForm<AssetFormValues>({
     resolver: zodResolver(assetSchema),
-    defaultValues: { value: 0, name: "", type: "", purchase_price: 0, purchase_date: "", notes: "" },
+    defaultValues: {
+      value: 0,
+      name: "",
+      type: "",
+      purchase_price: 0,
+      purchase_date: "",
+      notes: "",
+    },
   });
 
   const onAddAssetSubmit = async (data: AssetFormValues) => {
@@ -85,7 +100,7 @@ export default function AssetsPage() {
       } else {
         delete payload.purchase_date;
       }
-      
+
       await createAssetApi(payload).unwrap();
       toast.success("Asset recorded successfully!");
       setIsAddAssetOpen(false);
@@ -102,7 +117,9 @@ export default function AssetsPage() {
       type: asset.type,
       value: asset.value,
       purchase_price: asset.purchase_price || 0,
-      purchase_date: asset.purchase_date ? new Date(asset.purchase_date).toISOString().split('T')[0] : "",
+      purchase_date: asset.purchase_date
+        ? new Date(asset.purchase_date).toISOString().split("T")[0]
+        : "",
       notes: asset.notes || "",
     });
   };
@@ -206,9 +223,13 @@ export default function AssetsPage() {
               <Home className="w-6 h-6 text-primary" />
             </div>
             <div className="space-y-1">
-              <p className="text-sm font-semibold text-foreground">No Assets Found</p>
+              <p className="text-sm font-semibold text-foreground">
+                No Assets Found
+              </p>
               <p className="text-xs text-muted-foreground max-w-xs">
-                {searchTerm ? "No assets match your search criteria." : "Start tracking your physical assets and valuables here."}
+                {searchTerm
+                  ? "No assets match your search criteria."
+                  : "Start tracking your physical assets and valuables here."}
               </p>
             </div>
           </div>
@@ -220,9 +241,7 @@ export default function AssetsPage() {
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div
-                    className="w-12 h-12 rounded-2xl flex items-center justify-center bg-emerald-500 text-white font-bold text-lg shadow-md"
-                  >
+                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-emerald-500 text-white font-bold text-lg shadow-md">
                     <Home className="w-5 h-5" />
                   </div>
                   <div>
@@ -230,7 +249,7 @@ export default function AssetsPage() {
                       {asset.name}
                     </h3>
                     <span className="text-[10px] px-2 py-0.5 rounded-full bg-secondary border border-border font-semibold uppercase text-muted-foreground">
-                      {asset.type.replace('_', ' ')}
+                      {asset.type.replace("_", " ")}
                     </span>
                   </div>
                 </div>
@@ -282,7 +301,11 @@ export default function AssetsPage() {
       {/* Add Asset Modal */}
       {isAddAssetOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-          <div role="dialog" aria-modal="true" className="w-full max-w-md bg-card border border-border p-6 rounded-3xl space-y-4 shadow-2xl">
+          <div
+            role="dialog"
+            aria-modal="true"
+            className="w-full max-w-md bg-card border border-border p-6 rounded-3xl space-y-4 shadow-2xl"
+          >
             <div className="flex items-center justify-between border-b border-border pb-3">
               <h3 className="text-base font-bold text-foreground">
                 Add New Asset
@@ -349,14 +372,16 @@ export default function AssetsPage() {
                     Purchase Price (Opt)
                   </label>
                   <input
-                    {...registerAsset("purchase_price", { valueAsNumber: true })}
+                    {...registerAsset("purchase_price", {
+                      valueAsNumber: true,
+                    })}
                     type="number"
                     step="0.01"
                     className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                   />
                 </div>
               </div>
-              
+
               <div className="space-y-1">
                 <label className="text-xs font-semibold text-foreground">
                   Purchase Date (Opt)
@@ -471,7 +496,7 @@ export default function AssetsPage() {
                   />
                 </div>
               </div>
-              
+
               <div className="space-y-1">
                 <label className="text-xs font-semibold text-foreground">
                   Purchase Date (Opt)

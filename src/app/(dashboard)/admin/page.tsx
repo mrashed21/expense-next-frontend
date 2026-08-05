@@ -4,33 +4,31 @@ import { Card } from "@/components/ui/card";
 import { RootState } from "@/redux/store";
 import {
   useGetActivityQuery,
-  useGetSystemHealthQuery,
-  useGetUsersQuery,
   useGetDashboardStatsQuery,
+  useGetSystemHealthQuery,
   useGetUserGrowthQuery,
+  useGetUsersQuery,
 } from "@/services/admin-api";
-import {
-  Area,
-  AreaChart,
-  ResponsiveContainer,
-  Tooltip as RechartsTooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
 import {
   Activity,
   Cpu,
-  Database,
   Loader2,
   ShieldAlert,
-  Users,
-  CreditCard,
   UserCheck,
+  Users,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
+import {
+  Area,
+  AreaChart,
+  Tooltip as RechartsTooltip,
+  ResponsiveContainer,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 export default function AdminDashboardPage() {
   const router = useRouter();
@@ -47,8 +45,11 @@ export default function AdminDashboardPage() {
     useGetSystemHealthQuery({});
   const { data: activityData, isLoading: activityLoading } =
     useGetActivityQuery({});
-  const { data: statsData, isLoading: statsLoading } = useGetDashboardStatsQuery({});
-  const { data: growthData, isLoading: growthLoading } = useGetUserGrowthQuery({});
+  const { data: statsData, isLoading: statsLoading } =
+    useGetDashboardStatsQuery({});
+  const { data: growthData, isLoading: growthLoading } = useGetUserGrowthQuery(
+    {},
+  );
 
   if (!user || !user.isAdmin) {
     return (
@@ -62,7 +63,12 @@ export default function AdminDashboardPage() {
     );
   }
 
-  const stats = statsData?.data || { totalUsers: 0, totalAdmins: 0, totalTransactions: 0, activeUsers: 0 };
+  const stats = statsData?.data || {
+    totalUsers: 0,
+    totalAdmins: 0,
+    totalTransactions: 0,
+    activeUsers: 0,
+  };
   const activitiesCount = activityData?.data?.length || 0;
 
   // Format uptime
@@ -174,35 +180,52 @@ export default function AdminDashboardPage() {
               <AreaChart data={growthData?.data || []}>
                 <defs>
                   <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                    <stop
+                      offset="5%"
+                      stopColor="hsl(var(--primary))"
+                      stopOpacity={0.3}
+                    />
+                    <stop
+                      offset="95%"
+                      stopColor="hsl(var(--primary))"
+                      stopOpacity={0}
+                    />
                   </linearGradient>
                 </defs>
-                <XAxis 
-                  dataKey="date" 
-                  tickFormatter={(val) => new Date(val).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                  stroke="hsl(var(--muted-foreground))" 
-                  fontSize={12} 
-                  tickLine={false} 
-                  axisLine={false} 
+                <XAxis
+                  dataKey="date"
+                  tickFormatter={(val) =>
+                    new Date(val).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                    })
+                  }
+                  stroke="hsl(var(--muted-foreground))"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
                 />
-                <YAxis 
-                  stroke="hsl(var(--muted-foreground))" 
-                  fontSize={12} 
-                  tickLine={false} 
-                  axisLine={false} 
+                <YAxis
+                  stroke="hsl(var(--muted-foreground))"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
                 />
-                <RechartsTooltip 
-                  contentStyle={{ backgroundColor: "hsl(var(--card))", borderColor: "hsl(var(--border))", borderRadius: "8px" }}
+                <RechartsTooltip
+                  contentStyle={{
+                    backgroundColor: "hsl(var(--card))",
+                    borderColor: "hsl(var(--border))",
+                    borderRadius: "8px",
+                  }}
                   itemStyle={{ color: "hsl(var(--foreground))" }}
                 />
-                <Area 
-                  type="monotone" 
-                  dataKey="users" 
-                  stroke="hsl(var(--primary))" 
+                <Area
+                  type="monotone"
+                  dataKey="users"
+                  stroke="hsl(var(--primary))"
                   strokeWidth={2}
-                  fillOpacity={1} 
-                  fill="url(#colorUsers)" 
+                  fillOpacity={1}
+                  fill="url(#colorUsers)"
                 />
               </AreaChart>
             </ResponsiveContainer>

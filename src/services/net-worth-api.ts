@@ -16,7 +16,5 @@ export const netWorthApi = apiSlice.injectEndpoints({
   }),
 });
 
-export const {
-  useGetCurrentNetWorthQuery,
-  useGetNetWorthHistoryQuery,
-} = netWorthApi;
+export const { useGetCurrentNetWorthQuery, useGetNetWorthHistoryQuery } =
+  netWorthApi;

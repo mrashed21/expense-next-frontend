@@ -5,24 +5,24 @@ import PhonesInput from "@/components/custom/phone-input";
 import { bangladeshCities, cityAreas } from "@/lib/location-data";
 import { formatDate } from "@/lib/utils";
 import { logout, updateUser } from "@/redux/slices/auth-slice";
+import {
+  useUpdateAdminProfileImageMutation,
+  useUpdateAdminProfileMutation,
+} from "@/services/admin-api";
 import { useLogoutAllDevicesMutation } from "@/services/auth-api";
 import {
   useChangePasswordMutation,
   useDeleteAccountMutation,
+  useDisable2FAMutation,
+  useGenerate2FAMutation,
+  useGetDevicesQuery,
   useGetLoginHistoryQuery,
   useGetProfileQuery,
+  useRevokeDeviceMutation,
   useUpdateProfileImageMutation,
   useUpdateProfileMutation,
-  useGenerate2FAMutation,
   useVerify2FAMutation,
-  useDisable2FAMutation,
-  useGetDevicesQuery,
-  useRevokeDeviceMutation,
 } from "@/services/user-api";
-import {
-  useUpdateAdminProfileMutation,
-  useUpdateAdminProfileImageMutation
-} from "@/services/admin-api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Camera,
@@ -31,11 +31,10 @@ import {
   EyeOff,
   Loader2,
   ShieldAlert,
-  Upload,
   Smartphone,
-  Copy,
+  Trash2,
+  Upload,
   X,
-  Trash2
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo, useRef, useState } from "react";
@@ -67,7 +66,10 @@ export default function ProfilePage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const authUser = useSelector((state: any) => state.auth.user);
-  const { data: profileData } = useGetProfileQuery({}, { skip: !!authUser?.isAdmin });
+  const { data: profileData } = useGetProfileQuery(
+    {},
+    { skip: !!authUser?.isAdmin },
+  );
   const { data: historyData } = useGetLoginHistoryQuery({});
   const [updateProfileApi, { isLoading: isUpdatingUserProfile }] =
     useUpdateProfileMutation();
@@ -78,7 +80,7 @@ export default function ProfilePage() {
     useUpdateAdminProfileMutation();
   const [updateAdminProfileImageApi, { isLoading: isUploadingAdminImage }] =
     useUpdateAdminProfileImageMutation();
-    
+
   const isUpdatingProfile = isUpdatingUserProfile || isUpdatingAdminProfile;
   const isUploadingImage = isUploadingUserImage || isUploadingAdminImage;
   const [changePasswordApi, { isLoading: isChangingPassword }] =
@@ -96,7 +98,7 @@ export default function ProfilePage() {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
 
-  const user = authUser?.isAdmin ? authUser : (profileData?.data || {});
+  const user = authUser?.isAdmin ? authUser : profileData?.data || {};
   const history = historyData?.data || [];
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -158,10 +160,12 @@ export default function ProfilePage() {
           currency: data.currency,
         };
         await updateAdminProfileApi(adminData).unwrap();
-        dispatch(updateUser({ 
-          user_name: data.user_name, 
-          admin_name: data.user_name 
-        } as any)); // update local redux state
+        dispatch(
+          updateUser({
+            user_name: data.user_name,
+            admin_name: data.user_name,
+          } as any),
+        ); // update local redux state
       } else {
         await updateProfileApi(data).unwrap();
       }
@@ -249,14 +253,19 @@ export default function ProfilePage() {
 
   const handleUploadCroppedImage = async () => {
     if (!selectedFile) return;
-    
+
     const formData = new FormData();
-    formData.append(authUser?.isAdmin ? "admin_profile_image" : "user_profile_image", selectedFile);
+    formData.append(
+      authUser?.isAdmin ? "admin_profile_image" : "user_profile_image",
+      selectedFile,
+    );
 
     try {
       if (authUser?.isAdmin) {
         const res = await updateAdminProfileImageApi(formData).unwrap();
-        dispatch(updateUser({ user_profile_image: res.data.admin_profile_image }));
+        dispatch(
+          updateUser({ user_profile_image: res.data.admin_profile_image }),
+        );
       } else {
         await updateProfileImageApi(formData).unwrap();
       }
@@ -365,18 +374,23 @@ export default function ProfilePage() {
           {/* Profile Completion Indicator */}
           <div className="pt-4 border-t border-border text-left">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-semibold text-muted-foreground">Profile Completion</span>
-              <span className="text-xs font-bold text-foreground">{completionScore}%</span>
+              <span className="text-xs font-semibold text-muted-foreground">
+                Profile Completion
+              </span>
+              <span className="text-xs font-bold text-foreground">
+                {completionScore}%
+              </span>
             </div>
             <div className="w-full bg-secondary rounded-full h-2 overflow-hidden">
-              <div 
-                className={`h-full rounded-full transition-all duration-1000 ${completionScore === 100 ? 'bg-emerald-500' : 'bg-primary'}`} 
+              <div
+                className={`h-full rounded-full transition-all duration-1000 ${completionScore === 100 ? "bg-emerald-500" : "bg-primary"}`}
                 style={{ width: `${completionScore}%` }}
               ></div>
             </div>
             {completionScore < 100 && (
               <p className="text-[10px] text-muted-foreground mt-2">
-                Complete your profile to secure your account and personalize your experience.
+                Complete your profile to secure your account and personalize
+                your experience.
               </p>
             )}
           </div>
@@ -612,13 +626,19 @@ export default function ProfilePage() {
             <h3 className="text-base font-bold text-foreground border-b border-border pb-3 flex justify-between items-center">
               <span>Two-Factor Authentication (2FA)</span>
               {user.two_factor_enabled ? (
-                <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] font-bold border border-emerald-500/20">Enabled</span>
+                <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] font-bold border border-emerald-500/20">
+                  Enabled
+                </span>
               ) : (
-                <span className="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-500 text-[10px] font-bold border border-amber-500/20">Disabled</span>
+                <span className="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-500 text-[10px] font-bold border border-amber-500/20">
+                  Disabled
+                </span>
               )}
             </h3>
             <p className="text-xs text-muted-foreground">
-              Protect your account with an extra layer of security. Once configured, you'll be required to enter both your password and an authentication code from your mobile phone in order to sign in.
+              Protect your account with an extra layer of security. Once
+              configured, you'll be required to enter both your password and an
+              authentication code from your mobile phone in order to sign in.
             </p>
             {user.two_factor_enabled ? (
               <button
@@ -626,7 +646,11 @@ export default function ProfilePage() {
                 disabled={isDisabling2FA}
                 className="py-2.5 px-6 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 font-semibold text-xs border border-rose-500/20 transition-colors flex items-center justify-center gap-2"
               >
-                {isDisabling2FA ? <Loader2 className="w-4 h-4 animate-spin" /> : "Disable 2FA"}
+                {isDisabling2FA ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  "Disable 2FA"
+                )}
               </button>
             ) : (
               <button
@@ -637,7 +661,6 @@ export default function ProfilePage() {
               </button>
             )}
           </div>
-
         </div>
       </div>
 
@@ -648,16 +671,25 @@ export default function ProfilePage() {
           Trusted Devices
         </h2>
         <p className="text-xs text-muted-foreground mb-4">
-          Devices that have securely logged into your account. You can revoke access to any unrecognized device.
+          Devices that have securely logged into your account. You can revoke
+          access to any unrecognized device.
         </p>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
               <tr className="bg-secondary/60 text-muted-foreground uppercase text-[10px] font-bold border-b border-border">
-                <th scope="col" className="p-3">Device Name</th>
-                <th scope="col" className="p-3">IP Address</th>
-                <th scope="col" className="p-3">Last Active</th>
-                <th scope="col" className="p-3 text-right">Action</th>
+                <th scope="col" className="p-3">
+                  Device Name
+                </th>
+                <th scope="col" className="p-3">
+                  IP Address
+                </th>
+                <th scope="col" className="p-3">
+                  Last Active
+                </th>
+                <th scope="col" className="p-3 text-right">
+                  Action
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border font-medium">
@@ -711,9 +743,15 @@ export default function ProfilePage() {
           <table className="w-full text-left text-xs border-collapse">
             <thead>
               <tr className="bg-secondary/60 text-muted-foreground uppercase text-[10px] font-bold border-b border-border">
-                <th scope="col" className="p-3">IP Address</th>
-                <th scope="col" className="p-3">Device / Browser</th>
-                <th scope="col" className="p-3 text-right">Timestamp</th>
+                <th scope="col" className="p-3">
+                  IP Address
+                </th>
+                <th scope="col" className="p-3">
+                  Device / Browser
+                </th>
+                <th scope="col" className="p-3 text-right">
+                  Timestamp
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border font-medium">
@@ -752,9 +790,17 @@ export default function ProfilePage() {
       {/* Delete Account Confirmation Modal */}
       {isDeleteModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-          <div role="dialog" aria-modal="true" aria-labelledby="modal-title" className="w-full max-w-md bg-card border border-rose-500/40 p-6 rounded-3xl space-y-4 shadow-2xl">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="modal-title"
+            className="w-full max-w-md bg-card border border-rose-500/40 p-6 rounded-3xl space-y-4 shadow-2xl"
+          >
             <div className="flex items-center justify-between border-b border-border pb-3">
-              <h3 id="modal-title" className="text-base font-bold text-rose-500 flex items-center gap-2">
+              <h3
+                id="modal-title"
+                className="text-base font-bold text-rose-500 flex items-center gap-2"
+              >
                 <ShieldAlert className="w-5 h-5" />
                 Confirm Account Termination
               </h3>
@@ -798,9 +844,17 @@ export default function ProfilePage() {
       {/* Avatar Crop Modal */}
       {isCropModalOpen && previewUrl && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-          <div role="dialog" aria-modal="true" aria-labelledby="crop-modal-title" className="w-full max-w-sm bg-card border border-border p-6 rounded-3xl space-y-4 shadow-2xl">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="crop-modal-title"
+            className="w-full max-w-sm bg-card border border-border p-6 rounded-3xl space-y-4 shadow-2xl"
+          >
             <div className="flex items-center justify-between border-b border-border pb-3">
-              <h3 id="crop-modal-title" className="text-base font-bold text-foreground">
+              <h3
+                id="crop-modal-title"
+                className="text-base font-bold text-foreground"
+              >
                 Adjust Avatar
               </h3>
               <button
@@ -812,10 +866,17 @@ export default function ProfilePage() {
             </div>
 
             <div className="relative w-full aspect-square bg-secondary rounded-2xl overflow-hidden flex items-center justify-center">
-              <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
-              <div className="absolute inset-0 ring-4 ring-primary/50 rounded-full pointer-events-none" style={{ margin: '10%' }}></div>
+              <img
+                src={previewUrl}
+                alt="Preview"
+                className="w-full h-full object-cover"
+              />
+              <div
+                className="absolute inset-0 ring-4 ring-primary/50 rounded-full pointer-events-none"
+                style={{ margin: "10%" }}
+              ></div>
             </div>
-            
+
             <p className="text-[10px] text-muted-foreground text-center">
               Drag or pinch to adjust your avatar (simulated for native upload).
             </p>
@@ -849,7 +910,11 @@ export default function ProfilePage() {
       {/* 2FA Setup Modal */}
       {is2FaModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-          <div role="dialog" aria-modal="true" className="w-full max-w-md bg-card border border-border p-6 rounded-3xl space-y-4 shadow-2xl">
+          <div
+            role="dialog"
+            aria-modal="true"
+            className="w-full max-w-md bg-card border border-border p-6 rounded-3xl space-y-4 shadow-2xl"
+          >
             <div className="flex items-center justify-between border-b border-border pb-3">
               <h3 className="text-base font-bold text-foreground">
                 Two-Factor Authentication Setup
@@ -865,11 +930,16 @@ export default function ProfilePage() {
             {!recoveryCodes ? (
               <div className="space-y-4 flex flex-col items-center text-center">
                 <p className="text-xs text-muted-foreground">
-                  Scan the QR code below using an authenticator app (like Google Authenticator or Authy).
+                  Scan the QR code below using an authenticator app (like Google
+                  Authenticator or Authy).
                 </p>
                 {qrCodeUrl && (
                   <div className="bg-white p-2 rounded-xl">
-                    <img src={qrCodeUrl} alt="2FA QR Code" className="w-40 h-40" />
+                    <img
+                      src={qrCodeUrl}
+                      alt="2FA QR Code"
+                      className="w-40 h-40"
+                    />
                   </div>
                 )}
                 <div className="w-full space-y-2">
@@ -890,7 +960,11 @@ export default function ProfilePage() {
                   disabled={isVerifying2FA}
                   className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-xs shadow-md hover:bg-primary/90 flex items-center justify-center gap-2"
                 >
-                  {isVerifying2FA ? <Loader2 className="w-4 h-4 animate-spin" /> : "Verify and Enable"}
+                  {isVerifying2FA ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    "Verify and Enable"
+                  )}
                 </button>
               </div>
             ) : (
@@ -898,13 +972,19 @@ export default function ProfilePage() {
                 <div className="w-12 h-12 rounded-full bg-emerald-500/20 text-emerald-500 flex items-center justify-center mx-auto">
                   <CheckCircle2 className="w-6 h-6" />
                 </div>
-                <h4 className="text-sm font-bold text-foreground">2FA Enabled Successfully!</h4>
+                <h4 className="text-sm font-bold text-foreground">
+                  2FA Enabled Successfully!
+                </h4>
                 <p className="text-xs text-muted-foreground">
-                  Save these recovery codes in a secure place. You can use them to log in if you lose access to your authenticator app.
+                  Save these recovery codes in a secure place. You can use them
+                  to log in if you lose access to your authenticator app.
                 </p>
                 <div className="grid grid-cols-2 gap-2 bg-secondary/50 p-4 rounded-xl text-left">
                   {recoveryCodes.map((code, idx) => (
-                    <div key={idx} className="font-mono text-xs text-foreground tracking-widest">
+                    <div
+                      key={idx}
+                      className="font-mono text-xs text-foreground tracking-widest"
+                    >
                       {code}
                     </div>
                   ))}

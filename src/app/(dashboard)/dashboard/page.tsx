@@ -2,75 +2,93 @@
 
 import { useCurrency } from "@/hooks/use-currency";
 import { formatDate } from "@/lib/utils";
-import { useGetTransactionsQuery } from "@/services/transaction-api";
-import { useGetCurrentNetWorthQuery } from "@/services/net-worth-api";
-import { useGetInstallmentsQuery } from "@/services/installment-api";
 import { useGetBillsQuery } from "@/services/bill-api";
 import { useGetGoalsQuery } from "@/services/goal-api";
+import { useGetInstallmentsQuery } from "@/services/installment-api";
+import { useGetCurrentNetWorthQuery } from "@/services/net-worth-api";
+import { useGetTransactionsQuery } from "@/services/transaction-api";
 
 import {
   ArrowDownRight,
   ArrowUpRight,
-  ChevronRight,
+  CalendarDays,
+  CircleDollarSign,
+  CreditCard,
+  FileCheck,
+  PieChart,
   Plus,
+  Target,
   TrendingDown,
   TrendingUp,
   Wallet,
-  CalendarDays,
-  Target,
-  FileCheck,
-  CreditCard,
-  CircleDollarSign,
-  PieChart
 } from "lucide-react";
 import Link from "next/link";
 import { useMemo } from "react";
 
 export default function DashboardPage() {
   const { formatCurrency } = useCurrency();
-  
+
   // Data Fetching
   const { data: netWorthData } = useGetCurrentNetWorthQuery({});
-  const { data: monthlyTxData } = useGetTransactionsQuery({ dateRange: "thisMonth", limit: 1000 });
-  const { data: installmentsData } = useGetInstallmentsQuery({ status: "active" });
+  const { data: monthlyTxData } = useGetTransactionsQuery({
+    dateRange: "thisMonth",
+    limit: 1000,
+  });
+  const { data: installmentsData } = useGetInstallmentsQuery({
+    status: "active",
+  });
   const { data: billsData } = useGetBillsQuery({});
   const { data: goalsData } = useGetGoalsQuery({});
 
-  const netWorthInfo = netWorthData?.data || { net_worth: 0, total_assets: 0, total_liabilities: 0, breakdown: { assets: {}, liabilities: {} } };
+  const netWorthInfo = netWorthData?.data || {
+    net_worth: 0,
+    total_assets: 0,
+    total_liabilities: 0,
+    breakdown: { assets: {}, liabilities: {} },
+  };
   const monthlyTransactions = monthlyTxData?.data || [];
   const installments = installmentsData?.data || [];
   const bills = billsData?.data || [];
   const goals = goalsData?.data || [];
 
   // Cashflow Calculations
-  const monthlyIncome = useMemo(() =>
-    monthlyTransactions
-      .filter((tx: any) => tx.type === "income" || tx.type === "refund")
-      .reduce((sum: number, tx: any) => sum + (tx.amount || 0), 0),
-  [monthlyTransactions]);
+  const monthlyIncome = useMemo(
+    () =>
+      monthlyTransactions
+        .filter((tx: any) => tx.type === "income" || tx.type === "refund")
+        .reduce((sum: number, tx: any) => sum + (tx.amount || 0), 0),
+    [monthlyTransactions],
+  );
 
-  const monthlyExpense = useMemo(() =>
-    monthlyTransactions
-      .filter((tx: any) => tx.type === "expense")
-      .reduce((sum: number, tx: any) => sum + (tx.amount || 0), 0),
-  [monthlyTransactions]);
+  const monthlyExpense = useMemo(
+    () =>
+      monthlyTransactions
+        .filter((tx: any) => tx.type === "expense")
+        .reduce((sum: number, tx: any) => sum + (tx.amount || 0), 0),
+    [monthlyTransactions],
+  );
 
-  const savingsRate = monthlyIncome > 0 
-    ? Math.max(0, Math.round(((monthlyIncome - monthlyExpense) / monthlyIncome) * 100)) 
-    : 0;
+  const savingsRate =
+    monthlyIncome > 0
+      ? Math.max(
+          0,
+          Math.round(((monthlyIncome - monthlyExpense) / monthlyIncome) * 100),
+        )
+      : 0;
 
   // Upcoming Reminders Calculations
   const upcomingBills = useMemo(() => {
     return bills
       .filter((b: any) => b.status !== "paid")
-      .sort((a: any, b: any) => new Date(a.due_date).getTime() - new Date(b.due_date).getTime())
+      .sort(
+        (a: any, b: any) =>
+          new Date(a.due_date).getTime() - new Date(b.due_date).getTime(),
+      )
       .slice(0, 3);
   }, [bills]);
 
   const upcomingEMIs = useMemo(() => {
-    return installments
-      .filter((i: any) => !i.is_completed)
-      .slice(0, 2); // EMIs are usually fixed per month, just show top 2 active
+    return installments.filter((i: any) => !i.is_completed).slice(0, 2); // EMIs are usually fixed per month, just show top 2 active
   }, [installments]);
 
   const nearCompletionGoals = useMemo(() => {
@@ -116,7 +134,9 @@ export default function DashboardPage() {
           </div>
           <div className="flex items-center gap-2 text-primary">
             <Wallet className="w-5 h-5" />
-            <span className="text-xs font-bold uppercase tracking-wider">Net Worth</span>
+            <span className="text-xs font-bold uppercase tracking-wider">
+              Net Worth
+            </span>
           </div>
           <div>
             <p className="text-3xl font-black text-foreground">
@@ -137,14 +157,17 @@ export default function DashboardPage() {
         <div className="glass-card p-5 rounded-3xl space-y-3 relative overflow-hidden border border-border hover:-translate-y-1 hover:shadow-xl hover:border-emerald-500/30 transition-all duration-300 group">
           <div className="flex items-center gap-2 text-emerald-500">
             <TrendingUp className="w-5 h-5" />
-            <span className="text-xs font-bold uppercase tracking-wider">This Month In</span>
+            <span className="text-xs font-bold uppercase tracking-wider">
+              This Month In
+            </span>
           </div>
           <div>
             <p className="text-3xl font-black text-foreground">
               {formatCurrency(monthlyIncome)}
             </p>
             <p className="text-[11px] font-medium text-muted-foreground mt-2 flex items-center gap-1">
-              <ArrowUpRight className="w-3.5 h-3.5 text-emerald-500" /> All Income Streams
+              <ArrowUpRight className="w-3.5 h-3.5 text-emerald-500" /> All
+              Income Streams
             </p>
           </div>
         </div>
@@ -153,29 +176,50 @@ export default function DashboardPage() {
         <div className="glass-card p-5 rounded-3xl space-y-3 relative overflow-hidden border border-border hover:-translate-y-1 hover:shadow-xl hover:border-rose-500/30 transition-all duration-300 group">
           <div className="flex items-center gap-2 text-rose-500">
             <TrendingDown className="w-5 h-5" />
-            <span className="text-xs font-bold uppercase tracking-wider">This Month Out</span>
+            <span className="text-xs font-bold uppercase tracking-wider">
+              This Month Out
+            </span>
           </div>
           <div>
             <p className="text-3xl font-black text-foreground">
               {formatCurrency(monthlyExpense)}
             </p>
             <p className="text-[11px] font-medium text-muted-foreground mt-2 flex items-center gap-1">
-              <ArrowDownRight className="w-3.5 h-3.5 text-rose-500" /> All Expenses & Bills
+              <ArrowDownRight className="w-3.5 h-3.5 text-rose-500" /> All
+              Expenses & Bills
             </p>
           </div>
         </div>
 
         {/* Savings Rate */}
-        <div className="glass-card p-5 rounded-3xl space-y-3 relative overflow-hidden border border-border bg-gradient-to-br from-emerald-500/5 to-transparent hover:-translate-y-1 hover:shadow-xl hover:border-emerald-500/30 transition-all duration-300 group">
+        <div className="glass-card p-5 rounded-3xl space-y-3 relative overflow-hidden border border-border bg-linear-to-br from-emerald-500/5 to-transparent hover:-translate-y-1 hover:shadow-xl hover:border-emerald-500/30 transition-all duration-300 group">
           <div className="flex items-center gap-2 text-emerald-500">
             <PieChart className="w-5 h-5" />
-            <span className="text-xs font-bold uppercase tracking-wider">Savings Rate</span>
+            <span className="text-xs font-bold uppercase tracking-wider">
+              Savings Rate
+            </span>
           </div>
           <div className="flex items-center gap-4">
             <div className="relative w-14 h-14 shrink-0 flex items-center justify-center">
-              <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeWidth="4" className="text-secondary" />
-                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeWidth="4" strokeDasharray={`${savingsRate}, 100`} className="text-emerald-500" />
+              <svg
+                className="w-full h-full transform -rotate-90"
+                viewBox="0 0 36 36"
+              >
+                <path
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                  className="text-secondary"
+                />
+                <path
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                  strokeDasharray={`${savingsRate}, 100`}
+                  className="text-emerald-500"
+                />
               </svg>
               <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-foreground">
                 {savingsRate}%
@@ -183,7 +227,11 @@ export default function DashboardPage() {
             </div>
             <div>
               <p className="text-[11px] font-medium text-muted-foreground">
-                You saved <strong className="text-foreground">{formatCurrency(Math.max(0, monthlyIncome - monthlyExpense))}</strong> this month.
+                You saved{" "}
+                <strong className="text-foreground">
+                  {formatCurrency(Math.max(0, monthlyIncome - monthlyExpense))}
+                </strong>{" "}
+                this month.
               </p>
             </div>
           </div>
@@ -191,31 +239,64 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
         {/* Quick Links (Left 2/3) */}
         <div className="lg:col-span-2 space-y-6">
           <div className="glass-card p-6 rounded-3xl border border-border">
-            <h2 className="text-base font-bold text-foreground mb-4">Portfolio Overview</h2>
+            <h2 className="text-base font-bold text-foreground mb-4">
+              Portfolio Overview
+            </h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <Link href="/accounts" className="p-4 rounded-2xl bg-secondary/50 border border-border hover:border-emerald-500/50 hover:bg-emerald-500/5 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 group">
+              <Link
+                href="/accounts"
+                className="p-4 rounded-2xl bg-secondary/50 border border-border hover:border-emerald-500/50 hover:bg-emerald-500/5 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 group"
+              >
                 <Wallet className="w-5 h-5 text-emerald-500 mb-2 group-hover:scale-110 transition-transform" />
-                <p className="text-xs text-muted-foreground font-semibold">Cash</p>
-                <p className="text-sm font-bold text-foreground">{formatCurrency(netWorthInfo.breakdown.assets.cash)}</p>
+                <p className="text-xs text-muted-foreground font-semibold">
+                  Cash
+                </p>
+                <p className="text-sm font-bold text-foreground">
+                  {formatCurrency(netWorthInfo.breakdown.assets.cash)}
+                </p>
               </Link>
-              <Link href="/investments" className="p-4 rounded-2xl bg-secondary/50 border border-border hover:border-blue-500/50 hover:bg-blue-500/5 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 group">
+              <Link
+                href="/investments"
+                className="p-4 rounded-2xl bg-secondary/50 border border-border hover:border-blue-500/50 hover:bg-blue-500/5 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 group"
+              >
                 <TrendingUp className="w-5 h-5 text-blue-500 mb-2 group-hover:scale-110 transition-transform" />
-                <p className="text-xs text-muted-foreground font-semibold">Investments</p>
-                <p className="text-sm font-bold text-foreground">{formatCurrency(netWorthInfo.breakdown.assets.investments)}</p>
+                <p className="text-xs text-muted-foreground font-semibold">
+                  Investments
+                </p>
+                <p className="text-sm font-bold text-foreground">
+                  {formatCurrency(netWorthInfo.breakdown.assets.investments)}
+                </p>
               </Link>
-              <Link href="/assets" className="p-4 rounded-2xl bg-secondary/50 border border-border hover:border-purple-500/50 hover:bg-purple-500/5 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 group">
+              <Link
+                href="/assets"
+                className="p-4 rounded-2xl bg-secondary/50 border border-border hover:border-purple-500/50 hover:bg-purple-500/5 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 group"
+              >
                 <CircleDollarSign className="w-5 h-5 text-purple-500 mb-2 group-hover:scale-110 transition-transform" />
-                <p className="text-xs text-muted-foreground font-semibold">Physical Assets</p>
-                <p className="text-sm font-bold text-foreground">{formatCurrency(netWorthInfo.breakdown.assets.physical_assets)}</p>
+                <p className="text-xs text-muted-foreground font-semibold">
+                  Physical Assets
+                </p>
+                <p className="text-sm font-bold text-foreground">
+                  {formatCurrency(
+                    netWorthInfo.breakdown.assets.physical_assets,
+                  )}
+                </p>
               </Link>
-              <Link href="/debts" className="p-4 rounded-2xl bg-secondary/50 border border-border hover:border-rose-500/50 hover:bg-rose-500/5 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 group">
+              <Link
+                href="/debts"
+                className="p-4 rounded-2xl bg-secondary/50 border border-border hover:border-rose-500/50 hover:bg-rose-500/5 hover:-translate-y-1 hover:shadow-lg transition-all duration-300 group"
+              >
                 <CreditCard className="w-5 h-5 text-rose-500 mb-2 group-hover:scale-110 transition-transform" />
-                <p className="text-xs text-muted-foreground font-semibold">Debt (Owed)</p>
-                <p className="text-sm font-bold text-foreground">{formatCurrency(netWorthInfo.breakdown.liabilities.money_borrowed)}</p>
+                <p className="text-xs text-muted-foreground font-semibold">
+                  Debt (Owed)
+                </p>
+                <p className="text-sm font-bold text-foreground">
+                  {formatCurrency(
+                    netWorthInfo.breakdown.liabilities.money_borrowed,
+                  )}
+                </p>
               </Link>
             </div>
           </div>
@@ -233,81 +314,129 @@ export default function DashboardPage() {
           {/* Bills */}
           <div className="space-y-3">
             <h3 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex justify-between items-center">
-              Upcoming Bills <Link href="/bills" className="text-primary hover:underline">All</Link>
+              Upcoming Bills{" "}
+              <Link href="/bills" className="text-primary hover:underline">
+                All
+              </Link>
             </h3>
             {upcomingBills.length > 0 ? (
               upcomingBills.map((bill: any) => (
-                <div key={bill._id} className="flex items-center justify-between p-3 rounded-2xl bg-rose-500/5 border border-rose-500/10">
+                <div
+                  key={bill._id}
+                  className="flex items-center justify-between p-3 rounded-2xl bg-rose-500/5 border border-rose-500/10"
+                >
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-full bg-rose-500/10 flex items-center justify-center">
                       <FileCheck className="w-4 h-4 text-rose-500" />
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-foreground">{bill.title}</p>
-                      <p className="text-[10px] text-rose-500 font-semibold">Due: {formatDate(bill.due_date)}</p>
+                      <p className="text-xs font-bold text-foreground">
+                        {bill.title}
+                      </p>
+                      <p className="text-[10px] text-rose-500 font-semibold">
+                        Due: {formatDate(bill.due_date)}
+                      </p>
                     </div>
                   </div>
-                  <span className="text-sm font-black text-rose-500">{formatCurrency(bill.amount)}</span>
+                  <span className="text-sm font-black text-rose-500">
+                    {formatCurrency(bill.amount)}
+                  </span>
                 </div>
               ))
             ) : (
-              <p className="text-[11px] text-muted-foreground bg-secondary/30 p-3 rounded-xl border border-border">No upcoming bills.</p>
+              <p className="text-[11px] text-muted-foreground bg-secondary/30 p-3 rounded-xl border border-border">
+                No upcoming bills.
+              </p>
             )}
           </div>
 
           {/* EMIs */}
           <div className="space-y-3">
             <h3 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex justify-between items-center">
-              Active EMIs <Link href="/installments" className="text-primary hover:underline">All</Link>
+              Active EMIs{" "}
+              <Link
+                href="/installments"
+                className="text-primary hover:underline"
+              >
+                All
+              </Link>
             </h3>
             {upcomingEMIs.length > 0 ? (
               upcomingEMIs.map((emi: any) => (
-                <div key={emi._id} className="flex items-center justify-between p-3 rounded-2xl bg-orange-500/5 border border-orange-500/10">
+                <div
+                  key={emi._id}
+                  className="flex items-center justify-between p-3 rounded-2xl bg-orange-500/5 border border-orange-500/10"
+                >
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-full bg-orange-500/10 flex items-center justify-center">
                       <CreditCard className="w-4 h-4 text-orange-500" />
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-foreground">{emi.title}</p>
-                      <p className="text-[10px] text-orange-500 font-semibold">{emi.months_paid}/{emi.total_months} months paid</p>
+                      <p className="text-xs font-bold text-foreground">
+                        {emi.title}
+                      </p>
+                      <p className="text-[10px] text-orange-500 font-semibold">
+                        {emi.months_paid}/{emi.total_months} months paid
+                      </p>
                     </div>
                   </div>
-                  <span className="text-sm font-black text-orange-500">{formatCurrency(emi.monthly_amount)}</span>
+                  <span className="text-sm font-black text-orange-500">
+                    {formatCurrency(emi.monthly_amount)}
+                  </span>
                 </div>
               ))
             ) : (
-              <p className="text-[11px] text-muted-foreground bg-secondary/30 p-3 rounded-xl border border-border">No active EMIs.</p>
+              <p className="text-[11px] text-muted-foreground bg-secondary/30 p-3 rounded-xl border border-border">
+                No active EMIs.
+              </p>
             )}
           </div>
 
           {/* Goals */}
           <div className="space-y-3">
             <h3 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex justify-between items-center">
-              Top Goals <Link href="/goals" className="text-primary hover:underline">All</Link>
+              Top Goals{" "}
+              <Link href="/goals" className="text-primary hover:underline">
+                All
+              </Link>
             </h3>
             {nearCompletionGoals.length > 0 ? (
               nearCompletionGoals.map((goal: any) => {
-                const percent = Math.min(100, (goal.current_amount / goal.target_amount) * 100);
+                const percent = Math.min(
+                  100,
+                  (goal.current_amount / goal.target_amount) * 100,
+                );
                 return (
-                  <div key={goal._id} className="p-3 rounded-2xl bg-emerald-500/5 border border-emerald-500/10 space-y-2">
+                  <div
+                    key={goal._id}
+                    className="p-3 rounded-2xl bg-emerald-500/5 border border-emerald-500/10 space-y-2"
+                  >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <Target className="w-4 h-4 text-emerald-500" />
-                        <span className="text-xs font-bold text-foreground">{goal.title}</span>
+                        <span className="text-xs font-bold text-foreground">
+                          {goal.title}
+                        </span>
                       </div>
-                      <span className="text-xs font-bold text-emerald-500">{Math.round(percent)}%</span>
+                      <span className="text-xs font-bold text-emerald-500">
+                        {Math.round(percent)}%
+                      </span>
                     </div>
                     <div className="w-full h-1.5 bg-emerald-500/10 rounded-full overflow-hidden">
-                      <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${percent}%` }} />
+                      <div
+                        className="h-full bg-emerald-500 rounded-full"
+                        style={{ width: `${percent}%` }}
+                      />
                     </div>
                   </div>
                 );
               })
             ) : (
-              <p className="text-[11px] text-muted-foreground bg-secondary/30 p-3 rounded-xl border border-border">No active goals.</p>
+              <p className="text-[11px] text-muted-foreground bg-secondary/30 p-3 rounded-xl border border-border">
+                No active goals.
+              </p>
             )}
           </div>
-
         </div>
       </div>
     </div>

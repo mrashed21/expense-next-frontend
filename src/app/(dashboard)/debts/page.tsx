@@ -1,5 +1,6 @@
 "use client";
 
+import { ConfirmDialog } from "@/components/custom/confirm-dialog";
 import FormSelect from "@/components/custom/form-select";
 import { useCurrency } from "@/hooks/use-currency";
 import { formatDate } from "@/lib/utils";
@@ -11,12 +12,22 @@ import {
   useUpdateDebtMutation,
 } from "@/services/debt-api";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { HandCoins, Loader2, Pencil, Plus, Trash2, X, Search, CreditCard, Clock, CheckCircle2 } from "lucide-react";
+import {
+  CheckCircle2,
+  Clock,
+  CreditCard,
+  HandCoins,
+  Loader2,
+  Pencil,
+  Plus,
+  Search,
+  Trash2,
+  X,
+} from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { ConfirmDialog } from "@/components/custom/confirm-dialog";
 
 const debtTypes = [
   { label: "Lent (Money owed to you)", value: "lent" },
@@ -45,11 +56,11 @@ export default function DebtsPage() {
   const { formatCurrency } = useCurrency();
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  
+
   const { data: debtsData, isLoading: debtsLoading } = useGetDebtsQuery({
     search: searchTerm,
   });
-  
+
   const [createDebtApi, { isLoading: isCreating }] = useCreateDebtMutation();
   const [updateDebtApi, { isLoading: isUpdating }] = useUpdateDebtMutation();
   const [deleteDebtApi] = useDeleteDebtMutation();
@@ -60,7 +71,11 @@ export default function DebtsPage() {
   const [paymentItem, setPaymentItem] = useState<any>(null);
 
   const debts = debtsData?.data || [];
-  const metrics = debtsData?.meta?.metrics || { totalLent: 0, totalBorrowed: 0, netDebt: 0 };
+  const metrics = debtsData?.meta?.metrics || {
+    totalLent: 0,
+    totalBorrowed: 0,
+    netDebt: 0,
+  };
 
   const {
     register: registerForm,
@@ -71,7 +86,14 @@ export default function DebtsPage() {
     formState: { errors },
   } = useForm<DebtFormValues>({
     resolver: zodResolver(debtSchema),
-    defaultValues: { amount: 0, person_name: "", type: "", interest_rate: 0, due_date: "", notes: "" },
+    defaultValues: {
+      amount: 0,
+      person_name: "",
+      type: "",
+      interest_rate: 0,
+      due_date: "",
+      notes: "",
+    },
   });
 
   const {
@@ -92,7 +114,7 @@ export default function DebtsPage() {
       } else {
         delete payload.due_date;
       }
-      
+
       await createDebtApi(payload).unwrap();
       toast.success("Debt recorded successfully!");
       setIsAddOpen(false);
@@ -109,7 +131,9 @@ export default function DebtsPage() {
       type: item.type,
       amount: item.amount,
       interest_rate: item.interest_rate || 0,
-      due_date: item.due_date ? new Date(item.due_date).toISOString().split('T')[0] : "",
+      due_date: item.due_date
+        ? new Date(item.due_date).toISOString().split("T")[0]
+        : "",
       notes: item.notes || "",
     });
   };
@@ -151,8 +175,8 @@ export default function DebtsPage() {
     setPaymentItem(item);
     resetPayment({
       amount: item.true_remaining_amount,
-      date: new Date().toISOString().split('T')[0],
-      notes: ""
+      date: new Date().toISOString().split("T")[0],
+      notes: "",
     });
   };
 
@@ -198,7 +222,10 @@ export default function DebtsPage() {
             />
           </div>
           <button
-            onClick={() => { reset(); setIsAddOpen(true); }}
+            onClick={() => {
+              reset();
+              setIsAddOpen(true);
+            }}
             className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-primary-foreground font-semibold text-xs shadow-md shadow-primary/20 hover:bg-primary/90 transition-colors shrink-0"
           >
             <Plus className="w-4 h-4" />
@@ -229,8 +256,11 @@ export default function DebtsPage() {
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
             Net Debt Status
           </p>
-          <p className={`text-2xl font-black mt-1 ${metrics.netDebt >= 0 ? 'text-emerald-500' : 'text-destructive'}`}>
-            {metrics.netDebt > 0 ? '+' : ''}{formatCurrency(metrics.netDebt)}
+          <p
+            className={`text-2xl font-black mt-1 ${metrics.netDebt >= 0 ? "text-emerald-500" : "text-destructive"}`}
+          >
+            {metrics.netDebt > 0 ? "+" : ""}
+            {formatCurrency(metrics.netDebt)}
           </p>
         </div>
       </div>
@@ -241,12 +271,24 @@ export default function DebtsPage() {
           <table className="w-full text-left text-sm">
             <thead className="sticky top-0 z-10 bg-secondary/95 backdrop-blur-md text-muted-foreground border-b border-border">
               <tr>
-                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider">Details</th>
-                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">Principal</th>
-                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">Interest</th>
-                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">Owed/Remaining</th>
-                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-center">Status</th>
-                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">Actions</th>
+                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider">
+                  Details
+                </th>
+                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">
+                  Principal
+                </th>
+                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">
+                  Interest
+                </th>
+                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">
+                  Owed/Remaining
+                </th>
+                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-center">
+                  Status
+                </th>
+                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -263,8 +305,12 @@ export default function DebtsPage() {
                       <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
                         <HandCoins className="w-6 h-6 text-primary" />
                       </div>
-                      <p className="text-sm font-semibold text-foreground">No Debts Found</p>
-                      <p className="text-xs text-muted-foreground max-w-xs">Record who owes you money or your outstanding loans.</p>
+                      <p className="text-sm font-semibold text-foreground">
+                        No Debts Found
+                      </p>
+                      <p className="text-xs text-muted-foreground max-w-xs">
+                        Record who owes you money or your outstanding loans.
+                      </p>
                     </div>
                   </td>
                 </tr>
@@ -274,21 +320,31 @@ export default function DebtsPage() {
                   const isLent = debt.type === "lent";
 
                   return (
-                    <tr key={debt._id} className="hover:bg-secondary/30 transition-colors">
+                    <tr
+                      key={debt._id}
+                      className="hover:bg-secondary/30 transition-colors"
+                    >
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-xs uppercase shadow-sm ${isLent ? 'bg-emerald-500/10 text-emerald-500' : 'bg-destructive/10 text-destructive'}`}>
+                          <div
+                            className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-xs uppercase shadow-sm ${isLent ? "bg-emerald-500/10 text-emerald-500" : "bg-destructive/10 text-destructive"}`}
+                          >
                             {debt.person_name.substring(0, 2)}
                           </div>
                           <div>
-                            <p className="font-bold text-foreground line-clamp-1">{debt.person_name}</p>
+                            <p className="font-bold text-foreground line-clamp-1">
+                              {debt.person_name}
+                            </p>
                             <div className="flex items-center gap-2">
-                              <span className={`text-[10px] uppercase font-semibold ${isLent ? 'text-emerald-500' : 'text-destructive'}`}>
+                              <span
+                                className={`text-[10px] uppercase font-semibold ${isLent ? "text-emerald-500" : "text-destructive"}`}
+                              >
                                 {debt.type}
                               </span>
                               {debt.due_date && (
                                 <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
-                                  <Clock className="w-3 h-3" /> {formatDate(debt.due_date)}
+                                  <Clock className="w-3 h-3" />{" "}
+                                  {formatDate(debt.due_date)}
                                 </span>
                               )}
                             </div>
@@ -296,18 +352,26 @@ export default function DebtsPage() {
                         </div>
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <p className="font-semibold text-foreground">{formatCurrency(debt.amount)}</p>
+                        <p className="font-semibold text-foreground">
+                          {formatCurrency(debt.amount)}
+                        </p>
                       </td>
                       <td className="px-6 py-4 text-right">
                         <p className="font-semibold text-foreground">
-                          {debt.interest_rate > 0 ? `${debt.interest_rate}%` : '-'}
+                          {debt.interest_rate > 0
+                            ? `${debt.interest_rate}%`
+                            : "-"}
                         </p>
                         {debt.accrued_interest > 0 && (
-                          <p className="text-[10px] text-muted-foreground">+{formatCurrency(debt.accrued_interest)}</p>
+                          <p className="text-[10px] text-muted-foreground">
+                            +{formatCurrency(debt.accrued_interest)}
+                          </p>
                         )}
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <p className={`font-bold ${isPaid ? 'text-muted-foreground line-through' : 'text-foreground'}`}>
+                        <p
+                          className={`font-bold ${isPaid ? "text-muted-foreground line-through" : "text-foreground"}`}
+                        >
                           {formatCurrency(debt.true_remaining_amount)}
                         </p>
                       </td>
@@ -365,13 +429,19 @@ export default function DebtsPage() {
       {/* Form Modal (Shared Add/Edit) */}
       {(isAddOpen || editItem) && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-          <div role="dialog" className="w-full max-w-md bg-card border border-border p-6 rounded-3xl space-y-4 shadow-2xl overflow-y-auto max-h-[90vh]">
+          <div
+            role="dialog"
+            className="w-full max-w-md bg-card border border-border p-6 rounded-3xl space-y-4 shadow-2xl overflow-y-auto max-h-[90vh]"
+          >
             <div className="flex items-center justify-between border-b border-border pb-3 sticky top-0 bg-card z-10">
               <h3 className="text-base font-bold text-foreground">
                 {editItem ? "Edit Debt" : "Add New Debt"}
               </h3>
               <button
-                onClick={() => { setIsAddOpen(false); setEditItem(null); }}
+                onClick={() => {
+                  setIsAddOpen(false);
+                  setEditItem(null);
+                }}
                 className="text-muted-foreground hover:text-foreground"
               >
                 <X className="w-5 h-5" />
@@ -383,13 +453,19 @@ export default function DebtsPage() {
               className="space-y-4"
             >
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">Person or Entity Name</label>
+                <label className="text-xs font-semibold text-foreground">
+                  Person or Entity Name
+                </label>
                 <input
                   {...registerForm("person_name")}
                   placeholder="e.g. John Doe, Bank of America"
                   className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                 />
-                {errors.person_name && <p className="text-[10px] text-destructive">{errors.person_name.message}</p>}
+                {errors.person_name && (
+                  <p className="text-[10px] text-destructive">
+                    {errors.person_name.message}
+                  </p>
+                )}
               </div>
 
               <div className="space-y-1">
@@ -406,17 +482,25 @@ export default function DebtsPage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">Principal Amount</label>
+                  <label className="text-xs font-semibold text-foreground">
+                    Principal Amount
+                  </label>
                   <input
                     {...registerForm("amount", { valueAsNumber: true })}
                     type="number"
                     step="0.01"
                     className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                   />
-                  {errors.amount && <p className="text-[10px] text-destructive">{errors.amount.message}</p>}
+                  {errors.amount && (
+                    <p className="text-[10px] text-destructive">
+                      {errors.amount.message}
+                    </p>
+                  )}
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">Interest Rate (% APY)</label>
+                  <label className="text-xs font-semibold text-foreground">
+                    Interest Rate (% APY)
+                  </label>
                   <input
                     {...registerForm("interest_rate", { valueAsNumber: true })}
                     type="number"
@@ -426,9 +510,11 @@ export default function DebtsPage() {
                   />
                 </div>
               </div>
-              
+
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">Due Date (Optional)</label>
+                <label className="text-xs font-semibold text-foreground">
+                  Due Date (Optional)
+                </label>
                 <input
                   {...registerForm("due_date")}
                   type="date"
@@ -437,7 +523,9 @@ export default function DebtsPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">Notes (Optional)</label>
+                <label className="text-xs font-semibold text-foreground">
+                  Notes (Optional)
+                </label>
                 <input
                   {...registerForm("notes")}
                   className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
@@ -451,8 +539,10 @@ export default function DebtsPage() {
               >
                 {isCreating || isUpdating ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
+                ) : editItem ? (
+                  "Update Debt"
                 ) : (
-                  editItem ? "Update Debt" : "Save Debt"
+                  "Save Debt"
                 )}
               </button>
             </form>
@@ -463,7 +553,10 @@ export default function DebtsPage() {
       {/* Payment Modal */}
       {paymentItem && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-          <div role="dialog" className="w-full max-w-sm bg-card border border-border p-6 rounded-3xl space-y-4 shadow-2xl">
+          <div
+            role="dialog"
+            className="w-full max-w-sm bg-card border border-border p-6 rounded-3xl space-y-4 shadow-2xl"
+          >
             <div className="flex items-center justify-between border-b border-border pb-3">
               <h3 className="text-base font-bold text-foreground">
                 Log Payment
@@ -475,10 +568,17 @@ export default function DebtsPage() {
                 <X className="w-5 h-5" />
               </button>
             </div>
-            
+
             <div className="text-xs text-muted-foreground">
-              Recording payment for <span className="font-bold text-foreground">{paymentItem.person_name}</span>. 
-              Remaining balance: <span className="font-bold text-foreground">{formatCurrency(paymentItem.true_remaining_amount)}</span>.
+              Recording payment for{" "}
+              <span className="font-bold text-foreground">
+                {paymentItem.person_name}
+              </span>
+              . Remaining balance:{" "}
+              <span className="font-bold text-foreground">
+                {formatCurrency(paymentItem.true_remaining_amount)}
+              </span>
+              .
             </div>
 
             <form
@@ -486,7 +586,9 @@ export default function DebtsPage() {
               className="space-y-4"
             >
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">Payment Amount</label>
+                <label className="text-xs font-semibold text-foreground">
+                  Payment Amount
+                </label>
                 <input
                   {...registerPayment("amount", { valueAsNumber: true })}
                   type="number"
@@ -494,11 +596,17 @@ export default function DebtsPage() {
                   max={paymentItem.true_remaining_amount}
                   className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                 />
-                {paymentErrors.amount && <p className="text-[10px] text-destructive">{paymentErrors.amount.message}</p>}
+                {paymentErrors.amount && (
+                  <p className="text-[10px] text-destructive">
+                    {paymentErrors.amount.message}
+                  </p>
+                )}
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">Payment Date</label>
+                <label className="text-xs font-semibold text-foreground">
+                  Payment Date
+                </label>
                 <input
                   {...registerPayment("date")}
                   type="date"
@@ -507,7 +615,9 @@ export default function DebtsPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">Notes (Optional)</label>
+                <label className="text-xs font-semibold text-foreground">
+                  Notes (Optional)
+                </label>
                 <input
                   {...registerPayment("notes")}
                   className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"

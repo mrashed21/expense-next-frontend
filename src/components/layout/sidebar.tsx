@@ -82,54 +82,56 @@ const bottomItems = [
 
 import React, { useMemo } from "react";
 
-const NavItem = React.memo(({
-  item,
-  pathname,
-  sidebarCollapsed,
-}: {
-  item: { name: string; href: string; icon: React.ElementType };
-  pathname: string;
-  sidebarCollapsed: boolean;
-}) => {
-  const isActive =
-    pathname === item.href || pathname.startsWith(`${item.href}/`);
-  const Icon = item.icon;
+const NavItem = React.memo(
+  ({
+    item,
+    pathname,
+    sidebarCollapsed,
+  }: {
+    item: { name: string; href: string; icon: React.ElementType };
+    pathname: string;
+    sidebarCollapsed: boolean;
+  }) => {
+    const isActive =
+      pathname === item.href || pathname.startsWith(`${item.href}/`);
+    const Icon = item.icon;
 
-  const link = (
-    <Link
-      href={item.href}
-      className={cn(
-        "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 group",
-        isActive
-          ? "bg-primary text-primary-foreground"
-          : "text-muted-foreground hover:text-foreground hover:bg-secondary",
-      )}
-    >
-      <Icon
+    const link = (
+      <Link
+        href={item.href}
         className={cn(
-          "w-4 h-4 shrink-0",
+          "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 group",
           isActive
-            ? "text-primary-foreground"
-            : "text-muted-foreground group-hover:text-foreground",
+            ? "bg-primary text-primary-foreground"
+            : "text-muted-foreground hover:text-foreground hover:bg-secondary",
         )}
-      />
-      {!sidebarCollapsed && <span className="truncate">{item.name}</span>}
-    </Link>
-  );
-
-  if (sidebarCollapsed) {
-    return (
-      <Tooltip delayDuration={0}>
-        <TooltipTrigger asChild>{link}</TooltipTrigger>
-        <TooltipContent side="right" className="text-xs">
-          {item.name}
-        </TooltipContent>
-      </Tooltip>
+      >
+        <Icon
+          className={cn(
+            "w-4 h-4 shrink-0",
+            isActive
+              ? "text-primary-foreground"
+              : "text-muted-foreground group-hover:text-foreground",
+          )}
+        />
+        {!sidebarCollapsed && <span className="truncate">{item.name}</span>}
+      </Link>
     );
-  }
 
-  return link;
-});
+    if (sidebarCollapsed) {
+      return (
+        <Tooltip delayDuration={0}>
+          <TooltipTrigger asChild>{link}</TooltipTrigger>
+          <TooltipContent side="right" className="text-xs">
+            {item.name}
+          </TooltipContent>
+        </Tooltip>
+      );
+    }
+
+    return link;
+  },
+);
 NavItem.displayName = "NavItem";
 
 export function Sidebar() {
@@ -146,11 +148,21 @@ export function Sidebar() {
             {!sidebarCollapsed && "Administration"}
           </div>
           {adminItems.map((item) => (
-            <NavItem key={item.name} item={item} pathname={pathname} sidebarCollapsed={sidebarCollapsed} />
+            <NavItem
+              key={item.name}
+              item={item}
+              pathname={pathname}
+              sidebarCollapsed={sidebarCollapsed}
+            />
           ))}
           {user?.user_role === "super_admin" &&
             superAdminItems.map((item) => (
-              <NavItem key={item.name} item={item} pathname={pathname} sidebarCollapsed={sidebarCollapsed} />
+              <NavItem
+                key={item.name}
+                item={item}
+                pathname={pathname}
+                sidebarCollapsed={sidebarCollapsed}
+              />
             ))}
         </>
       );
@@ -158,7 +170,12 @@ export function Sidebar() {
     return (
       <>
         {navigationItems.map((item) => (
-          <NavItem key={item.name} item={item} pathname={pathname} sidebarCollapsed={sidebarCollapsed} />
+          <NavItem
+            key={item.name}
+            item={item}
+            pathname={pathname}
+            sidebarCollapsed={sidebarCollapsed}
+          />
         ))}
       </>
     );
@@ -166,7 +183,12 @@ export function Sidebar() {
 
   const renderBottomItems = useMemo(() => {
     return bottomItems.map((item) => (
-      <NavItem key={item.name} item={item} pathname={pathname} sidebarCollapsed={sidebarCollapsed} />
+      <NavItem
+        key={item.name}
+        item={item}
+        pathname={pathname}
+        sidebarCollapsed={sidebarCollapsed}
+      />
     ));
   }, [pathname, sidebarCollapsed]);
 

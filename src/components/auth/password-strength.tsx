@@ -6,7 +6,7 @@ interface PasswordStrengthProps {
 
 export function PasswordStrength({ password = "" }: PasswordStrengthProps) {
   let score = 0;
-  
+
   if (password.length >= 8) score += 1;
   if (/[a-z]/.test(password)) score += 1;
   if (/[A-Z]/.test(password)) score += 1;
@@ -32,7 +32,9 @@ export function PasswordStrength({ password = "" }: PasswordStrengthProps) {
         <span
           className={cn(
             "font-medium",
-            password.length === 0 ? "text-muted-foreground" : `text-${strengthColor[currentScore].split("-")[1]}-500`
+            password.length === 0
+              ? "text-muted-foreground"
+              : `text-${strengthColor[currentScore].split("-")[1]}-500`,
           )}
         >
           {textScore}
@@ -46,7 +48,7 @@ export function PasswordStrength({ password = "" }: PasswordStrengthProps) {
               "h-full flex-1 rounded-full transition-colors duration-300",
               password.length > 0 && index <= currentScore
                 ? strengthColor[currentScore]
-                : "bg-muted"
+                : "bg-muted",
             )}
           />
         ))}

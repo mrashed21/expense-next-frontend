@@ -1,5 +1,6 @@
 "use client";
 
+import { ConfirmDialog } from "@/components/custom/confirm-dialog";
 import FormSelect from "@/components/custom/form-select";
 import { useCurrency } from "@/hooks/use-currency";
 import { formatDate } from "@/lib/utils";
@@ -12,17 +13,28 @@ import {
   useUpdateInstallmentMutation,
 } from "@/services/installment-api";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Calendar, CheckCircle2, CreditCard, Loader2, Pencil, Plus, Search, Trash2, X } from "lucide-react";
+import {
+  Calendar,
+  CheckCircle2,
+  CreditCard,
+  Loader2,
+  Pencil,
+  Plus,
+  Search,
+  Trash2,
+  X,
+} from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { ConfirmDialog } from "@/components/custom/confirm-dialog";
 
 const installmentSchema = z.object({
   title: z.string().min(1, "Title is required"),
   account_id: z.string().min(1, "Account is required"),
-  total_amount: z.coerce.number().min(0.01, "Total amount must be greater than zero"),
+  total_amount: z.coerce
+    .number()
+    .min(0.01, "Total amount must be greater than zero"),
   total_months: z.coerce.number().min(1, "Must have at least 1 month"),
   start_date: z.string().min(1, "Start date is required"),
   notes: z.string().optional(),
@@ -42,28 +54,32 @@ export default function InstallmentsPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all"); // 'all', 'active', 'completed'
-  
-  const { data: installmentsData, isLoading: installmentsLoading } = useGetInstallmentsQuery({
-    search: searchTerm,
-    status: statusFilter,
-  });
+
+  const { data: installmentsData, isLoading: installmentsLoading } =
+    useGetInstallmentsQuery({
+      search: searchTerm,
+      status: statusFilter,
+    });
   const { data: accountsData } = useGetAccountsQuery({});
-  
-  const [createInstallmentApi, { isLoading: isCreating }] = useCreateInstallmentMutation();
-  const [updateInstallmentApi, { isLoading: isUpdating }] = useUpdateInstallmentMutation();
+
+  const [createInstallmentApi, { isLoading: isCreating }] =
+    useCreateInstallmentMutation();
+  const [updateInstallmentApi, { isLoading: isUpdating }] =
+    useUpdateInstallmentMutation();
   const [deleteInstallmentApi] = useDeleteInstallmentMutation();
-  const [addPaymentApi, { isLoading: isPaying }] = useAddInstallmentPaymentMutation();
+  const [addPaymentApi, { isLoading: isPaying }] =
+    useAddInstallmentPaymentMutation();
 
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editItem, setEditItem] = useState<any>(null);
   const [paymentItem, setPaymentItem] = useState<any>(null);
 
   const installments = installmentsData?.data || [];
-  const metrics = installmentsData?.meta?.metrics || { 
-    totalMonthlyBurden: 0, 
-    totalOutstanding: 0, 
-    activeCount: 0, 
-    completedCount: 0 
+  const metrics = installmentsData?.meta?.metrics || {
+    totalMonthlyBurden: 0,
+    totalOutstanding: 0,
+    activeCount: 0,
+    completedCount: 0,
   };
 
   const accountOptions = (accountsData?.data || []).map((acc: any) => ({
@@ -80,7 +96,14 @@ export default function InstallmentsPage() {
     formState: { errors },
   } = useForm<InstallmentFormValues>({
     resolver: zodResolver(installmentSchema),
-    defaultValues: { total_amount: 0, total_months: 1, title: "", account_id: "", start_date: "", notes: "" },
+    defaultValues: {
+      total_amount: 0,
+      total_months: 1,
+      title: "",
+      account_id: "",
+      start_date: "",
+      notes: "",
+    },
   });
 
   const {
@@ -97,7 +120,7 @@ export default function InstallmentsPage() {
     try {
       const payload = { ...data };
       payload.start_date = new Date(payload.start_date).toISOString();
-      
+
       await createInstallmentApi(payload).unwrap();
       toast.success("EMI recorded successfully!");
       setIsAddOpen(false);
@@ -114,7 +137,7 @@ export default function InstallmentsPage() {
       account_id: item.account_id?._id || item.account_id,
       total_amount: item.total_amount,
       total_months: item.total_months,
-      start_date: new Date(item.start_date).toISOString().split('T')[0],
+      start_date: new Date(item.start_date).toISOString().split("T")[0],
       notes: item.notes || "",
     });
   };
@@ -124,7 +147,7 @@ export default function InstallmentsPage() {
     try {
       const payload = { ...data };
       payload.start_date = new Date(payload.start_date).toISOString();
-      
+
       await updateInstallmentApi({ id: editItem._id, data: payload }).unwrap();
       toast.success("EMI updated successfully!");
       setEditItem(null);
@@ -152,11 +175,14 @@ export default function InstallmentsPage() {
   const openPayment = (item: any) => {
     setPaymentItem(item);
     // Suggest the exact monthly amount to pay
-    const suggestedPayment = Math.min(item.monthly_amount, item.remaining_amount);
+    const suggestedPayment = Math.min(
+      item.monthly_amount,
+      item.remaining_amount,
+    );
     resetPayment({
       amount: Number(suggestedPayment.toFixed(2)),
-      date: new Date().toISOString().split('T')[0],
-      notes: ""
+      date: new Date().toISOString().split("T")[0],
+      notes: "",
     });
   };
 
@@ -201,7 +227,7 @@ export default function InstallmentsPage() {
               className="w-full pl-9 pr-4 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
             />
           </div>
-          
+
           <div className="flex rounded-xl overflow-hidden border border-border text-xs font-medium">
             <button
               onClick={() => setStatusFilter("all")}
@@ -218,7 +244,10 @@ export default function InstallmentsPage() {
           </div>
 
           <button
-            onClick={() => { reset(); setIsAddOpen(true); }}
+            onClick={() => {
+              reset();
+              setIsAddOpen(true);
+            }}
             className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-primary-foreground font-semibold text-xs shadow-md shadow-primary/20 hover:bg-primary/90 transition-colors shrink-0"
           >
             <Plus className="w-4 h-4" />
@@ -269,12 +298,24 @@ export default function InstallmentsPage() {
           <table className="w-full text-left text-sm">
             <thead className="sticky top-0 z-10 bg-secondary/95 backdrop-blur-md text-muted-foreground border-b border-border">
               <tr>
-                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider">EMI Details</th>
-                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">Progress</th>
-                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">Monthly EMI</th>
-                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">Remaining</th>
-                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-center">Status</th>
-                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">Actions</th>
+                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider">
+                  EMI Details
+                </th>
+                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">
+                  Progress
+                </th>
+                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">
+                  Monthly EMI
+                </th>
+                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">
+                  Remaining
+                </th>
+                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-center">
+                  Status
+                </th>
+                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -291,30 +332,44 @@ export default function InstallmentsPage() {
                       <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
                         <Calendar className="w-6 h-6 text-primary" />
                       </div>
-                      <p className="text-sm font-semibold text-foreground">No EMIs Found</p>
-                      <p className="text-xs text-muted-foreground max-w-xs">Start tracking your car loan, mortgage, or device installments.</p>
+                      <p className="text-sm font-semibold text-foreground">
+                        No EMIs Found
+                      </p>
+                      <p className="text-xs text-muted-foreground max-w-xs">
+                        Start tracking your car loan, mortgage, or device
+                        installments.
+                      </p>
                     </div>
                   </td>
                 </tr>
               ) : (
                 installments.map((inst: any) => {
-                  const progressPercent = Math.min(100, Math.max(0, (inst.months_paid / inst.total_months) * 100));
+                  const progressPercent = Math.min(
+                    100,
+                    Math.max(0, (inst.months_paid / inst.total_months) * 100),
+                  );
 
                   return (
-                    <tr key={inst._id} className={`hover:bg-secondary/30 transition-colors ${inst.is_completed ? 'opacity-60' : ''}`}>
+                    <tr
+                      key={inst._id}
+                      className={`hover:bg-secondary/30 transition-colors ${inst.is_completed ? "opacity-60" : ""}`}
+                    >
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold text-xs uppercase shadow-sm">
                             {inst.title.substring(0, 2)}
                           </div>
                           <div>
-                            <p className="font-bold text-foreground line-clamp-1">{inst.title}</p>
+                            <p className="font-bold text-foreground line-clamp-1">
+                              {inst.title}
+                            </p>
                             <div className="flex items-center gap-2">
                               <span className="text-[10px] uppercase font-semibold text-muted-foreground truncate w-24">
                                 {inst.account_id?.name || "Unknown"}
                               </span>
                               <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
-                                <Calendar className="w-3 h-3" /> Ends {formatDate(inst.end_date)}
+                                <Calendar className="w-3 h-3" /> Ends{" "}
+                                {formatDate(inst.end_date)}
                               </span>
                             </div>
                           </div>
@@ -323,26 +378,40 @@ export default function InstallmentsPage() {
                       <td className="px-6 py-4">
                         <div className="flex flex-col items-end w-32 ml-auto gap-1.5">
                           <div className="flex items-center justify-between w-full text-[10px] font-bold">
-                            <span className="text-primary">{inst.months_paid} <span className="text-muted-foreground font-normal">paid</span></span>
-                            <span className="text-muted-foreground">{inst.total_months} <span className="font-normal">total</span></span>
+                            <span className="text-primary">
+                              {inst.months_paid}{" "}
+                              <span className="text-muted-foreground font-normal">
+                                paid
+                              </span>
+                            </span>
+                            <span className="text-muted-foreground">
+                              {inst.total_months}{" "}
+                              <span className="font-normal">total</span>
+                            </span>
                           </div>
                           <div className="w-full h-1.5 bg-secondary rounded-full overflow-hidden">
-                            <div 
-                              className={`h-full rounded-full ${inst.is_completed ? 'bg-emerald-500' : 'bg-primary'}`} 
+                            <div
+                              className={`h-full rounded-full ${inst.is_completed ? "bg-emerald-500" : "bg-primary"}`}
                               style={{ width: `${progressPercent}%` }}
                             />
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <p className="font-semibold text-foreground">{formatCurrency(inst.monthly_amount)}</p>
-                        <p className="text-[10px] text-muted-foreground">per month</p>
+                        <p className="font-semibold text-foreground">
+                          {formatCurrency(inst.monthly_amount)}
+                        </p>
+                        <p className="text-[10px] text-muted-foreground">
+                          per month
+                        </p>
                       </td>
                       <td className="px-6 py-4 text-right">
                         <p className="font-bold text-foreground">
                           {formatCurrency(inst.remaining_amount)}
                         </p>
-                        <p className="text-[10px] text-muted-foreground">of {formatCurrency(inst.total_amount)}</p>
+                        <p className="text-[10px] text-muted-foreground">
+                          of {formatCurrency(inst.total_amount)}
+                        </p>
                       </td>
                       <td className="px-6 py-4 text-center">
                         {inst.is_completed ? (
@@ -394,13 +463,19 @@ export default function InstallmentsPage() {
       {/* Form Modal (Shared Add/Edit) */}
       {(isAddOpen || editItem) && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-          <div role="dialog" className="w-full max-w-md bg-card border border-border p-6 rounded-3xl space-y-4 shadow-2xl overflow-y-auto max-h-[90vh]">
+          <div
+            role="dialog"
+            className="w-full max-w-md bg-card border border-border p-6 rounded-3xl space-y-4 shadow-2xl overflow-y-auto max-h-[90vh]"
+          >
             <div className="flex items-center justify-between border-b border-border pb-3 sticky top-0 bg-card z-10">
               <h3 className="text-base font-bold text-foreground">
                 {editItem ? "Edit EMI" : "Setup New EMI"}
               </h3>
               <button
-                onClick={() => { setIsAddOpen(false); setEditItem(null); }}
+                onClick={() => {
+                  setIsAddOpen(false);
+                  setEditItem(null);
+                }}
                 className="text-muted-foreground hover:text-foreground"
               >
                 <X className="w-5 h-5" />
@@ -412,13 +487,19 @@ export default function InstallmentsPage() {
               className="space-y-4"
             >
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">EMI Title</label>
+                <label className="text-xs font-semibold text-foreground">
+                  EMI Title
+                </label>
                 <input
                   {...registerForm("title")}
                   placeholder="e.g. Car Loan, iPhone Installment"
                   className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                 />
-                {errors.title && <p className="text-[10px] text-destructive">{errors.title.message}</p>}
+                {errors.title && (
+                  <p className="text-[10px] text-destructive">
+                    {errors.title.message}
+                  </p>
+                )}
               </div>
 
               <div className="space-y-1">
@@ -435,39 +516,59 @@ export default function InstallmentsPage() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">Total Loan Amount</label>
+                  <label className="text-xs font-semibold text-foreground">
+                    Total Loan Amount
+                  </label>
                   <input
                     {...registerForm("total_amount", { valueAsNumber: true })}
                     type="number"
                     step="0.01"
                     className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                   />
-                  {errors.total_amount && <p className="text-[10px] text-destructive">{errors.total_amount.message}</p>}
+                  {errors.total_amount && (
+                    <p className="text-[10px] text-destructive">
+                      {errors.total_amount.message}
+                    </p>
+                  )}
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">Duration (Months)</label>
+                  <label className="text-xs font-semibold text-foreground">
+                    Duration (Months)
+                  </label>
                   <input
                     {...registerForm("total_months", { valueAsNumber: true })}
                     type="number"
                     step="1"
                     className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                   />
-                  {errors.total_months && <p className="text-[10px] text-destructive">{errors.total_months.message}</p>}
+                  {errors.total_months && (
+                    <p className="text-[10px] text-destructive">
+                      {errors.total_months.message}
+                    </p>
+                  )}
                 </div>
               </div>
-              
+
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">Start Date</label>
+                <label className="text-xs font-semibold text-foreground">
+                  Start Date
+                </label>
                 <input
                   {...registerForm("start_date")}
                   type="date"
                   className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                 />
-                {errors.start_date && <p className="text-[10px] text-destructive">{errors.start_date.message}</p>}
+                {errors.start_date && (
+                  <p className="text-[10px] text-destructive">
+                    {errors.start_date.message}
+                  </p>
+                )}
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">Notes (Optional)</label>
+                <label className="text-xs font-semibold text-foreground">
+                  Notes (Optional)
+                </label>
                 <input
                   {...registerForm("notes")}
                   className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
@@ -475,7 +576,10 @@ export default function InstallmentsPage() {
               </div>
 
               <div className="p-3 rounded-xl bg-primary/5 border border-primary/10 text-xs text-muted-foreground">
-                <span className="font-semibold text-foreground">Note:</span> The system will automatically calculate the Monthly Payment ({editItem ? 'recalculated on save' : 'Total ÷ Months'}) and determine the End Date based on your inputs.
+                <span className="font-semibold text-foreground">Note:</span> The
+                system will automatically calculate the Monthly Payment (
+                {editItem ? "recalculated on save" : "Total ÷ Months"}) and
+                determine the End Date based on your inputs.
               </div>
 
               <button
@@ -485,8 +589,10 @@ export default function InstallmentsPage() {
               >
                 {isCreating || isUpdating ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
+                ) : editItem ? (
+                  "Update EMI Schedule"
                 ) : (
-                  editItem ? "Update EMI Schedule" : "Create EMI Schedule"
+                  "Create EMI Schedule"
                 )}
               </button>
             </form>
@@ -497,7 +603,10 @@ export default function InstallmentsPage() {
       {/* Payment Modal */}
       {paymentItem && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-          <div role="dialog" className="w-full max-w-sm bg-card border border-border p-6 rounded-3xl space-y-4 shadow-2xl">
+          <div
+            role="dialog"
+            className="w-full max-w-sm bg-card border border-border p-6 rounded-3xl space-y-4 shadow-2xl"
+          >
             <div className="flex items-center justify-between border-b border-border pb-3">
               <h3 className="text-base font-bold text-foreground">
                 Log EMI Payment
@@ -509,19 +618,25 @@ export default function InstallmentsPage() {
                 <X className="w-5 h-5" />
               </button>
             </div>
-            
+
             <div className="p-3 rounded-xl bg-secondary/50 border border-border space-y-1">
               <div className="flex justify-between text-xs">
                 <span className="text-muted-foreground">EMI Target:</span>
-                <span className="font-bold text-foreground">{paymentItem.title}</span>
+                <span className="font-bold text-foreground">
+                  {paymentItem.title}
+                </span>
               </div>
               <div className="flex justify-between text-xs">
                 <span className="text-muted-foreground">Required EMI:</span>
-                <span className="font-bold text-primary">{formatCurrency(paymentItem.monthly_amount)}</span>
+                <span className="font-bold text-primary">
+                  {formatCurrency(paymentItem.monthly_amount)}
+                </span>
               </div>
               <div className="flex justify-between text-xs">
                 <span className="text-muted-foreground">Outstanding:</span>
-                <span className="font-bold text-destructive">{formatCurrency(paymentItem.remaining_amount)}</span>
+                <span className="font-bold text-destructive">
+                  {formatCurrency(paymentItem.remaining_amount)}
+                </span>
               </div>
             </div>
 
@@ -530,7 +645,9 @@ export default function InstallmentsPage() {
               className="space-y-4"
             >
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">Payment Amount</label>
+                <label className="text-xs font-semibold text-foreground">
+                  Payment Amount
+                </label>
                 <input
                   {...registerPayment("amount", { valueAsNumber: true })}
                   type="number"
@@ -538,11 +655,17 @@ export default function InstallmentsPage() {
                   max={paymentItem.remaining_amount}
                   className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                 />
-                {paymentErrors.amount && <p className="text-[10px] text-destructive">{paymentErrors.amount.message}</p>}
+                {paymentErrors.amount && (
+                  <p className="text-[10px] text-destructive">
+                    {paymentErrors.amount.message}
+                  </p>
+                )}
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">Payment Date</label>
+                <label className="text-xs font-semibold text-foreground">
+                  Payment Date
+                </label>
                 <input
                   {...registerPayment("date")}
                   type="date"
@@ -551,7 +674,9 @@ export default function InstallmentsPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">Notes (Optional)</label>
+                <label className="text-xs font-semibold text-foreground">
+                  Notes (Optional)
+                </label>
                 <input
                   {...registerPayment("notes")}
                   className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"

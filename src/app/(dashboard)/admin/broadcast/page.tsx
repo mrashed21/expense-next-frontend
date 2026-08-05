@@ -1,20 +1,20 @@
 "use client";
 
+import FormSelect from "@/components/custom/form-select";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RootState } from "@/redux/store";
 import { useBroadcastNotificationMutation } from "@/services/admin-api";
-import { Megaphone, ShieldAlert, Send, Loader2 } from "lucide-react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2, Megaphone, Send, ShieldAlert } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
 import { toast } from "sonner";
-import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import FormSelect from "@/components/custom/form-select";
 
 const broadcastSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters").max(50),
@@ -112,7 +112,9 @@ export default function BroadcastPage() {
               }`}
             />
             {errors.message && (
-              <p className="text-sm text-destructive">{errors.message.message}</p>
+              <p className="text-sm text-destructive">
+                {errors.message.message}
+              </p>
             )}
           </div>
 

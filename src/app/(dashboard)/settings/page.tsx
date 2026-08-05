@@ -8,8 +8,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { logout } from "@/redux/slices/auth-slice";
-import { useLazyExportBackupQuery, useRestoreBackupMutation } from "@/services/data-api";
-import { useDeleteAccountMutation, useUpdateProfileMutation } from "@/services/user-api";
+import {
+  useLazyExportBackupQuery,
+  useRestoreBackupMutation,
+} from "@/services/data-api";
+import {
+  useDeleteAccountMutation,
+  useUpdateProfileMutation,
+} from "@/services/user-api";
 import {
   Download,
   Loader2,
@@ -17,8 +23,8 @@ import {
   Moon,
   ShieldAlert,
   Sun,
-  Upload,
   Trash2,
+  Upload,
   X,
 } from "lucide-react";
 import { useTheme } from "next-themes";
@@ -58,8 +64,10 @@ export default function SettingsPage() {
     }
   };
 
-  const [exportBackup, { isFetching: isExporting }] = useLazyExportBackupQuery();
-  const [restoreBackup, { isLoading: isRestoring }] = useRestoreBackupMutation();
+  const [exportBackup, { isFetching: isExporting }] =
+    useLazyExportBackupQuery();
+  const [restoreBackup, { isLoading: isRestoring }] =
+    useRestoreBackupMutation();
 
   const handleDeleteAccount = async () => {
     try {
@@ -228,11 +236,19 @@ export default function SettingsPage() {
               disabled={isExporting}
               className="flex items-center gap-2 px-4 py-2 rounded-xl bg-secondary border border-border text-foreground text-xs font-semibold hover:bg-secondary/80 transition-colors disabled:opacity-50"
             >
-              {isExporting ? <Loader2 className="w-4 h-4 text-primary animate-spin" /> : <Download className="w-4 h-4 text-primary" />}
+              {isExporting ? (
+                <Loader2 className="w-4 h-4 text-primary animate-spin" />
+              ) : (
+                <Download className="w-4 h-4 text-primary" />
+              )}
               <span>Export JSON</span>
             </button>
             <label className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary/10 border border-primary/20 text-primary text-xs font-semibold hover:bg-primary/20 transition-colors cursor-pointer disabled:opacity-50">
-              {isRestoring ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+              {isRestoring ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Upload className="w-4 h-4" />
+              )}
               <span>Restore Backup</span>
               <input
                 type="file"
@@ -274,9 +290,17 @@ export default function SettingsPage() {
       {/* Delete Confirmation Modal */}
       {isDeleteModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-          <div role="dialog" aria-modal="true" aria-labelledby="modal-title" className="w-full max-w-md bg-card border border-rose-500/40 p-6 rounded-3xl space-y-4 shadow-2xl">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="modal-title"
+            className="w-full max-w-md bg-card border border-rose-500/40 p-6 rounded-3xl space-y-4 shadow-2xl"
+          >
             <div className="flex items-center justify-between border-b border-border pb-3">
-              <h3 id="modal-title" className="text-base font-bold text-rose-500 flex items-center gap-2">
+              <h3
+                id="modal-title"
+                className="text-base font-bold text-rose-500 flex items-center gap-2"
+              >
                 <ShieldAlert className="w-5 h-5" />
                 Confirm Account Termination
               </h3>
