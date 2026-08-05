@@ -38,7 +38,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo, useRef, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -138,6 +138,8 @@ export default function ProfilePage() {
       currency: user.currency || "USD",
     },
   });
+
+  const selectedCity = useWatch({ control: profileControl, name: "user_city" });
 
   const {
     register: registerPassword,
@@ -482,9 +484,8 @@ export default function ProfilePage() {
                     label="Area"
                     name="user_area"
                     control={profileControl}
-                    options={(profileControl._formValues.user_city &&
-                    cityAreas[profileControl._formValues.user_city]
-                      ? cityAreas[profileControl._formValues.user_city]
+                    options={(selectedCity && cityAreas[selectedCity]
+                      ? cityAreas[selectedCity]
                       : []
                     ).map((a) => ({ label: a, value: a }))}
                     searchable={true}
