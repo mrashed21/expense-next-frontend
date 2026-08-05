@@ -132,7 +132,7 @@ export const PdfReportDocument = ({
   <Document>
     <Page size="A4" style={styles.page}>
       <View>
-        <Text style={styles.header}>ExpenseVault Financial Statement</Text>
+        <Text style={styles.header}>Expense Tracker Financial Statement</Text>
         <Text style={styles.subheader}>Period: {periodLabel}</Text>
         <Text style={styles.subheader}>
           Generated on: {new Date().toLocaleDateString()}

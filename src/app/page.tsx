@@ -151,7 +151,7 @@ const testimonials = [
     role: "Senior Software Engineer",
     avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80",
     rating: 5,
-    review: "ExpenseVault completely transformed how I manage my monthly budget. The real-time alerts saved me over $500 last month alone!",
+    review: "Expense Tracker completely transformed how I manage my monthly budget. The real-time alerts saved me over $500 last month alone!",
   },
   {
     name: "David Chen",
@@ -171,7 +171,7 @@ const testimonials = [
 
 const faqs = [
   {
-    q: "Is my financial data secure on ExpenseVault?",
+    q: "Is my financial data secure on Expense Tracker?",
     a: "Yes. We use industry-standard 256-bit AES encryption in transit and at rest, secure JWT authentication with HttpOnly cookies, and strict database isolation.",
   },
   {
@@ -180,15 +180,15 @@ const faqs = [
   },
   {
     q: "How do automated recurring expenses work?",
-    a: "You can set up rules for monthly rent, utility bills, or subscriptions. ExpenseVault automatically logs these transactions on your designated due dates.",
+    a: "You can set up rules for monthly rent, utility bills, or subscriptions. Expense Tracker automatically logs these transactions on your designated due dates.",
   },
   {
     q: "Can I manage multiple bank accounts and cash wallets?",
-    a: "Yes! ExpenseVault supports unlimited custom accounts (Checking, Savings, Credit Cards, Cash Wallets, Crypto) and records transfers between them seamlessy.",
+    a: "Yes! Expense Tracker supports unlimited custom accounts (Checking, Savings, Credit Cards, Cash Wallets, Crypto) and records transfers between them seamlessy.",
   },
   {
-    q: "Is ExpenseVault fully responsive on mobile devices?",
-    a: "Yes. ExpenseVault is built with a mobile-first philosophy, featuring touch-optimized tables, drawers, and responsive charts across all screen sizes.",
+    q: "Is Expense Tracker fully responsive on mobile devices?",
+    a: "Yes. Expense Tracker is built with a mobile-first philosophy, featuring touch-optimized tables, drawers, and responsive charts across all screen sizes.",
   },
 ];
 
@@ -208,7 +208,7 @@ export default function HomePage() {
               <TrendingUp className="w-5 h-5" />
             </div>
             <span className="font-extrabold text-lg tracking-tight bg-linear-to-r from-foreground via-foreground to-muted-foreground bg-clip-text text-transparent">
-              ExpenseVault
+              Expense Tracker
             </span>
           </Link>
 
@@ -280,7 +280,7 @@ export default function HomePage() {
 
             {/* Description */}
             <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto font-normal leading-relaxed">
-              ExpenseVault gives you complete clarity over income, expenses, budgets, and net worth. Generate automated PDF/Excel reports, get real-time alerts, and achieve true financial freedom.
+              Expense Tracker gives you complete clarity over income, expenses, budgets, and net worth. Generate automated PDF/Excel reports, get real-time alerts, and achieve true financial freedom.
             </p>
 
             {/* CTAs */}
@@ -311,7 +311,7 @@ export default function HomePage() {
                       <div className="w-3 h-3 rounded-full bg-rose-500/80" />
                       <div className="w-3 h-3 rounded-full bg-amber-500/80" />
                       <div className="w-3 h-3 rounded-full bg-emerald-500/80" />
-                      <span className="text-xs font-mono text-muted-foreground ml-2">app.expensevault.com/dashboard</span>
+                      <span className="text-xs font-mono text-muted-foreground ml-2">app.expensetracker.com/dashboard</span>
                     </div>
                     <div className="hidden sm:flex items-center gap-2">
                       <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 text-[11px] font-extrabold flex items-center gap-1">
@@ -463,7 +463,7 @@ export default function HomePage() {
                 Interactive Preview
               </h2>
               <p className="text-3xl sm:text-4xl font-black tracking-tight">
-                Explore the ExpenseVault Interface
+                Explore the Expense Tracker Interface
               </p>
               <p className="text-xs sm:text-sm text-muted-foreground">
                 Sleek, responsive, and designed for effortless navigation on every device.
@@ -587,7 +587,7 @@ export default function HomePage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
             <div className="text-center space-y-3 max-w-3xl mx-auto">
               <h2 className="text-xs font-extrabold uppercase tracking-widest text-primary">
-                Why ExpenseVault
+                Why Expense Tracker
               </h2>
               <p className="text-3xl sm:text-4xl font-black tracking-tight">
                 Designed for Speed, Security & Precision
@@ -715,7 +715,7 @@ export default function HomePage() {
                 Simple Workflow
               </h2>
               <p className="text-3xl sm:text-4xl font-black tracking-tight">
-                How ExpenseVault Works in 5 Easy Steps
+                How Expense Tracker Works in 5 Easy Steps
               </p>
             </div>
 
@@ -971,7 +971,7 @@ export default function HomePage() {
                 Take Control of Your Finances Today.
               </h2>
               <p className="text-xs sm:text-sm text-white/80 max-w-xl mx-auto">
-                Join over 10,000+ users who log daily expenses, track net worth, and achieve financial security with ExpenseVault.
+                Join over 10,000+ users who log daily expenses, track net worth, and achieve financial security with Expense Tracker.
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
                 <Link
@@ -1002,7 +1002,7 @@ export default function HomePage() {
                 <div className="w-8 h-8 rounded-xl bg-primary text-primary-foreground flex items-center justify-center font-bold">
                   <TrendingUp className="w-4 h-4" />
                 </div>
-                <span className="font-extrabold text-base">ExpenseVault</span>
+                <span className="font-extrabold text-base">Expense Tracker</span>
               </Link>
               <p className="text-xs text-muted-foreground leading-relaxed">
                 The all-in-one financial tracking platform for smart budgeting, expense management, and real-time visual analytics.
@@ -1042,7 +1042,7 @@ export default function HomePage() {
           </div>
 
           <div className="pt-8 border-t border-border/60 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
-            <p>© 2026 ExpenseVault SaaS. All rights reserved.</p>
+            <p>© 2026 Expense Tracker SaaS. All rights reserved.</p>
             <div className="flex items-center gap-4">
               <span>English (US)</span>
               <span>USD ($)</span>

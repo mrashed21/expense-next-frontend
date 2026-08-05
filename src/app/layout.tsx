@@ -11,16 +11,16 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://expensevault.com";
+const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://expensetracker.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: {
-    default: "ExpenseVault - Premium SaaS Expense Tracker & Financial Analytics",
-    template: "%s | ExpenseVault",
+    default: "Expense Tracker - Premium SaaS Expense Tracker & Financial Analytics",
+    template: "%s | Expense Tracker",
   },
   description:
-    "Take full control of your personal and business finances with ExpenseVault. Track income, manage budget limits, automate recurring bills, and export custom PDF & Excel reports.",
+    "Take full control of your personal and business finances with Expense Tracker. Track income, manage budget limits, automate recurring bills, and export custom PDF & Excel reports.",
   keywords: [
     "Expense Tracker",
     "SaaS Financial Manager",
@@ -32,9 +32,9 @@ export const metadata: Metadata = {
     "Excel Export",
     "Money Management",
   ],
-  authors: [{ name: "ExpenseVault Team" }],
-  creator: "ExpenseVault",
-  publisher: "ExpenseVault",
+  authors: [{ name: "Expense Tracker Team" }],
+  creator: "Expense Tracker",
+  publisher: "Expense Tracker",
   robots: {
     index: true,
     follow: true,
@@ -53,25 +53,25 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: baseUrl,
-    title: "ExpenseVault - Premium SaaS Expense Tracker & Financial Analytics",
+    title: "Expense Tracker - Premium SaaS Expense Tracker & Financial Analytics",
     description:
       "Modern, secure, and intuitive expense tracking application. Real-time budget alerts, instant search, multi-account transfers, and financial visual charts.",
-    siteName: "ExpenseVault",
+    siteName: "Expense Tracker",
     images: [
       {
         url: `${baseUrl}/og-image.jpg`,
         width: 1200,
         height: 630,
-        alt: "ExpenseVault SaaS Dashboard Preview",
+        alt: "Expense Tracker SaaS Dashboard Preview",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "ExpenseVault - Smart Expense Tracker & Finance Dashboard",
+    title: "Expense Tracker - Smart Expense Tracker & Finance Dashboard",
     description:
       "Track daily expenses, set budget alerts, and generate automated PDF/Excel reports in seconds.",
-    creator: "@expensevault",
+    creator: "@expensetracker",
     images: [`${baseUrl}/og-image.jpg`],
   },
 };
@@ -84,7 +84,7 @@ export default function RootLayout({
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    name: "ExpenseVault",
+    name: "Expense Tracker",
     operatingSystem: "Web, iOS, Android",
     applicationCategory: "FinanceApplication",
     offers: {

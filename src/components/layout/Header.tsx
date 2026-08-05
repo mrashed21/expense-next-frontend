@@ -100,7 +100,7 @@ export function Header() {
           <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
             <TrendingUp className="w-3.5 h-3.5 text-primary-foreground" />
           </div>
-          <span className="font-semibold text-sm">ExpenseVault</span>
+          <span className="font-semibold text-sm">Expense Tracker</span>
         </div>
 
         {/* Desktop Search */}

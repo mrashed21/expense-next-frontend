@@ -133,7 +133,7 @@ export function CommandPalette() {
           </div>
           
           <div className="border-t border-border px-4 py-2 bg-secondary/30 flex items-center justify-between text-[10px] text-muted-foreground uppercase font-bold tracking-widest">
-            <span>ExpenseVault Search</span>
+            <span>Expense Tracker Search</span>
             <span>ESC to close</span>
           </div>
         </DialogContent>

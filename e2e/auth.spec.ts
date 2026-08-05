@@ -5,7 +5,7 @@ test.describe("Authentication Flow", () => {
     await page.goto("/login");
 
     // Verify title and main elements
-    await expect(page).toHaveTitle(/ExpenseVault/i);
+    await expect(page).toHaveTitle(/Expense Tracker/i);
     await expect(page.getByRole("heading", { name: "Welcome back" })).toBeVisible();
     
     // Verify form fields

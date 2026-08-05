@@ -197,7 +197,7 @@ export function Sidebar() {
               </div>
               <div className="flex flex-col min-w-0">
                 <span className="font-semibold text-sm tracking-tight text-foreground truncate">
-                  ExpenseVault
+                  Expense Tracker
                 </span>
                 <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-widest">
                   SaaS

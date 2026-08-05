@@ -43,7 +43,7 @@ export default function AdminSystemHealthPage() {
           System Health
         </h1>
         <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-          Real-time metrics and historical performance data for the ExpenseVault
+          Real-time metrics and historical performance data for the Expense Tracker
           backend.
         </p>
       </div>

@@ -2,8 +2,8 @@ import { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "ExpenseVault - Personal & Business Expense Tracker",
-    short_name: "ExpenseVault",
+    name: "Expense Tracker - Personal & Business Expense Tracker",
+    short_name: "Expense Tracker",
     description: "Modern, secure financial management, budgeting, and analytics platform.",
     start_url: "/",
     display: "standalone",

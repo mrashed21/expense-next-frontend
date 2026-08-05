@@ -118,7 +118,7 @@ export default function RegisterPage() {
             <TrendingUp className="w-5 h-5 text-primary-foreground" />
           </div>
           <h1 className="text-xl font-semibold tracking-tight text-foreground">
-            ExpenseVault
+            Expense Tracker
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
             Create your free account
