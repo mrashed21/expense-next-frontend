@@ -6,7 +6,7 @@ import {
   useMarkAllAsReadMutation,
   useMarkAsReadMutation,
   useDeleteNotificationMutation,
-} from "@/services/notificationApi";
+} from "@/services/notification-api";
 import {
   Bell,
   Check,
@@ -22,10 +22,10 @@ import {
   Info,
 } from "lucide-react";
 import { toast } from "sonner";
-import { EmptyState } from "@/components/custom/EmptyState";
-import { TableSkeleton } from "@/components/custom/TableSkeleton";
+import { EmptyState } from "@/components/custom/empty-state";
+import { TableSkeleton } from "@/components/custom/table-skeleton";
 import { ConfirmDialog } from "@/components/custom/confirm-dialog";
-import { getNotificationIcon, getRelativeTime } from "@/components/layout/NotificationDropdown";
+import { getNotificationIcon, getRelativeTime } from "@/components/layout/notification-dropdown";
 
 const categories = [
   { label: "All Categories", value: "all" },

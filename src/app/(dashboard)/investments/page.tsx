@@ -1,13 +1,13 @@
 "use client";
 
 import FormSelect from "@/components/custom/form-select";
-import { useCurrency } from "@/hooks/useCurrency";
+import { useCurrency } from "@/hooks/use-currency";
 import {
   useCreateInvestmentMutation,
   useDeleteInvestmentMutation,
   useGetInvestmentsQuery,
   useUpdateInvestmentMutation,
-} from "@/services/investmentApi";
+} from "@/services/investment-api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Pencil, Plus, Trash2, X, Search, TrendingUp, TrendingDown, Activity } from "lucide-react";
 import { useState } from "react";

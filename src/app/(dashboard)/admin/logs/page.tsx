@@ -2,7 +2,7 @@
 
 import { Card } from "@/components/ui/card";
 import { RootState } from "@/redux/store";
-import { useGetAuditLogsQuery, useGetErrorLogsQuery } from "@/services/adminApi";
+import { useGetAuditLogsQuery, useGetErrorLogsQuery } from "@/services/admin-api";
 import { format } from "date-fns";
 import { Loader2, ShieldAlert } from "lucide-react";
 import { useRouter } from "next/navigation";

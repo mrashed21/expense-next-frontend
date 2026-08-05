@@ -33,7 +33,7 @@ import {
   Globe,
   HelpCircle,
 } from "lucide-react";
-import { ThemeToggle } from "@/components/layout/ThemeToggle";
+import { ThemeToggle } from "@/components/layout/theme-toggle";
 import {
   Accordion,
   AccordionContent,

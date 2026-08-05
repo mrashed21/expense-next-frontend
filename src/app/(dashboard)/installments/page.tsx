@@ -1,16 +1,16 @@
 "use client";
 
 import FormSelect from "@/components/custom/form-select";
-import { useCurrency } from "@/hooks/useCurrency";
+import { useCurrency } from "@/hooks/use-currency";
 import { formatDate } from "@/lib/utils";
-import { useGetAccountsQuery } from "@/services/accountApi";
+import { useGetAccountsQuery } from "@/services/account-api";
 import {
   useAddInstallmentPaymentMutation,
   useCreateInstallmentMutation,
   useDeleteInstallmentMutation,
   useGetInstallmentsQuery,
   useUpdateInstallmentMutation,
-} from "@/services/installmentApi";
+} from "@/services/installment-api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Calendar, CheckCircle2, CreditCard, Loader2, Pencil, Plus, Search, Trash2, X } from "lucide-react";
 import { useState } from "react";

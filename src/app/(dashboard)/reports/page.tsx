@@ -1,12 +1,12 @@
 "use client";
 
-import { useCurrency } from "@/hooks/useCurrency";
+import { useCurrency } from "@/hooks/use-currency";
 import { formatDate } from "@/lib/utils";
 import {
   useGetBalanceSheetQuery,
   useGetCashFlowReportQuery,
   useGetTaxReportQuery,
-} from "@/services/reportApi";
+} from "@/services/report-api";
 import {
   Download,
   FileSpreadsheet,

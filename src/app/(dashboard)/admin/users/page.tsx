@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { RootState } from "@/redux/store";
-import { useGetUsersQuery, useUpdateUserStatusMutation } from "@/services/adminApi";
+import { useGetUsersQuery, useUpdateUserStatusMutation } from "@/services/admin-api";
 import { Ban, CheckCircle, Loader2, MoreVertical, ShieldAlert, UserCog, Users, Search, Trash2, ArrowUpDown } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";

@@ -3,7 +3,7 @@
 import { Card } from "@/components/ui/card";
 import { formatDate } from "@/lib/utils";
 import { RootState } from "@/redux/store";
-import { useGetActivityQuery } from "@/services/adminApi";
+import { useGetActivityQuery } from "@/services/admin-api";
 import { Activity, Loader2, ShieldAlert } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";

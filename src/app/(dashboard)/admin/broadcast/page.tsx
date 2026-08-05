@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RootState } from "@/redux/store";
-import { useBroadcastNotificationMutation } from "@/services/adminApi";
+import { useBroadcastNotificationMutation } from "@/services/admin-api";
 import { Megaphone, ShieldAlert, Send, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";

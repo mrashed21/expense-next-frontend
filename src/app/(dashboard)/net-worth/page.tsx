@@ -1,7 +1,7 @@
 "use client";
 
-import { useCurrency } from "@/hooks/useCurrency";
-import { useGetCurrentNetWorthQuery, useGetNetWorthHistoryQuery } from "@/services/netWorthApi";
+import { useCurrency } from "@/hooks/use-currency";
+import { useGetCurrentNetWorthQuery, useGetNetWorthHistoryQuery } from "@/services/net-worth-api";
 import { formatCurrency as formatCurrencyRaw } from "@/lib/utils";
 import { Loader2, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownRight, Wallet, Home, HandCoins, CreditCard } from "lucide-react";
 import {

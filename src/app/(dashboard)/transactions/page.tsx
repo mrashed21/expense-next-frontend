@@ -8,11 +8,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useCurrency } from "@/hooks/useCurrency";
+import { useCurrency } from "@/hooks/use-currency";
 import { formatDate } from "@/lib/utils";
-import { useGetAccountsQuery } from "@/services/accountApi";
-import { useGetCategoriesQuery } from "@/services/categoryApi";
-import { useGetSavedFiltersQuery, useCreateSavedFilterMutation } from "@/services/savedFilterApi";
+import { useGetAccountsQuery } from "@/services/account-api";
+import { useGetCategoriesQuery } from "@/services/category-api";
+import { useGetSavedFiltersQuery, useCreateSavedFilterMutation } from "@/services/saved-filter-api";
 import {
   useDeleteTransactionMutation,
   useGetTransactionsQuery,
@@ -21,16 +21,16 @@ import {
   useBulkRestoreTransactionsMutation,
   useCreateTransactionMutation,
   useBulkEditTransactionsMutation,
-} from "@/services/transactionApi";
+} from "@/services/transaction-api";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useDebounce } from "@/hooks/useDebounce";
+import { useDebounce } from "@/hooks/use-debounce";
 import { Bookmark, ChevronLeft, ChevronRight, Loader2, Plus, Save, Search, Trash2, X, Receipt } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { EmptyState } from "@/components/custom/EmptyState";
-import { TableSkeleton } from "@/components/custom/TableSkeleton";
+import { EmptyState } from "@/components/custom/empty-state";
+import { TableSkeleton } from "@/components/custom/table-skeleton";
 import { ConfirmDialog } from "@/components/custom/confirm-dialog";
 import { PromptDialog } from "@/components/custom/prompt-dialog";
 

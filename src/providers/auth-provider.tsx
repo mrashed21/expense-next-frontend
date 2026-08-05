@@ -7,8 +7,8 @@ import {
   logout,
   setAuthLoading,
   setCredentials,
-} from "../redux/slices/authSlice";
-import { useLazyGetAdminMeQuery, useLazyGetMeQuery } from "../services/authApi";
+} from "../redux/slices/auth-slice";
+import { useLazyGetAdminMeQuery, useLazyGetMeQuery } from "../services/auth-api";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const dispatch = useDispatch();

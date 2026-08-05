@@ -10,12 +10,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { logout } from "@/redux/slices/authSlice";
+import { logout } from "@/redux/slices/auth-slice";
 import { RootState } from "@/redux/store";
 import {
   useLogoutAllDevicesMutation,
   useLogoutMutation,
-} from "@/services/authApi";
+} from "@/services/auth-api";
 import {
   Bell,
   LogOut,
@@ -31,11 +31,11 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
-import { useSocket } from "@/hooks/useSocket";
-import { useGetNotificationsQuery } from "@/services/notificationApi";
-import { ThemeToggle } from "./ThemeToggle";
-import { CommandPalette } from "./CommandPalette";
-import { NotificationDropdown } from "./NotificationDropdown";
+import { useSocket } from "@/hooks/use-socket";
+import { useGetNotificationsQuery } from "@/services/notification-api";
+import { ThemeToggle } from "./theme-toggle";
+import { CommandPalette } from "./command-palette";
+import { NotificationDropdown } from "./notification-dropdown";
 
 export function Header() {
   const router = useRouter();

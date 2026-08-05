@@ -14,7 +14,7 @@ import {
   useGetAdminsQuery,
   useUpdateAdminStatusMutation,
   useCreateAdminMutation,
-} from "@/services/adminApi";
+} from "@/services/admin-api";
 import {
   Ban,
   CheckCircle,

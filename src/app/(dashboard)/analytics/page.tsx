@@ -1,7 +1,7 @@
 "use client";
 
-import { useCurrency } from "@/hooks/useCurrency";
-import { useGetAnalyticsSummaryQuery } from "@/services/analyticsApi";
+import { useCurrency } from "@/hooks/use-currency";
+import { useGetAnalyticsSummaryQuery } from "@/services/analytics-api";
 import {
   Activity,
   ArrowDownCircle,

@@ -8,10 +8,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useCurrency } from "@/hooks/useCurrency";
+import { useCurrency } from "@/hooks/use-currency";
 import { formatDate } from "@/lib/utils";
-import { useGetAccountsQuery } from "@/services/accountApi";
-import { useCreateBillMutation, useDeleteBillMutation, useGetBillsQuery, usePayBillMutation } from "@/services/billApi";
+import { useGetAccountsQuery } from "@/services/account-api";
+import { useCreateBillMutation, useDeleteBillMutation, useGetBillsQuery, usePayBillMutation } from "@/services/bill-api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CheckCircle2, CreditCard, FileCheck, Loader2, Plus, Trash2, X } from "lucide-react";
 import { useState } from "react";

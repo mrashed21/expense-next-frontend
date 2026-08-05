@@ -20,9 +20,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { bangladeshCities, cityAreas } from "@/lib/locationData";
+import { bangladeshCities, cityAreas } from "@/lib/location-data";
 import { RootState } from "@/redux/store";
-import { useRegisterMutation } from "@/services/authApi";
+import { useRegisterMutation } from "@/services/auth-api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   ArrowRight,
@@ -40,7 +40,7 @@ import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useSelector } from "react-redux";
 import { toast } from "sonner";
-import { PasswordStrength } from "@/components/auth/PasswordStrength";
+import { PasswordStrength } from "@/components/auth/password-strength";
 import { z } from "zod";
 
 const passwordSchema = z

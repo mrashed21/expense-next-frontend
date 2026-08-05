@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 const SystemHealthChart = dynamic(
   () =>
-    import("@/components/admin/SystemHealthChart").then(
+    import("@/components/admin/system-health-chart").then(
       (mod) => mod.SystemHealthChart
     ),
   { ssr: false }

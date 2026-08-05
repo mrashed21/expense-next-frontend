@@ -1,6 +1,6 @@
 "use client";
 
-import { apiSlice } from "@/services/apiSlice";
+import { apiSlice } from "@/services/api-slice";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { io, Socket } from "socket.io-client";

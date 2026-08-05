@@ -2,10 +2,10 @@
 
 import FormSelect from "@/components/custom/form-select";
 import PhonesInput from "@/components/custom/phone-input";
-import { bangladeshCities, cityAreas } from "@/lib/locationData";
+import { bangladeshCities, cityAreas } from "@/lib/location-data";
 import { formatDate } from "@/lib/utils";
-import { logout, updateUser } from "@/redux/slices/authSlice";
-import { useLogoutAllDevicesMutation } from "@/services/authApi";
+import { logout, updateUser } from "@/redux/slices/auth-slice";
+import { useLogoutAllDevicesMutation } from "@/services/auth-api";
 import {
   useChangePasswordMutation,
   useDeleteAccountMutation,
@@ -18,11 +18,11 @@ import {
   useDisable2FAMutation,
   useGetDevicesQuery,
   useRevokeDeviceMutation,
-} from "@/services/userApi";
+} from "@/services/user-api";
 import {
   useUpdateAdminProfileMutation,
   useUpdateAdminProfileImageMutation
-} from "@/services/adminApi";
+} from "@/services/admin-api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Camera,

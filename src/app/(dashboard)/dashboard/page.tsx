@@ -1,12 +1,12 @@
 "use client";
 
-import { useCurrency } from "@/hooks/useCurrency";
+import { useCurrency } from "@/hooks/use-currency";
 import { formatDate } from "@/lib/utils";
-import { useGetTransactionsQuery } from "@/services/transactionApi";
-import { useGetCurrentNetWorthQuery } from "@/services/netWorthApi";
-import { useGetInstallmentsQuery } from "@/services/installmentApi";
-import { useGetBillsQuery } from "@/services/billApi";
-import { useGetGoalsQuery } from "@/services/goalApi";
+import { useGetTransactionsQuery } from "@/services/transaction-api";
+import { useGetCurrentNetWorthQuery } from "@/services/net-worth-api";
+import { useGetInstallmentsQuery } from "@/services/installment-api";
+import { useGetBillsQuery } from "@/services/bill-api";
+import { useGetGoalsQuery } from "@/services/goal-api";
 
 import {
   ArrowDownRight,

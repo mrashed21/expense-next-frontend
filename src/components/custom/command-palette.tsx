@@ -1,4 +1,4 @@
-import { useLazySearchDataQuery } from "@/services/dataApi";
+import { useLazySearchDataQuery } from "@/services/data-api";
 import { ArrowRight, FileText, Folder, Loader2, Search, Wallet, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";

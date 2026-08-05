@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useSocket } from "@/hooks/useSocket";
+import { useSocket } from "@/hooks/use-socket";
 import { Activity, Cpu, HardDrive } from "lucide-react";
 import { useEffect, useState } from "react";
 import {

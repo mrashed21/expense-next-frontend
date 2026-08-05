@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { useGetCalendarEventsQuery } from "@/services/calendarApi";
+import { useGetCalendarEventsQuery } from "@/services/calendar-api";
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Loader2 } from "lucide-react";
-import { useCurrency } from "@/hooks/useCurrency";
+import { useCurrency } from "@/hooks/use-currency";
 import { formatCurrency } from "@/lib/utils"; // If it exports formatCurrency separately, otherwise use hook
 
 const DAYS_OF_WEEK = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];

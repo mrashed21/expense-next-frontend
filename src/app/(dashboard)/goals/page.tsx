@@ -1,13 +1,13 @@
 "use client";
 
 import FormSelect from "@/components/custom/form-select";
-import { useCurrency } from "@/hooks/useCurrency";
+import { useCurrency } from "@/hooks/use-currency";
 import {
   useCreateGoalMutation,
   useDeleteGoalMutation,
   useDepositToGoalMutation,
   useGetGoalsQuery,
-} from "@/services/goalApi";
+} from "@/services/goal-api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Plus, Target, Trash2, X } from "lucide-react";
 import { useState } from "react";

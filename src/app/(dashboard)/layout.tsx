@@ -1,7 +1,7 @@
-import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
-import { Header } from "@/components/layout/Header";
-import { MobileNav } from "@/components/layout/MobileNav";
-import { Sidebar } from "@/components/layout/Sidebar";
+import { ProtectedRoute } from "@/components/auth/protected-route";
+import { Header } from "@/components/layout/header";
+import { MobileNav } from "@/components/layout/mobile-nav";
+import { Sidebar } from "@/components/layout/sidebar";
 
 export default function DashboardLayout({
   children,

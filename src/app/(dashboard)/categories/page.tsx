@@ -6,7 +6,7 @@ import {
   useDeleteCategoryMutation,
   useGetCategoriesQuery,
   useUpdateCategoryMutation,
-} from "@/services/categoryApi";
+} from "@/services/category-api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, Pencil, Plus, Trash2, X } from "lucide-react";
 import { useState } from "react";

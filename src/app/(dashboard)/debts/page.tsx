@@ -1,7 +1,7 @@
 "use client";
 
 import FormSelect from "@/components/custom/form-select";
-import { useCurrency } from "@/hooks/useCurrency";
+import { useCurrency } from "@/hooks/use-currency";
 import { formatDate } from "@/lib/utils";
 import {
   useAddPaymentMutation,
@@ -9,7 +9,7 @@ import {
   useDeleteDebtMutation,
   useGetDebtsQuery,
   useUpdateDebtMutation,
-} from "@/services/debtApi";
+} from "@/services/debt-api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { HandCoins, Loader2, Pencil, Plus, Trash2, X, Search, CreditCard, Clock, CheckCircle2 } from "lucide-react";
 import { useState } from "react";

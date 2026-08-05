@@ -38,7 +38,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { cn } from "../../lib/utils";
-import { toggleSidebar } from "../../redux/slices/layoutSlice";
+import { toggleSidebar } from "../../redux/slices/layout-slice";
 import { RootState } from "../../redux/store";
 
 const navigationItems = [

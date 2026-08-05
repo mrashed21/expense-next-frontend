@@ -1,4 +1,4 @@
-import { logout, setCredentials } from "@/redux/slices/authSlice";
+import { logout, setCredentials } from "@/redux/slices/auth-slice";
 import { RootState } from "@/redux/store";
 import {
   BaseQueryFn,

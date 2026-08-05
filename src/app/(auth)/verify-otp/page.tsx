@@ -12,19 +12,17 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { RootState } from "@/redux/store";
+import { useResendOtpMutation, useVerifyOtpMutation } from "@/services/auth-api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CheckCircle, KeyRound, Loader2, RefreshCw } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useSelector } from "react-redux";
 import { toast } from "sonner";
 import { z } from "zod";
-import {
-  useResendOtpMutation,
-  useVerifyOtpMutation,
-} from "../../../services/authApi";
-import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
+
 
 const otpSchema = z.object({
   otp_code: z.string().length(6, "OTP must be exactly 6 digits"),

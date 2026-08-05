@@ -1,6 +1,6 @@
 "use client";
 
-import { useSocket } from "@/hooks/useSocket";
+import { useSocket } from "@/hooks/use-socket";
 import { RootState } from "@/redux/store";
 import { Loader2 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";

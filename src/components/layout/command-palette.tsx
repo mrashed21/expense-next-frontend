@@ -3,10 +3,10 @@
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Search, Loader2, X, Command, CreditCard, Folder, Wallet, FileText } from "lucide-react";
-import { useLazyGlobalSearchQuery } from "@/services/searchApi";
-import { useLazyGlobalAdminSearchQuery } from "@/services/adminApi";
+import { useLazyGlobalSearchQuery } from "@/services/search-api";
+import { useLazyGlobalAdminSearchQuery } from "@/services/admin-api";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { useDebounce } from "@/hooks/useDebounce"; // Need to make sure this hook exists or use inline debounce
+import { useDebounce } from "@/hooks/use-debounce"; // Need to make sure this hook exists or use inline debounce
 
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";

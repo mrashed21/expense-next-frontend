@@ -29,7 +29,7 @@ import {
   useMarkAsReadMutation,
   useMarkAllAsReadMutation,
   useDeleteNotificationMutation,
-} from "@/services/notificationApi";
+} from "@/services/notification-api";
 import { toast } from "sonner";
 
 export function getRelativeTime(dateStr: string | Date) {

@@ -1,12 +1,12 @@
 "use client";
 
-import { useCurrency } from "@/hooks/useCurrency";
+import { useCurrency } from "@/hooks/use-currency";
 import { formatDate } from "@/lib/utils";
 import {
   useGetRecurringQuery,
   useToggleRecurringStatusMutation,
   useDeleteRecurringMutation,
-} from "@/services/recurringApi";
+} from "@/services/recurring-api";
 import {
   CalendarClock,
   Clock,
@@ -20,7 +20,7 @@ import {
 import { useState } from "react";
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/custom/confirm-dialog";
-import { RecurringModal } from "./RecurringModal";
+import { RecurringModal } from "./recurring-modal";
 
 export default function RecurringPage() {
   const { formatCurrency } = useCurrency();

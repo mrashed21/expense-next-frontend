@@ -7,9 +7,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { logout } from "@/redux/slices/authSlice";
-import { useLazyExportBackupQuery, useRestoreBackupMutation } from "@/services/dataApi";
-import { useDeleteAccountMutation, useUpdateProfileMutation } from "@/services/userApi";
+import { logout } from "@/redux/slices/auth-slice";
+import { useLazyExportBackupQuery, useRestoreBackupMutation } from "@/services/data-api";
+import { useDeleteAccountMutation, useUpdateProfileMutation } from "@/services/user-api";
 import {
   Download,
   Loader2,

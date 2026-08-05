@@ -1,13 +1,13 @@
 "use client";
 
 import FormSelect from "@/components/custom/form-select";
-import { useCurrency } from "@/hooks/useCurrency";
+import { useCurrency } from "@/hooks/use-currency";
 import {
   useCreateBudgetMutation,
   useDeleteBudgetMutation,
   useGetBudgetsQuery,
-} from "@/services/budgetApi";
-import { useGetCategoriesQuery } from "@/services/categoryApi";
+} from "@/services/budget-api";
+import { useGetCategoriesQuery } from "@/services/category-api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   AlertTriangle,

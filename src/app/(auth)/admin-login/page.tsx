@@ -10,9 +10,9 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { setCredentials } from "@/redux/slices/authSlice";
+import { setCredentials } from "@/redux/slices/auth-slice";
 import { RootState } from "@/redux/store";
-import { useAdminLoginMutation } from "@/services/authApi";
+import { useAdminLoginMutation } from "@/services/auth-api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   ArrowRight,

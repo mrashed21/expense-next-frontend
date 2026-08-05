@@ -8,7 +8,7 @@ import {
   useGetUsersQuery,
   useGetDashboardStatsQuery,
   useGetUserGrowthQuery,
-} from "@/services/adminApi";
+} from "@/services/admin-api";
 import {
   Area,
   AreaChart,

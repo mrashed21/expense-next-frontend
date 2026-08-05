@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useResetPasswordMutation } from "@/services/authApi";
+import { useResetPasswordMutation } from "@/services/auth-api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   CheckCircle,
@@ -24,7 +24,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { PasswordStrength } from "@/components/auth/PasswordStrength";
+import { PasswordStrength } from "@/components/auth/password-strength";
 import { z } from "zod";
 
 const passwordSchema = z
