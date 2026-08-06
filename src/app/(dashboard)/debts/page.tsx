@@ -2,6 +2,7 @@
 
 import { ConfirmDialog } from "@/components/custom/confirm-dialog";
 import FormSelect from "@/components/custom/form-select";
+import FormDatePicker from "@/components/custom/form-date-picker";
 import { useCurrency } from "@/hooks/use-currency";
 import { formatDate } from "@/lib/utils";
 import {
@@ -100,6 +101,8 @@ export default function DebtsPage() {
     register: registerPayment,
     handleSubmit: handlePaymentSubmit,
     reset: resetPayment,
+    control: controlPayment,
+    clearErrors: clearErrorsPayment,
     formState: { errors: paymentErrors },
   } = useForm<PaymentFormValues>({
     resolver: zodResolver(paymentSchema),
@@ -512,13 +515,10 @@ export default function DebtsPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">
-                  Due Date (Optional)
-                </label>
-                <input
-                  {...registerForm("due_date")}
-                  type="date"
-                  className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
+                <FormDatePicker
+                  name="due_date"
+                  control={control}
+                  error={errors.due_date}
                 />
               </div>
 
@@ -604,13 +604,10 @@ export default function DebtsPage() {
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">
-                  Payment Date
-                </label>
-                <input
-                  {...registerPayment("date")}
-                  type="date"
-                  className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
+                <FormDatePicker
+                  name="date"
+                  control={controlPayment}
+                  error={paymentErrors.date}
                 />
               </div>
 

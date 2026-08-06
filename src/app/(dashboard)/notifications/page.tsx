@@ -173,9 +173,10 @@ export default function NotificationsPage() {
             {filteredNotifications.map((n: any) => (
               <div
                 key={n._id}
-                className={`p-4 transition-colors flex items-start gap-4 ${
+                onClick={!n.is_read ? () => handleMarkAsRead(n._id) : undefined}
+                className={`p-4 transition-colors flex items-start gap-4 ${!n.is_read ? "cursor-pointer" : ""} ${
                   !n.is_read
-                    ? "bg-primary/5 dark:bg-primary/10"
+                    ? "bg-primary/5 dark:bg-primary/10 hover:bg-primary/10"
                     : "hover:bg-secondary/30"
                 }`}
               >

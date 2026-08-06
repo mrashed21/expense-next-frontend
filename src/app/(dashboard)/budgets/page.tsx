@@ -26,7 +26,7 @@ import { z } from "zod";
 const budgetSchema = z.object({
   category_id: z.string().min(1, "Select a category"),
   amount: z.number().positive("Amount must be positive"),
-  warning_threshold: z.number(),
+  warning_threshold: z.coerce.number(),
 });
 
 type BudgetFormValues = z.infer<typeof budgetSchema>;

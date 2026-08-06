@@ -2,6 +2,7 @@
 
 import { ConfirmDialog } from "@/components/custom/confirm-dialog";
 import FormSelect from "@/components/custom/form-select";
+import FormDatePicker from "@/components/custom/form-date-picker";
 import {
   Select,
   SelectContent,
@@ -285,13 +286,10 @@ export default function BillsPage() {
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">
-                    Due Date
-                  </label>
-                  <input
-                    {...register("due_date")}
-                    type="date"
-                    className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
+                  <FormDatePicker
+                    name="due_date"
+                    control={control}
+                    error={errors.due_date}
                   />
                 </div>
               </div>

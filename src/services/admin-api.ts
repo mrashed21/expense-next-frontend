@@ -55,6 +55,12 @@ export const adminApi = apiSlice.injectEndpoints({
       }),
       providesTags: ["AdminActivity"] as any,
     }),
+    getNotificationHistory: builder.query({
+      query: ({ page = 1, limit = 20 }) => ({
+        url: `/admin/notifications?page=${page}&limit=${limit}`,
+      }),
+      providesTags: ["AdminNotifications"] as any,
+    }),
     getDashboardStats: builder.query({
       query: () => ({
         url: "/admin/dashboard-stats",
@@ -125,6 +131,7 @@ export const {
   useUpdateAdminStatusMutation,
   useGetSystemHealthQuery,
   useGetActivityQuery,
+  useGetNotificationHistoryQuery,
   useGetDashboardStatsQuery,
   useGetUserGrowthQuery,
   useGetErrorLogsQuery,

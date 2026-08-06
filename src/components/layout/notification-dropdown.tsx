@@ -228,9 +228,10 @@ export function NotificationDropdown() {
             filteredNotifications.map((n: any) => (
               <div
                 key={n._id}
-                className={`p-3 transition-colors flex items-start gap-3 relative group ${
+                onClick={!n.is_read ? (e) => handleMarkAsRead(e, n._id) : undefined}
+                className={`p-3 transition-colors flex items-start gap-3 relative group ${!n.is_read ? "cursor-pointer" : ""} ${
                   !n.is_read
-                    ? "bg-primary/5 dark:bg-primary/10"
+                    ? "bg-primary/5 dark:bg-primary/10 hover:bg-primary/10"
                     : "hover:bg-secondary/40"
                 }`}
               >

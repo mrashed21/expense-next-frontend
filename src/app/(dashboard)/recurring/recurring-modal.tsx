@@ -23,6 +23,7 @@ import {
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import DatePicker from "@/components/custom/date-picker";
 
 interface Props {
   isOpen: boolean;
@@ -185,13 +186,11 @@ export function RecurringModal({ isOpen, onClose, item }: Props) {
             <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
               Start / Next Run Date
             </label>
-            <Input
-              type="date"
+            <DatePicker
               value={formData.next_run_date}
-              onChange={(e) =>
-                setFormData({ ...formData, next_run_date: e.target.value })
+              onChange={(date) =>
+                setFormData({ ...formData, next_run_date: date })
               }
-              className="bg-secondary/50 border-border"
             />
           </div>
 

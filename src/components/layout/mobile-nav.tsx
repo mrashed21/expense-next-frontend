@@ -5,6 +5,7 @@ import { RootState } from "@/redux/store";
 import {
   Activity,
   BarChart3,
+  Bell,
   LayoutDashboard,
   Receipt,
   ShieldAlert,
@@ -28,6 +29,7 @@ const adminMobileItems = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { name: "Users", href: "/admin/users", icon: Users },
   { name: "Activity", href: "/admin/activity", icon: Activity },
+  { name: "Notifications", href: "/admin/notifications", icon: Bell },
   { name: "Health", href: "/admin/system-health", icon: ShieldAlert },
 ];
 
