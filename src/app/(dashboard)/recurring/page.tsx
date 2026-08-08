@@ -63,7 +63,7 @@ export default function RecurringPage() {
     <div className="space-y-6 pb-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-3xl bg-linear-to-r from-primary via-indigo-600 to-purple-600 text-white shadow-xl shadow-primary/20">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight flex items-center gap-2">
+          <h1 className="text-xl sm:text-xl font-bold tracking-tight flex items-center gap-2">
             <RefreshCw className="w-8 h-8" /> Automations
           </h1>
           <p className="text-xs sm:text-sm text-indigo-100 mt-1">

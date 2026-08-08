@@ -78,7 +78,7 @@ export default function NetWorthPage() {
     <div className="space-y-6 pb-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-extrabold tracking-tight">
+        <h1 className="text-xl font-bold tracking-tight">
           Net Worth Dashboard
         </h1>
         <p className="text-xs text-muted-foreground">

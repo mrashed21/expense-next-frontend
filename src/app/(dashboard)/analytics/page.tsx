@@ -80,12 +80,12 @@ export default function AnalyticsPage() {
   } = data;
 
   return (
-    <div className="space-y-6 pb-6">
+    <div className="space-y-5 pb-6">
       <div>
-        <h1 className="text-2xl font-extrabold tracking-tight">
+        <h1 className="text-xl font-bold tracking-tight">
           Financial Analytics
         </h1>
-        <p className="text-xs text-muted-foreground">
+        <p className="text-xs text-muted-foreground mt-0.5">
           Comprehensive insights into your spending, wealth, and planning.
         </p>
       </div>
@@ -134,38 +134,40 @@ export default function AnalyticsPage() {
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex bg-secondary/50 p-1 rounded-xl w-fit">
-        <button
-          onClick={() => setActiveTab("cashflow")}
-          className={`px-4 py-2 text-xs font-bold rounded-lg transition-all ${
-            activeTab === "cashflow"
-              ? "bg-card text-foreground shadow-sm"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          Cash Flow & Trends
-        </button>
-        <button
-          onClick={() => setActiveTab("wealth")}
-          className={`px-4 py-2 text-xs font-bold rounded-lg transition-all ${
-            activeTab === "wealth"
-              ? "bg-card text-foreground shadow-sm"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          Wealth & Assets
-        </button>
-        <button
-          onClick={() => setActiveTab("planning")}
-          className={`px-4 py-2 text-xs font-bold rounded-lg transition-all ${
-            activeTab === "planning"
-              ? "bg-card text-foreground shadow-sm"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          Budgets & Goals
-        </button>
+      {/* Tabs — scrollable on mobile */}
+      <div className="overflow-x-auto pb-0.5 scrollbar-hide">
+        <div className="flex bg-secondary/50 p-1 rounded-xl w-fit min-w-max">
+          <button
+            onClick={() => setActiveTab("cashflow")}
+            className={`px-3 sm:px-4 py-1.5 sm:py-2 text-xs font-semibold rounded-lg transition-all whitespace-nowrap ${
+              activeTab === "cashflow"
+                ? "bg-card text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Cash Flow
+          </button>
+          <button
+            onClick={() => setActiveTab("wealth")}
+            className={`px-3 sm:px-4 py-1.5 sm:py-2 text-xs font-semibold rounded-lg transition-all whitespace-nowrap ${
+              activeTab === "wealth"
+                ? "bg-card text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Wealth &amp; Assets
+          </button>
+          <button
+            onClick={() => setActiveTab("planning")}
+            className={`px-3 sm:px-4 py-1.5 sm:py-2 text-xs font-semibold rounded-lg transition-all whitespace-nowrap ${
+              activeTab === "planning"
+                ? "bg-card text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Budgets &amp; Goals
+          </button>
+        </div>
       </div>
 
       {/* Tab: Cash Flow */}

@@ -121,7 +121,7 @@ export default function SettingsPage() {
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
       <div>
-        <h1 className="text-2xl font-extrabold tracking-tight">
+        <h1 className="text-xl font-bold tracking-tight">
           System Preferences & Settings
         </h1>
         <p className="text-xs text-muted-foreground">

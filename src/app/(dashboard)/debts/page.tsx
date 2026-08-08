@@ -205,7 +205,7 @@ export default function DebtsPage() {
       {/* Header Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight">
+          <h1 className="text-xl font-bold tracking-tight">
             Debt Management
           </h1>
           <p className="text-xs text-muted-foreground">

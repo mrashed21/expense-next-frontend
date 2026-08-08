@@ -157,7 +157,7 @@ export default function CategoriesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight">
+          <h1 className="text-xl font-bold tracking-tight">
             Category Manager
           </h1>
           <p className="text-xs text-muted-foreground">

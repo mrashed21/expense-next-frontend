@@ -168,7 +168,7 @@ export default function AssetsPage() {
       {/* Header Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold tracking-tight">
+          <h1 className="text-xl font-bold tracking-tight">
             Asset Management
           </h1>
           <p className="text-xs text-muted-foreground">
@@ -203,7 +203,7 @@ export default function AssetsPage() {
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
             Total Asset Portfolio Value
           </p>
-          <p className="text-3xl font-black text-foreground mt-1">
+          <p className="text-2xl font-bold text-foreground mt-1">
             {formatCurrency(totalValue)}
           </p>
           <p className="text-[11px] text-muted-foreground mt-1">
