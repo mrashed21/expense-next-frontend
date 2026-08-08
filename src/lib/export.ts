@@ -48,7 +48,7 @@ export const exportToPdf = (filename: string, title: string, columns: string[], 
     margin: { top: 45, bottom: 20 },
     didDrawPage: (dataArg) => {
       // Footer with page number
-      const str = "Page " + doc.internal.getNumberOfPages();
+      const str = "Page " + doc.getNumberOfPages();
       doc.setFontSize(8);
       doc.setTextColor(150, 150, 150);
       const pageSize = doc.internal.pageSize;
