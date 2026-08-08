@@ -9,7 +9,7 @@ import {
 } from "@reduxjs/toolkit/query/react";
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5005/api/v1";
+  process.env.NEXT_PUBLIC_API_URL || "https://expense-tracker-bb-backend.vercel.app/api/v1";
 
 let csrfPromise: Promise<string | null> | null = null;
 

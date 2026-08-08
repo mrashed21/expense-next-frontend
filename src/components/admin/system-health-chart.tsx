@@ -35,7 +35,7 @@ export function SystemHealthChart() {
     
     const fetchHealth = async () => {
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5005/api/v1";
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://expense-tracker-bb-backend.vercel.app/api/v1";
         const res = await fetch(`${apiUrl}/admin/system-health`, {
           // If the backend requires auth for this endpoint, we would need to pass token or rely on cookies
           // For now, assuming cookies are sent if credentials included:
