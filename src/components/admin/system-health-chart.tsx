@@ -7,7 +7,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useSocket } from "@/hooks/use-socket";
 import { Activity, Cpu, HardDrive } from "lucide-react";
 import { useEffect, useState } from "react";
 import {
@@ -28,27 +27,61 @@ interface HealthData {
 }
 
 export function SystemHealthChart() {
-  const socket = useSocket();
   const [data, setData] = useState<HealthData[]>([]);
+  const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
-    if (!socket) return;
-
-    socket.on("system_health_update", (newData: HealthData) => {
-      setData((prevData) => {
-        // Keep only the last 30 data points for a smooth rolling window
-        const updatedData = [...prevData, newData];
-        if (updatedData.length > 30) {
-          updatedData.shift();
+    let isMounted = true;
+    
+    const fetchHealth = async () => {
+      try {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5005/api/v1";
+        const res = await fetch(`${apiUrl}/admin/system-health`, {
+          // If the backend requires auth for this endpoint, we would need to pass token or rely on cookies
+          // For now, assuming cookies are sent if credentials included:
+          credentials: "include"
+        });
+        
+        if (res.ok) {
+          const json = await res.json();
+          if (json.success && json.data) {
+            setIsConnected(true);
+            
+            // Generate a valid time if missing from backend, or use backend time
+            const newData: HealthData = {
+              time: json.data.time || new Date().toISOString(),
+              memoryUsage: json.data.memoryUsage || ((json.data.usedMemory || 0) / (json.data.totalMemory || 1) * 100).toFixed(2) || "0.00",
+              cpuUsage: json.data.cpuUsage || (json.data.loadAvg?.[0] || 0).toFixed(2) || "0.00",
+              uptime: json.data.uptime || 0,
+            };
+            
+            if (isMounted) {
+              setData((prevData) => {
+                const updatedData = [...prevData, newData];
+                if (updatedData.length > 30) {
+                  updatedData.shift();
+                }
+                return updatedData;
+              });
+            }
+          }
+        } else {
+          if (isMounted) setIsConnected(false);
         }
-        return updatedData;
-      });
-    });
+      } catch (err) {
+        if (isMounted) setIsConnected(false);
+      }
+    };
+
+    // Poll every 5 seconds
+    fetchHealth();
+    const interval = setInterval(fetchHealth, 5000);
 
     return () => {
-      socket.off("system_health_update");
+      isMounted = false;
+      clearInterval(interval);
     };
-  }, [socket]);
+  }, []);
 
   // Format time for X-axis
   const formatTime = (timeStr: string) => {
@@ -62,7 +95,7 @@ export function SystemHealthChart() {
   return (
     <Card className="col-span-full shadow-lg border-border overflow-hidden relative bg-card">
       <div className="absolute top-0 right-0 p-4 flex gap-2">
-        {socket?.connected ? (
+        {isConnected ? (
           <span className="flex items-center text-xs font-medium text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded-full">
             <span className="w-2 h-2 rounded-full bg-emerald-500 mr-1.5 animate-pulse" />
             Live

@@ -10,7 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useSocket } from "@/hooks/use-socket";
+import { useRealtime } from "@/hooks/use-realtime";
 import { logout } from "@/redux/slices/auth-slice";
 import { RootState } from "@/redux/store";
 import {
@@ -43,7 +43,7 @@ export function Header() {
   const [logoutAllApi] = useLogoutAllDevicesMutation();
 
   // Mount the singleton socket connection for this session
-  useSocket();
+  useRealtime();
 
   // Live unread notification count for the bell badge
   // pollingInterval: 0 — updates come exclusively via socket cache invalidation

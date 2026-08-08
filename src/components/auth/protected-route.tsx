@@ -1,6 +1,6 @@
 "use client";
 
-import { useSocket } from "@/hooks/use-socket";
+import { useRealtime } from "@/hooks/use-realtime";
 import { RootState } from "@/redux/store";
 import { Loader2 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
@@ -15,7 +15,7 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   );
 
   // Initialize Socket.io connection for authenticated users
-  useSocket();
+  useRealtime();
 
   useEffect(() => {
     if (!isLoading) {
