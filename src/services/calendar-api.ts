@@ -4,7 +4,7 @@ export const calendarApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getCalendarEvents: builder.query({
       query: ({ startDate, endDate }) => ({
-        url: "/calendar/events",
+        url: "/calendar",
         params: { startDate, endDate },
       }),
       // Calendar events depend on multiple collections

@@ -92,7 +92,7 @@ const FormDatePicker = <T extends FieldValues>({
                 mode="single"
                 selected={field.value ? new Date(field.value) : undefined}
                 onSelect={(date) => {
-                  field.onChange(date ? date.toISOString().split("T")[0] : "");
+                  field.onChange(date ? format(date, "yyyy-MM-dd") : "");
                   clearErrors?.(name);
                 }}
                 initialFocus

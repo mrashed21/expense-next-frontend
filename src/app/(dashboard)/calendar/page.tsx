@@ -18,22 +18,21 @@ import { useMemo, useState } from "react";
 const DAYS_OF_WEEK = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const DAYS_MOBILE = ["S", "M", "T", "W", "T", "F", "S"];
 
-// Normalize a Date (or ISO string) to a YYYY-MM-DD key using UTC parts
-// This prevents UTC vs local-timezone off-by-one issues
-function toUTCDateKey(date: Date | string): string {
-  const d = typeof date === "string" ? new Date(date) : date;
-  const y = d.getUTCFullYear();
-  const m = String(d.getUTCMonth() + 1).padStart(2, "0");
-  const day = String(d.getUTCDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
-}
-
-// Local calendar cell date key (uses local date parts since user builds grid locally)
-function toLocalDateKey(date: Date): string {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
+// Normalize a Date or ISO string to a local YYYY-MM-DD key
+function getDateString(date: Date | string | null | undefined): string {
+  if (!date) return "";
+  if (typeof date === "string") {
+    // Extract the YYYY-MM-DD part from the backend ISO string
+    return date.split("T")[0];
+  }
+  try {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  } catch (e) {
+    return "";
+  }
 }
 
 function getEventIcon(type: string, size = "w-3.5 h-3.5") {
@@ -142,11 +141,11 @@ export default function CalendarPage() {
     return cells;
   }, [currentYear, currentMonth, daysInMonth, startingDayOfWeek]);
 
-  // Build event map keyed by UTC date string for O(1) lookup
+  // Build event map keyed by date string for O(1) lookup
   const eventMap = useMemo(() => {
     const map = new Map<string, any[]>();
     events.forEach((e: any) => {
-      const key = toUTCDateKey(e.date);
+      const key = getDateString(e.date);
       if (!map.has(key)) map.set(key, []);
       map.get(key)!.push(e);
     });
@@ -154,12 +153,8 @@ export default function CalendarPage() {
   }, [events]);
 
   const getEventsForDate = (date: Date): any[] => {
-    // Use local date key for calendar cells since the grid is built in local time
-    // But also check UTC key since backend sends UTC dates
-    const localKey = toLocalDateKey(date);
-    const utcKey = toUTCDateKey(date);
-    // Prefer local key match; fallback to UTC key if different
-    return eventMap.get(localKey) || eventMap.get(utcKey) || [];
+    const key = getDateString(date);
+    return eventMap.get(key) || [];
   };
 
   const selectedEvents = useMemo(
@@ -168,7 +163,7 @@ export default function CalendarPage() {
     [selectedDate, eventMap],
   );
 
-  const todayKey = toLocalDateKey(new Date());
+  const todayKey = getDateString(new Date());
 
   // Summary counts for legend
   const eventTypeCounts = useMemo(() => {
@@ -274,11 +269,11 @@ export default function CalendarPage() {
             )}
             {gridCells.map((cell, idx) => {
               const cellEvents = getEventsForDate(cell.date);
-              const cellKey = toLocalDateKey(cell.date);
+              const cellKey = getDateString(cell.date);
               const isToday = cellKey === todayKey;
               const isSelected =
                 selectedDate &&
-                toLocalDateKey(selectedDate) === cellKey;
+                getDateString(selectedDate) === cellKey;
               const maxVisible = 2;
               const extra = cellEvents.length - maxVisible;
 
@@ -292,7 +287,7 @@ export default function CalendarPage() {
                   `}
                 >
                   {/* Date number */}
-                  <div className="flex items-center justify-between mb-1 shrink-0">
+                  <div className="flex items-start justify-center relative mb-1 shrink-0">
                     <span
                       className={`text-xs font-semibold w-6 h-6 flex items-center justify-center rounded-full transition-colors
                         ${isToday ? "bg-primary text-primary-foreground font-bold" : "text-foreground"}
@@ -302,7 +297,7 @@ export default function CalendarPage() {
                       {cell.date.getDate()}
                     </span>
                     {cellEvents.length > 0 && (
-                      <span className="text-[9px] font-bold text-muted-foreground bg-secondary/80 px-1 py-0.5 rounded hidden sm:inline-block">
+                      <span className="absolute top-0 right-0 text-[9px] font-bold text-muted-foreground bg-secondary/80 px-1 py-0.5 rounded hidden sm:inline-block">
                         {cellEvents.length}
                       </span>
                     )}

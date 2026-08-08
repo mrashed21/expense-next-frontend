@@ -9,6 +9,14 @@ import {
   useGetTransfersQuery,
 } from "@/services/transfer-api";
 import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { ArrowRightLeft, Loader2, Plus, X } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -129,44 +137,48 @@ export default function TransfersPage() {
             All internal balance movements between your accounts
           </p>
         </div>
-        <div className="divide-y divide-border">
+        <div className="border-t border-border">
           {isLoading ? (
             <div className="flex items-center justify-center py-10">
               <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
             </div>
           ) : transfers.length > 0 ? (
-            transfers.map((t: any) => (
-              <div
-                key={t._id}
-                className="p-4 flex items-center justify-between gap-3 hover:bg-secondary/30 transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
-                    <ArrowRightLeft className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold text-foreground">
-                      {t.from_account_id?.name || "Account"} →{" "}
-                      {t.to_account_id?.name || "Account"}
-                    </p>
-                    <p className="text-[11px] text-muted-foreground">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Date</TableHead>
+                  <TableHead>From Account</TableHead>
+                  <TableHead>To Account</TableHead>
+                  <TableHead>Notes</TableHead>
+                  <TableHead className="text-right">Amount</TableHead>
+                  <TableHead className="text-right">Fee</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {transfers.map((t: any) => (
+                  <TableRow key={t._id}>
+                    <TableCell className="font-medium">
                       {formatDate(t.date)}
-                      {t.notes ? ` • ${t.notes}` : ""}
-                    </p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm font-bold text-foreground">
-                    {formatCurrency(t.amount)}
-                  </p>
-                  {t.fee > 0 && (
-                    <p className="text-[10px] text-rose-500 font-semibold">
-                      Fee: {formatCurrency(t.fee)}
-                    </p>
-                  )}
-                </div>
-              </div>
-            ))
+                    </TableCell>
+                    <TableCell>
+                      {t.from_account_id?.name || "Account"}
+                    </TableCell>
+                    <TableCell>
+                      {t.to_account_id?.name || "Account"}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {t.notes || "-"}
+                    </TableCell>
+                    <TableCell className="text-right font-bold">
+                      {formatCurrency(t.amount)}
+                    </TableCell>
+                    <TableCell className="text-right text-rose-500">
+                      {t.fee > 0 ? formatCurrency(t.fee) : "-"}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           ) : (
             <div className="text-center py-12 text-xs text-muted-foreground">
               No transfers yet. Click "New Transfer" to move funds between

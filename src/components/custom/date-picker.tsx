@@ -40,7 +40,7 @@ export default function DatePicker({
           mode="single"
           selected={value ? new Date(value) : undefined}
           onSelect={(date) => {
-            onChange(date ? date.toISOString().split("T")[0] : "");
+            onChange(date ? format(date, "yyyy-MM-dd") : "");
           }}
           initialFocus
         />
