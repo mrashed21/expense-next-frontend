@@ -42,7 +42,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             response = await triggerGetMe(undefined, false).unwrap();
           }
         } catch (err: any) {
-          // If we fail on a user route, try the admin route as a fallback
           if (!isAdminRoute && (err.status === 401 || err.status === 403)) {
             response = await triggerGetAdminMe(undefined, false).unwrap();
             isAdmin = true;
@@ -56,7 +55,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             ? response?.data?.admin
             : response?.data?.user;
           if (userObj) {
-            // Normalize admin object to match user structure in redux
             let normalizedUser = { ...userObj };
 
             if (isAdmin) {

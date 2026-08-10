@@ -53,7 +53,7 @@ export default function AdminNotificationHistoryPage() {
             <Bell className="w-4 h-4 text-primary" /> System & User Alerts
           </h2>
         </div>
-        <div className="space-y-3 max-h-[600px] overflow-y-auto scrollbar-hide pr-2">
+        <div className="space-y-3 max-h-150 overflow-y-auto scrollbar-hide pr-2">
           {notificationLoading ? (
             <Loader2 className="w-6 h-6 animate-spin mx-auto my-4 text-primary" />
           ) : notifications.length > 0 ? (
@@ -87,7 +87,10 @@ export default function AdminNotificationHistoryPage() {
                     {n.message}
                   </p>
                   <p className="text-[10px] text-muted-foreground mt-2">
-                    Recipient: <span className="font-semibold text-primary">{n.user_id?.user_email || "Unknown User"}</span>
+                    Recipient:{" "}
+                    <span className="font-semibold text-primary">
+                      {n.user_id?.user_email || "Unknown User"}
+                    </span>
                   </p>
                 </div>
                 <div className="text-right shrink-0">

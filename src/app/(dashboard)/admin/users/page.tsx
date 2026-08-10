@@ -61,7 +61,6 @@ export default function AdminUsersPage() {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
 
-  // Action Dialog State
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [actionType, setActionType] = useState<
     "active" | "deactive" | "banned" | "delete" | null
@@ -112,7 +111,6 @@ export default function AdminUsersPage() {
 
     try {
       if (actionType === "delete") {
-        // Implement delete mutation here if needed (e.g. useDeleteUserMutation)
         toast.info("Delete user API not implemented here yet.");
       } else {
         await updateUserStatus({

@@ -18,11 +18,9 @@ import { useMemo, useState } from "react";
 const DAYS_OF_WEEK = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const DAYS_MOBILE = ["S", "M", "T", "W", "T", "F", "S"];
 
-// Normalize a Date or ISO string to a local YYYY-MM-DD key
 function getDateString(date: Date | string | null | undefined): string {
   if (!date) return "";
   if (typeof date === "string") {
-    // Extract the YYYY-MM-DD part from the backend ISO string
     return date.split("T")[0];
   }
   try {
@@ -90,7 +88,6 @@ export default function CalendarPage() {
   const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
   const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0);
 
-  // Fetch wider range to cover leading/trailing cells
   const startDate = new Date(currentYear, currentMonth, -7).toISOString();
   const endDate = new Date(currentYear, currentMonth + 1, 7).toISOString();
 
@@ -102,7 +99,6 @@ export default function CalendarPage() {
 
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
-  // Navigation handlers
   const prevMonth = () =>
     setCurrentDate(new Date(currentYear, currentMonth - 1, 1));
   const nextMonth = () =>
@@ -112,7 +108,6 @@ export default function CalendarPage() {
     setSelectedDate(new Date());
   };
 
-  // Generate grid cells
   const daysInMonth = lastDayOfMonth.getDate();
   const startingDayOfWeek = firstDayOfMonth.getDay();
 
@@ -141,7 +136,6 @@ export default function CalendarPage() {
     return cells;
   }, [currentYear, currentMonth, daysInMonth, startingDayOfWeek]);
 
-  // Build event map keyed by date string for O(1) lookup
   const eventMap = useMemo(() => {
     const map = new Map<string, any[]>();
     events.forEach((e: any) => {
@@ -159,13 +153,11 @@ export default function CalendarPage() {
 
   const selectedEvents = useMemo(
     () => (selectedDate ? getEventsForDate(selectedDate) : []),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [selectedDate, eventMap],
   );
 
   const todayKey = getDateString(new Date());
 
-  // Summary counts for legend
   const eventTypeCounts = useMemo(() => {
     const counts: Record<string, number> = {};
     events.forEach((e: any) => {
@@ -261,7 +253,7 @@ export default function CalendarPage() {
           </div>
 
           {/* Grid cells */}
-          <div className="flex-1 grid grid-cols-7 grid-rows-6 relative min-h-[380px] sm:min-h-[460px]">
+          <div className="flex-1 grid grid-cols-7 grid-rows-6 relative min-h-9 sm:min-h-115">
             {isLoading && (
               <div className="absolute inset-0 bg-background/50 backdrop-blur-sm flex items-center justify-center z-10 rounded-b-2xl">
                 <Loader2 className="w-6 h-6 animate-spin text-primary" />
@@ -272,8 +264,7 @@ export default function CalendarPage() {
               const cellKey = getDateString(cell.date);
               const isToday = cellKey === todayKey;
               const isSelected =
-                selectedDate &&
-                getDateString(selectedDate) === cellKey;
+                selectedDate && getDateString(selectedDate) === cellKey;
               const maxVisible = 2;
               const extra = cellEvents.length - maxVisible;
 

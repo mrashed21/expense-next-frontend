@@ -1,13 +1,14 @@
-import { apiSlice } from "@/services/api-slice";
-import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
+import { apiSlice } from "@/services/api-slice";
 import Ably from "ably";
 import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 
-const ablyClient = typeof window !== "undefined" && process.env.NEXT_PUBLIC_ABLY_KEY
-  ? new Ably.Realtime({ key: process.env.NEXT_PUBLIC_ABLY_KEY })
-  : null;
+const ablyClient =
+  typeof window !== "undefined" && process.env.NEXT_PUBLIC_ABLY_KEY
+    ? new Ably.Realtime({ key: process.env.NEXT_PUBLIC_ABLY_KEY })
+    : null;
 
 export const useRealtime = () => {
   const dispatch = useDispatch();
@@ -30,7 +31,7 @@ export const useRealtime = () => {
       } else {
         toast.info(`🔔 ${data.title}`, { description: data.message });
       }
-      // Refresh notifications list
+
       dispatch(apiSlice.util.invalidateTags(["Notifications"]));
     };
 

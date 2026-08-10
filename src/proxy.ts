@@ -23,11 +23,9 @@ export function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Check for the HttpOnly access token set by the backend
   const token = request.cookies.get("accessToken")?.value;
 
   if (!token) {
-    // Prevent redirect loops
     if (pathname !== "/login") {
       const url = request.nextUrl.clone();
       url.pathname = "/login";
@@ -40,8 +38,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    // Apply middleware to all routes except api, _next, and static files
-    "/((?!api|_next/static|_next/image|favicon.ico).*)",
-  ],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
 };

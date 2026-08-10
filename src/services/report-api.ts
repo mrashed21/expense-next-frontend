@@ -4,7 +4,7 @@ export const reportApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getBalanceSheet: builder.query({
       query: () => "/reports/balance-sheet",
-      providesTags: ["NetWorth", "Accounts", "Assets", "Debts"], // Dependent on many entities
+      providesTags: ["NetWorth", "Accounts", "Assets", "Debts"],
     }),
     getCashFlowReport: builder.query({
       query: ({ startDate, endDate }) => ({

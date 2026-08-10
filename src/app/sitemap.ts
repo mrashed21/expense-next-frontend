@@ -2,7 +2,7 @@ import { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl =
-    process.env.NEXT_PUBLIC_APP_URL || "https://expensetracker.com";
+    process.env.NEXT_PUBLIC_APP_URL || "https://expense-trecker-bd.vercel.app";
 
   return [
     {

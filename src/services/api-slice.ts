@@ -9,13 +9,14 @@ import {
 } from "@reduxjs/toolkit/query/react";
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "https://expense-tracker-bb-backend.vercel.app/api/v1";
+  process.env.NEXT_PUBLIC_API_URL ||
+  "https://expense-tracker-bb-backend.vercel.app/api/v1";
 
 let csrfPromise: Promise<string | null> | null = null;
 
 const baseQuery = fetchBaseQuery({
   baseUrl: API_BASE_URL,
-  credentials: "include", // For HttpOnly refresh and access cookies
+  credentials: "include", 
   prepareHeaders: async (headers) => {
     const getCsrfFromCookie = () => {
       if (typeof document === "undefined") return null;
@@ -115,7 +116,6 @@ const baseQueryWithReauth: BaseQueryFn<
       if (user) {
         api.dispatch(setCredentials({ user }));
       }
-      // Retry original request with new token
       result = await baseQuery(args, api, extraOptions);
     } else {
       api.dispatch(logout());

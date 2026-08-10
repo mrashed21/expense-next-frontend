@@ -42,11 +42,8 @@ export function Header() {
   const [logoutApi] = useLogoutMutation();
   const [logoutAllApi] = useLogoutAllDevicesMutation();
 
-  // Mount the singleton socket connection for this session
   useRealtime();
 
-  // Live unread notification count for the bell badge
-  // pollingInterval: 0 — updates come exclusively via socket cache invalidation
   const { data: notificationsData } = useGetNotificationsQuery(undefined, {
     skip: user?.isAdmin,
     refetchOnFocus: false,

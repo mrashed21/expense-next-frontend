@@ -44,7 +44,6 @@ export default function NetWorthPage() {
 
   const history = historyData?.data || [];
 
-  // Format history for the chart
   const chartData = history.map((h: any) => {
     const date = new Date(h.date);
     return {
@@ -53,7 +52,6 @@ export default function NetWorthPage() {
     };
   });
 
-  // Calculate 30-day growth if we have history
   let growth = 0;
   let growthPercent = 0;
   if (history.length > 0) {

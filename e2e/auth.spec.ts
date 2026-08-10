@@ -4,17 +4,14 @@ test.describe("Authentication Flow", () => {
   test("should render the login page correctly", async ({ page }) => {
     await page.goto("/login");
 
-    // Verify title and main elements
     await expect(page).toHaveTitle(/Expense Tracker/i);
     await expect(
       page.getByRole("heading", { name: "Welcome back" }),
     ).toBeVisible();
 
-    // Verify form fields
     await expect(page.getByLabel("Email Address")).toBeVisible();
     await expect(page.getByLabel("Password")).toBeVisible();
 
-    // Verify buttons
     await expect(page.getByRole("button", { name: "Sign in" })).toBeVisible();
     await expect(page.getByText("Don't have an account?")).toBeVisible();
   });
@@ -25,7 +22,6 @@ test.describe("Authentication Flow", () => {
     const submitBtn = page.getByRole("button", { name: "Sign in" });
     await submitBtn.click();
 
-    // Verify Zod validation messages
     await expect(page.getByText("Invalid email address")).toBeVisible();
     await expect(
       page.getByText("Password must be at least 8 characters"),

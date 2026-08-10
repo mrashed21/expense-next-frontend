@@ -20,7 +20,6 @@ export const dataApi = apiSlice.injectEndpoints({
         method: "POST",
         body: payload,
       }),
-      // Invalidate tags so everything refetches after restore
       invalidatesTags: [
         "Accounts",
         "Categories",

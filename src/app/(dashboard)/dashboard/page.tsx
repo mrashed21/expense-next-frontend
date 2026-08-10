@@ -67,13 +67,10 @@ function SkeletonCard() {
   );
 }
 
-
-
 export default function DashboardPage() {
   const { formatCurrency } = useCurrency();
   const [dateRange, setDateRange] = useState<DateRange>("thisMonth");
 
-  // Data Fetching
   const { data: netWorthData, isLoading: isLoadingNW } =
     useGetCurrentNetWorthQuery({});
   const { data: monthlyTxData, isLoading: isLoadingTx } =
@@ -103,7 +100,6 @@ export default function DashboardPage() {
   const goals = goalsData?.data || [];
   const analytics = analyticsData?.data;
 
-  // Cashflow Calculations
   const monthlyIncome = useMemo(
     () =>
       allTransactions
@@ -130,7 +126,6 @@ export default function DashboardPage() {
 
   const netSavings = Math.max(0, monthlyIncome - monthlyExpense);
 
-  // Upcoming items
   const upcomingBills = useMemo(() => {
     return bills
       .filter((b: any) => b.status !== "paid")
@@ -157,7 +152,6 @@ export default function DashboardPage() {
       .slice(0, 2);
   }, [goals]);
 
-  // Chart data from analytics
   const monthlyChartData = useMemo(() => {
     if (!analytics?.monthlyComparison) return [];
     return analytics.monthlyComparison.map((m: any) => ({
@@ -189,7 +183,7 @@ export default function DashboardPage() {
   return (
     <div className="space-y-5 pb-6">
       {/* Top Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-5 rounded-2xl bg-gradient-to-r from-primary via-indigo-600 to-purple-600 text-white shadow-lg shadow-primary/20">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-5 rounded-2xl bg-linear-to-r from-primary via-indigo-600 to-purple-600 text-white shadow-lg shadow-primary/20">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold tracking-tight">
             Financial Dashboard
@@ -489,7 +483,8 @@ export default function DashboardPage() {
                     (s: number, x: any) => s + x.value,
                     0,
                   );
-                  const pct = total > 0 ? Math.round((c.value / total) * 100) : 0;
+                  const pct =
+                    total > 0 ? Math.round((c.value / total) * 100) : 0;
                   return (
                     <div
                       key={i}
@@ -754,9 +749,7 @@ export default function DashboardPage() {
               Investments
             </p>
             <p className="text-sm font-bold text-foreground mt-0.5">
-              {formatCurrency(
-                netWorthInfo.breakdown.assets?.investments || 0,
-              )}
+              {formatCurrency(netWorthInfo.breakdown.assets?.investments || 0)}
             </p>
           </Link>
           <Link

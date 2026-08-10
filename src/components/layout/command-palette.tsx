@@ -1,10 +1,19 @@
 "use client";
 
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { useDebounce } from "@/hooks/use-debounce"; // Need to make sure this hook exists or use inline debounce
+import { useDebounce } from "@/hooks/use-debounce";
 import { useLazyGlobalAdminSearchQuery } from "@/services/admin-api";
 import { useLazyGlobalSearchQuery } from "@/services/search-api";
-import { Command, CreditCard, FileText, Folder, Loader2, Search, Wallet, X } from "lucide-react";
+import {
+  Command,
+  CreditCard,
+  FileText,
+  Folder,
+  Loader2,
+  Search,
+  Wallet,
+  X,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
@@ -17,16 +26,17 @@ export function CommandPalette() {
   const debouncedQuery = useDebounce(query, 300);
   const router = useRouter();
   const user = useSelector((state: RootState) => state.auth.user);
-  
-  const [triggerUserSearch, { data: userData, isFetching: isUserFetching }] = useLazyGlobalSearchQuery();
-  const [triggerAdminSearch, { data: adminData, isFetching: isAdminFetching }] = useLazyGlobalAdminSearchQuery();
-  
+
+  const [triggerUserSearch, { data: userData, isFetching: isUserFetching }] =
+    useLazyGlobalSearchQuery();
+  const [triggerAdminSearch, { data: adminData, isFetching: isAdminFetching }] =
+    useLazyGlobalAdminSearchQuery();
+
   const isFetching = isUserFetching || isAdminFetching;
   const results = (user?.isAdmin ? adminData?.data : userData?.data) || [];
 
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Toggle with Ctrl+K / Cmd+K
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
@@ -38,7 +48,6 @@ export function CommandPalette() {
     return () => document.removeEventListener("keydown", down);
   }, []);
 
-  // Trigger search when debounced query changes
   useEffect(() => {
     if (debouncedQuery.length >= 2) {
       if (user?.isAdmin) {
@@ -57,19 +66,26 @@ export function CommandPalette() {
 
   const getIcon = (type: string) => {
     switch (type) {
-      case "transaction": return <CreditCard className="w-4 h-4 text-emerald-500" />;
-      case "category": return <Folder className="w-4 h-4 text-indigo-500" />;
-      case "account": return <Wallet className="w-4 h-4 text-blue-500" />;
-      case "bill": return <FileText className="w-4 h-4 text-purple-500" />;
-      case "user": return <Folder className="w-4 h-4 text-emerald-500" />;
-      case "admin": return <Wallet className="w-4 h-4 text-rose-500" />;
-      default: return <Command className="w-4 h-4 text-muted-foreground" />;
+      case "transaction":
+        return <CreditCard className="w-4 h-4 text-emerald-500" />;
+      case "category":
+        return <Folder className="w-4 h-4 text-indigo-500" />;
+      case "account":
+        return <Wallet className="w-4 h-4 text-blue-500" />;
+      case "bill":
+        return <FileText className="w-4 h-4 text-purple-500" />;
+      case "user":
+        return <Folder className="w-4 h-4 text-emerald-500" />;
+      case "admin":
+        return <Wallet className="w-4 h-4 text-rose-500" />;
+      default:
+        return <Command className="w-4 h-4 text-muted-foreground" />;
     }
   };
 
   return (
     <>
-      <button 
+      <button
         onClick={() => setIsOpen(true)}
         className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border bg-secondary/50 text-muted-foreground hover:bg-secondary transition-colors"
       >
@@ -92,9 +108,14 @@ export function CommandPalette() {
               className="flex-1 bg-transparent border-none outline-none ring-0 px-3 py-2 text-foreground placeholder:text-muted-foreground text-base"
               autoFocus
             />
-            {isFetching && <Loader2 className="w-5 h-5 animate-spin text-muted-foreground shrink-0" />}
+            {isFetching && (
+              <Loader2 className="w-5 h-5 animate-spin text-muted-foreground shrink-0" />
+            )}
             {query && (
-              <button onClick={() => setQuery("")} className="p-1 rounded-full hover:bg-secondary text-muted-foreground">
+              <button
+                onClick={() => setQuery("")}
+                className="p-1 rounded-full hover:bg-secondary text-muted-foreground"
+              >
                 <X className="w-4 h-4" />
               </button>
             )}
@@ -107,7 +128,8 @@ export function CommandPalette() {
               </div>
             ) : results.length === 0 && !isFetching ? (
               <div className="p-8 text-center text-sm text-muted-foreground">
-                No results found for <span className="font-bold text-foreground">"{query}"</span>
+                No results found for{" "}
+                <span className="font-bold text-foreground">"{query}"</span>
               </div>
             ) : (
               <div className="space-y-1">
@@ -121,9 +143,13 @@ export function CommandPalette() {
                       {getIcon(item.type)}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-foreground truncate">{item.title}</p>
+                      <p className="text-sm font-semibold text-foreground truncate">
+                        {item.title}
+                      </p>
                       {item.subtitle && (
-                        <p className="text-xs text-muted-foreground truncate">{item.subtitle}</p>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {item.subtitle}
+                        </p>
                       )}
                     </div>
                   </button>
@@ -131,7 +157,7 @@ export function CommandPalette() {
               </div>
             )}
           </div>
-          
+
           <div className="border-t border-border px-4 py-2 bg-secondary/30 flex items-center justify-between text-[10px] text-muted-foreground uppercase font-bold tracking-widest">
             <span>Expense Tracker Search</span>
             <span>ESC to close</span>

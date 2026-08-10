@@ -110,7 +110,6 @@ export default function ProfilePage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
-  // Profile Completion Logic
   const completionScore = useMemo(() => {
     let score = 0;
     if (user.user_name) score += 20;
@@ -167,7 +166,7 @@ export default function ProfilePage() {
             user_name: data.user_name,
             admin_name: data.user_name,
           } as any),
-        ); // update local redux state
+        ); 
       } else {
         await updateProfileApi(data).unwrap();
       }

@@ -21,7 +21,6 @@ import {
   Loader2,
   Trash2,
 } from "lucide-react";
-import Link from "next/link";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -81,7 +80,8 @@ export default function NotificationsPage() {
   const [markAsReadApi, { isLoading: isMarkingOne }] = useMarkAsReadMutation();
   const [markAllAsReadApi, { isLoading: isMarkingAll }] =
     useMarkAllAsReadMutation();
-  const [deleteApi, { isLoading: isDeleting }] = useDeleteNotificationMutation();
+  const [deleteApi, { isLoading: isDeleting }] =
+    useDeleteNotificationMutation();
 
   const notifications = useMemo(
     () => notificationsData?.data || [],
@@ -95,7 +95,10 @@ export default function NotificationsPage() {
 
   // Count per filter for badges
   const filterCounts = useMemo(() => {
-    const counts: Record<string, number> = { all: notifications.length, unread: unreadCount };
+    const counts: Record<string, number> = {
+      all: notifications.length,
+      unread: unreadCount,
+    };
     notifications.forEach((n: any) => {
       const key = (n.category || n.type || "").toLowerCase();
       FILTER_OPTIONS.forEach((opt) => {
@@ -161,7 +164,8 @@ export default function NotificationsPage() {
             )}
           </h1>
           <p className="text-xs text-muted-foreground mt-1">
-            Alerts for budgets, recurring bills, security events, and system updates.
+            Alerts for budgets, recurring bills, security events, and system
+            updates.
           </p>
         </div>
 
@@ -186,11 +190,7 @@ export default function NotificationsPage() {
         {FILTER_OPTIONS.map((opt) => {
           const count = filterCounts[opt.value] || 0;
           // Hide filters with no notifications (except "all" and "unread")
-          if (
-            opt.value !== "all" &&
-            opt.value !== "unread" &&
-            count === 0
-          )
+          if (opt.value !== "all" && opt.value !== "unread" && count === 0)
             return null;
           const isActive = activeFilter === opt.value;
           return (
@@ -251,7 +251,7 @@ export default function NotificationsPage() {
                 key={n._id}
                 className={`p-4 transition-colors flex items-start gap-3.5 group ${
                   !n.is_read
-                    ? "bg-primary/[0.04] dark:bg-primary/[0.08]"
+                    ? "bg-primary/4 dark:bg-primary/8"
                     : "hover:bg-secondary/20"
                 }`}
               >
@@ -296,7 +296,9 @@ export default function NotificationsPage() {
                   </div>
                   <p
                     className={`text-xs mt-1 leading-relaxed ${
-                      !n.is_read ? "text-foreground/80" : "text-muted-foreground"
+                      !n.is_read
+                        ? "text-foreground/80"
+                        : "text-muted-foreground"
                     }`}
                   >
                     {n.message}
@@ -370,7 +372,8 @@ export default function NotificationsPage() {
       {/* Footer hint */}
       {filteredNotifications.length > 0 && (
         <p className="text-center text-[11px] text-muted-foreground">
-          Showing {filteredNotifications.length} of {notifications.length} notifications
+          Showing {filteredNotifications.length} of {notifications.length}{" "}
+          notifications
           {activeFilter !== "all" && (
             <button
               onClick={() => setActiveFilter("all")}

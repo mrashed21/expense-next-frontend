@@ -1,22 +1,23 @@
+import { AuthProvider } from "@/providers/auth-provider";
+import { ReduxProvider } from "@/providers/redux-provider";
+import { ThemeProvider } from "@/providers/theme-provider";
+import { ToastProvider } from "@/providers/toast-provider";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { ReduxProvider } from "@/providers/redux-provider";
-import { AuthProvider } from "@/providers/auth-provider";
-import { ThemeProvider } from "@/providers/theme-provider";
-import { ToastProvider } from "@/providers/toast-provider";
 
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
 });
 
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://expensetracker.com";
+const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://expense-trecker-bd.vercel.app";
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: {
-    default: "Expense Tracker - Premium SaaS Expense Tracker & Financial Analytics",
+    default:
+      "Expense Tracker - Premium SaaS Expense Tracker & Financial Analytics",
     template: "%s | Expense Tracker",
   },
   description:
@@ -53,7 +54,8 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: baseUrl,
-    title: "Expense Tracker - Premium SaaS Expense Tracker & Financial Analytics",
+    title:
+      "Expense Tracker - Premium SaaS Expense Tracker & Financial Analytics",
     description:
       "Modern, secure, and intuitive expense tracking application. Real-time budget alerts, instant search, multi-account transfers, and financial visual charts.",
     siteName: "Expense Tracker",

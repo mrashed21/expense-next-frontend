@@ -14,7 +14,6 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
     (state: RootState) => state.auth,
   );
 
-  // Initialize Socket.io connection for authenticated users
   useRealtime();
 
   useEffect(() => {

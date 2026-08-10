@@ -1,8 +1,8 @@
 "use client";
 
 import { ConfirmDialog } from "@/components/custom/confirm-dialog";
-import FormSelect from "@/components/custom/form-select";
 import FormDatePicker from "@/components/custom/form-date-picker";
+import FormSelect from "@/components/custom/form-select";
 import { useCurrency } from "@/hooks/use-currency";
 import { formatDate } from "@/lib/utils";
 import { useGetAccountsQuery } from "@/services/account-api";
@@ -54,8 +54,7 @@ export default function InstallmentsPage() {
   const { formatCurrency } = useCurrency();
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all"); // 'all', 'active', 'completed'
-
+  const [statusFilter, setStatusFilter] = useState("all");
   const { data: installmentsData, isLoading: installmentsLoading } =
     useGetInstallmentsQuery({
       search: searchTerm,
@@ -177,7 +176,6 @@ export default function InstallmentsPage() {
 
   const openPayment = (item: any) => {
     setPaymentItem(item);
-    // Suggest the exact monthly amount to pay
     const suggestedPayment = Math.min(
       item.monthly_amount,
       item.remaining_amount,

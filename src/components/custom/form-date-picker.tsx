@@ -17,13 +17,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
 
 type FormDatePickerProps<T extends FieldValues> = {
   icon?: React.ReactNode;
@@ -75,7 +75,7 @@ const FormDatePicker = <T extends FieldValues>({
                 className={cn(
                   "w-full justify-start text-left font-normal bg-secondary border-border text-xs text-foreground px-3 py-5 rounded-xl h-10",
                   !field.value && "text-muted-foreground",
-                  error && "border-destructive"
+                  error && "border-destructive",
                 )}
                 disabled={disabled}
               >

@@ -52,12 +52,21 @@ export function Accordion({
   );
 }
 
-export function AccordionItem({ value, children, className }: AccordionItemProps) {
+export function AccordionItem({
+  value,
+  children,
+  className,
+}: AccordionItemProps) {
   const { openValue, toggleValue } = React.useContext(AccordionContext);
   const isOpen = openValue === value;
 
   return (
-    <div className={cn("py-2 border-b border-border/60 last:border-b-0", className)}>
+    <div
+      className={cn(
+        "py-2 border-b border-border/60 last:border-b-0",
+        className,
+      )}
+    >
       {React.Children.map(children, (child) => {
         if (React.isValidElement(child)) {
           return React.cloneElement(child as React.ReactElement<any>, {
@@ -84,14 +93,14 @@ export function AccordionTrigger({
       className={cn(
         "flex w-full items-center justify-between py-4 font-semibold text-left text-sm transition-all hover:text-primary",
         isOpen ? "text-primary font-bold" : "text-foreground",
-        className
+        className,
       )}
     >
       {children}
       <ChevronDown
         className={cn(
           "h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200",
-          isOpen && "rotate-180 text-primary"
+          isOpen && "rotate-180 text-primary",
         )}
       />
     </button>
@@ -109,7 +118,7 @@ export function AccordionContent({
     <div
       className={cn(
         "pb-4 pt-1 text-xs text-muted-foreground leading-relaxed animate-in fade-in-50 duration-200",
-        className
+        className,
       )}
     >
       {children}

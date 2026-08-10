@@ -7,7 +7,6 @@ export const calendarApi = apiSlice.injectEndpoints({
         url: "/calendar",
         params: { startDate, endDate },
       }),
-      // Calendar events depend on multiple collections
       providesTags: ["Transactions", "Bills", "Installments"],
     }),
   }),

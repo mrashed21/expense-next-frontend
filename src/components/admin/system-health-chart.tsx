@@ -32,29 +32,37 @@ export function SystemHealthChart() {
 
   useEffect(() => {
     let isMounted = true;
-    
+
     const fetchHealth = async () => {
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://expense-tracker-bb-backend.vercel.app/api/v1";
+        const apiUrl =
+          process.env.NEXT_PUBLIC_API_URL ||
+          "https://expense-tracker-bb-backend.vercel.app/api/v1";
         const res = await fetch(`${apiUrl}/admin/system-health`, {
-          // If the backend requires auth for this endpoint, we would need to pass token or rely on cookies
-          // For now, assuming cookies are sent if credentials included:
-          credentials: "include"
+          credentials: "include",
         });
-        
+
         if (res.ok) {
           const json = await res.json();
           if (json.success && json.data) {
             setIsConnected(true);
-            
-            // Generate a valid time if missing from backend, or use backend time
+
             const newData: HealthData = {
               time: json.data.time || new Date().toISOString(),
-              memoryUsage: json.data.memoryUsage || ((json.data.usedMemory || 0) / (json.data.totalMemory || 1) * 100).toFixed(2) || "0.00",
-              cpuUsage: json.data.cpuUsage || (json.data.loadAvg?.[0] || 0).toFixed(2) || "0.00",
+              memoryUsage:
+                json.data.memoryUsage ||
+                (
+                  ((json.data.usedMemory || 0) / (json.data.totalMemory || 1)) *
+                  100
+                ).toFixed(2) ||
+                "0.00",
+              cpuUsage:
+                json.data.cpuUsage ||
+                (json.data.loadAvg?.[0] || 0).toFixed(2) ||
+                "0.00",
               uptime: json.data.uptime || 0,
             };
-            
+
             if (isMounted) {
               setData((prevData) => {
                 const updatedData = [...prevData, newData];

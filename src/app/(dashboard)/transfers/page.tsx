@@ -1,14 +1,6 @@
 "use client";
 
 import FormSelect from "@/components/custom/form-select";
-import { useCurrency } from "@/hooks/use-currency";
-import { formatDate } from "@/lib/utils";
-import { useGetAccountsQuery } from "@/services/account-api";
-import {
-  useCreateTransferMutation,
-  useGetTransfersQuery,
-} from "@/services/transfer-api";
-import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Table,
   TableBody,
@@ -17,7 +9,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ArrowRightLeft, Loader2, Plus, X } from "lucide-react";
+import { useCurrency } from "@/hooks/use-currency";
+import { formatDate } from "@/lib/utils";
+import { useGetAccountsQuery } from "@/services/account-api";
+import {
+  useCreateTransferMutation,
+  useGetTransfersQuery,
+} from "@/services/transfer-api";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2, Plus, X } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -82,9 +82,7 @@ export default function TransfersPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold tracking-tight">
-            Fund Transfers
-          </h1>
+          <h1 className="text-xl font-bold tracking-tight">Fund Transfers</h1>
           <p className="text-xs text-muted-foreground">
             Move money between your accounts with optional fee tracking
           </p>
@@ -163,9 +161,7 @@ export default function TransfersPage() {
                     <TableCell>
                       {t.from_account_id?.name || "Account"}
                     </TableCell>
-                    <TableCell>
-                      {t.to_account_id?.name || "Account"}
-                    </TableCell>
+                    <TableCell>{t.to_account_id?.name || "Account"}</TableCell>
                     <TableCell className="text-muted-foreground">
                       {t.notes || "-"}
                     </TableCell>

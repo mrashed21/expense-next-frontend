@@ -35,7 +35,6 @@ export default function ReportsPage() {
     { skip: activeReport !== "balance-sheet" },
   );
 
-  // For cash flow, default to current year
   const now = new Date();
   const startDate = `${now.getFullYear()}-01-01`;
   const endDate = `${now.getFullYear()}-12-31`;

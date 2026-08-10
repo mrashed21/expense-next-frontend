@@ -1,8 +1,8 @@
 "use client";
 
 import { ConfirmDialog } from "@/components/custom/confirm-dialog";
-import FormSelect from "@/components/custom/form-select";
 import FormDatePicker from "@/components/custom/form-date-picker";
+import FormSelect from "@/components/custom/form-select";
 import { useCurrency } from "@/hooks/use-currency";
 import {
   useCreateAssetMutation,
@@ -168,9 +168,7 @@ export default function AssetsPage() {
       {/* Header Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold tracking-tight">
-            Asset Management
-          </h1>
+          <h1 className="text-xl font-bold tracking-tight">Asset Management</h1>
           <p className="text-xs text-muted-foreground">
             Track real estate, vehicles, and valuables for your net worth
           </p>

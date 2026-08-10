@@ -276,9 +276,7 @@ export default function TransactionsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold tracking-tight">
-            Transactions Log
-          </h1>
+          <h1 className="text-xl font-bold tracking-tight">Transactions Log</h1>
           <p className="text-xs text-muted-foreground">
             Search, filter, and audit all recorded financial transactions
           </p>

@@ -1,8 +1,8 @@
 "use client";
 
 import { ConfirmDialog } from "@/components/custom/confirm-dialog";
-import FormSelect from "@/components/custom/form-select";
 import FormDatePicker from "@/components/custom/form-date-picker";
+import FormSelect from "@/components/custom/form-select";
 import { useCurrency } from "@/hooks/use-currency";
 import {
   useCreateInvestmentMutation,
@@ -95,7 +95,7 @@ export default function InvestmentsPage() {
       current: inv.current_price * inv.quantity,
       isProfit: inv.current_price - inv.purchase_price >= 0,
     }))
-    .slice(0, 10); // Show top 10 in chart
+    .slice(0, 10);
 
   const {
     register: registerForm,
