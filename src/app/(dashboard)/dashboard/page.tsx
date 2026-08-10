@@ -226,7 +226,7 @@ export default function DashboardPage() {
       </div>
 
       {/* KPI Cards Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {/* Net Worth */}
         {isLoadingNW ? (
           <SkeletonCard />
@@ -241,7 +241,7 @@ export default function DashboardPage() {
                 Net Worth
               </span>
             </div>
-            <p className="text-2xl font-bold text-foreground truncate">
+            <p className="text-lg sm:text-2xl font-bold text-foreground leading-tight">
               {formatCurrency(netWorthInfo.net_worth)}
             </p>
             <div className="flex items-center gap-1.5 mt-2 flex-wrap">
@@ -266,7 +266,7 @@ export default function DashboardPage() {
                 {selectedRangeLabel} In
               </span>
             </div>
-            <p className="text-2xl font-bold text-foreground truncate">
+            <p className="text-lg sm:text-2xl font-bold text-foreground leading-tight">
               {formatCurrency(monthlyIncome)}
             </p>
             <p className="text-[11px] text-muted-foreground mt-2 flex items-center gap-1">
@@ -287,7 +287,7 @@ export default function DashboardPage() {
                 {selectedRangeLabel} Out
               </span>
             </div>
-            <p className="text-2xl font-bold text-foreground truncate">
+            <p className="text-lg sm:text-2xl font-bold text-foreground leading-tight">
               {formatCurrency(monthlyExpense)}
             </p>
             <p className="text-[11px] text-muted-foreground mt-2 flex items-center gap-1">

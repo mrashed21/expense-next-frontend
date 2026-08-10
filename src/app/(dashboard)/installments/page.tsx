@@ -295,28 +295,94 @@ export default function InstallmentsPage() {
 
       {/* Data Grid */}
       <div className="glass-card rounded-3xl overflow-hidden border border-border">
-        <div className="overflow-x-auto">
+        {/* ── Mobile Card View (< md) ── */}
+        <div className="md:hidden divide-y divide-border">
+          {installmentsLoading ? (
+            <div className="p-8 text-center">
+              <Loader2 className="w-6 h-6 animate-spin text-muted-foreground mx-auto" />
+            </div>
+          ) : installments.length === 0 ? (
+            <div className="px-6 py-12 flex flex-col items-center space-y-3 text-center">
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                <Calendar className="w-6 h-6 text-primary" />
+              </div>
+              <p className="text-sm font-semibold text-foreground">No EMIs Found</p>
+              <p className="text-xs text-muted-foreground">Start tracking your car loan, mortgage, or device installments.</p>
+            </div>
+          ) : installments.filter((inst: any) =>
+              statusFilter === "all" ? true : !inst.is_completed
+            ).filter((inst: any) =>
+              inst.title.toLowerCase().includes(searchTerm.toLowerCase())
+            ).map((inst: any) => {
+            const progressPercent = Math.min(100, Math.max(0, (inst.months_paid / inst.total_months) * 100));
+            return (
+              <div key={inst._id} className={`p-4 hover:bg-secondary/20 transition-colors ${inst.is_completed ? "opacity-60" : ""}`}>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold text-xs uppercase shrink-0">
+                      {inst.title.substring(0, 2)}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-bold text-foreground text-sm truncate">{inst.title}</p>
+                      <p className="text-[10px] text-muted-foreground">{inst.account_id?.name || "Unknown"} &middot; Ends {formatDate(inst.end_date)}</p>
+                      {/* Progress bar */}
+                      <div className="mt-2 space-y-1">
+                        <div className="flex items-center justify-between text-[10px] font-bold">
+                          <span className="text-primary">{inst.months_paid} <span className="text-muted-foreground font-normal">paid</span></span>
+                          <span className="text-muted-foreground">{inst.total_months} total</span>
+                        </div>
+                        <div className="w-full h-1.5 bg-secondary rounded-full overflow-hidden">
+                          <div
+                            className={`h-full rounded-full ${inst.is_completed ? "bg-emerald-500" : "bg-primary"}`}
+                            style={{ width: `${progressPercent}%` }}
+                          />
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 mt-1 flex-wrap">
+                        <span className="text-[10px] text-muted-foreground">{formatCurrency(inst.monthly_amount)}/mo</span>
+                        <span className="text-[10px] text-muted-foreground">Remaining: {formatCurrency(inst.remaining_amount)}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end gap-2 shrink-0">
+                    {inst.is_completed ? (
+                      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[10px] font-bold uppercase">
+                        <CheckCircle2 className="w-3 h-3" /> Cleared
+                      </span>
+                    ) : (
+                      <span className="inline-flex px-2 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-500 text-[10px] font-bold uppercase">Active</span>
+                    )}
+                    <div className="flex items-center gap-1">
+                      {!inst.is_completed && (
+                        <button onClick={() => openPayment(inst)} className="p-1.5 rounded-lg text-muted-foreground hover:text-emerald-500 hover:bg-emerald-500/10 transition-colors" title="Log EMI Payment">
+                          <CreditCard className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                      <button onClick={() => openEdit(inst)} className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors">
+                        <Pencil className="w-3.5 h-3.5" />
+                      </button>
+                      <button onClick={() => handleDelete(inst._id)} className="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors">
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* ── Desktop Table (md+) ── */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead className="sticky top-0 z-10 bg-secondary/95 backdrop-blur-md text-muted-foreground border-b border-border">
               <tr>
-                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider">
-                  EMI Details
-                </th>
-                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">
-                  Progress
-                </th>
-                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">
-                  Monthly EMI
-                </th>
-                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">
-                  Remaining
-                </th>
-                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-center">
-                  Status
-                </th>
-                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">
-                  Actions
-                </th>
+                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider">EMI Details</th>
+                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">Progress</th>
+                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">Monthly EMI</th>
+                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">Remaining</th>
+                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-center">Status</th>
+                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -333,44 +399,27 @@ export default function InstallmentsPage() {
                       <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
                         <Calendar className="w-6 h-6 text-primary" />
                       </div>
-                      <p className="text-sm font-semibold text-foreground">
-                        No EMIs Found
-                      </p>
-                      <p className="text-xs text-muted-foreground max-w-xs">
-                        Start tracking your car loan, mortgage, or device
-                        installments.
-                      </p>
+                      <p className="text-sm font-semibold text-foreground">No EMIs Found</p>
+                      <p className="text-xs text-muted-foreground max-w-xs">Start tracking your car loan, mortgage, or device installments.</p>
                     </div>
                   </td>
                 </tr>
               ) : (
                 installments.map((inst: any) => {
-                  const progressPercent = Math.min(
-                    100,
-                    Math.max(0, (inst.months_paid / inst.total_months) * 100),
-                  );
-
+                  const progressPercent = Math.min(100, Math.max(0, (inst.months_paid / inst.total_months) * 100));
                   return (
-                    <tr
-                      key={inst._id}
-                      className={`hover:bg-secondary/30 transition-colors ${inst.is_completed ? "opacity-60" : ""}`}
-                    >
+                    <tr key={inst._id} className={`hover:bg-secondary/30 transition-colors ${inst.is_completed ? "opacity-60" : ""}`}>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold text-xs uppercase shadow-sm">
                             {inst.title.substring(0, 2)}
                           </div>
                           <div>
-                            <p className="font-bold text-foreground line-clamp-1">
-                              {inst.title}
-                            </p>
+                            <p className="font-bold text-foreground line-clamp-1">{inst.title}</p>
                             <div className="flex items-center gap-2">
-                              <span className="text-[10px] uppercase font-semibold text-muted-foreground truncate w-24">
-                                {inst.account_id?.name || "Unknown"}
-                              </span>
+                              <span className="text-[10px] uppercase font-semibold text-muted-foreground truncate w-24">{inst.account_id?.name || "Unknown"}</span>
                               <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
-                                <Calendar className="w-3 h-3" /> Ends{" "}
-                                {formatDate(inst.end_date)}
+                                <Calendar className="w-3 h-3" /> Ends {formatDate(inst.end_date)}
                               </span>
                             </div>
                           </div>
@@ -379,40 +428,21 @@ export default function InstallmentsPage() {
                       <td className="px-6 py-4">
                         <div className="flex flex-col items-end w-32 ml-auto gap-1.5">
                           <div className="flex items-center justify-between w-full text-[10px] font-bold">
-                            <span className="text-primary">
-                              {inst.months_paid}{" "}
-                              <span className="text-muted-foreground font-normal">
-                                paid
-                              </span>
-                            </span>
-                            <span className="text-muted-foreground">
-                              {inst.total_months}{" "}
-                              <span className="font-normal">total</span>
-                            </span>
+                            <span className="text-primary">{inst.months_paid} <span className="text-muted-foreground font-normal">paid</span></span>
+                            <span className="text-muted-foreground">{inst.total_months} <span className="font-normal">total</span></span>
                           </div>
                           <div className="w-full h-1.5 bg-secondary rounded-full overflow-hidden">
-                            <div
-                              className={`h-full rounded-full ${inst.is_completed ? "bg-emerald-500" : "bg-primary"}`}
-                              style={{ width: `${progressPercent}%` }}
-                            />
+                            <div className={`h-full rounded-full ${inst.is_completed ? "bg-emerald-500" : "bg-primary"}`} style={{ width: `${progressPercent}%` }} />
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <p className="font-semibold text-foreground">
-                          {formatCurrency(inst.monthly_amount)}
-                        </p>
-                        <p className="text-[10px] text-muted-foreground">
-                          per month
-                        </p>
+                        <p className="font-semibold text-foreground">{formatCurrency(inst.monthly_amount)}</p>
+                        <p className="text-[10px] text-muted-foreground">per month</p>
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <p className="font-bold text-foreground">
-                          {formatCurrency(inst.remaining_amount)}
-                        </p>
-                        <p className="text-[10px] text-muted-foreground">
-                          of {formatCurrency(inst.total_amount)}
-                        </p>
+                        <p className="font-bold text-foreground">{formatCurrency(inst.remaining_amount)}</p>
+                        <p className="text-[10px] text-muted-foreground">of {formatCurrency(inst.total_amount)}</p>
                       </td>
                       <td className="px-6 py-4 text-center">
                         {inst.is_completed ? (
@@ -420,34 +450,20 @@ export default function InstallmentsPage() {
                             <CheckCircle2 className="w-3 h-3" /> Cleared
                           </span>
                         ) : (
-                          <span className="inline-flex px-2 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-500 text-[10px] font-bold uppercase">
-                            Active
-                          </span>
+                          <span className="inline-flex px-2 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-500 text-[10px] font-bold uppercase">Active</span>
                         )}
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center justify-end gap-1">
                           {!inst.is_completed && (
-                            <button
-                              onClick={() => openPayment(inst)}
-                              className="p-1.5 rounded-lg text-muted-foreground hover:text-emerald-500 hover:bg-emerald-500/10 transition-colors"
-                              title="Log EMI Payment"
-                            >
+                            <button onClick={() => openPayment(inst)} className="p-1.5 rounded-lg text-muted-foreground hover:text-emerald-500 hover:bg-emerald-500/10 transition-colors" title="Log EMI Payment">
                               <CreditCard className="w-4 h-4" />
                             </button>
                           )}
-                          <button
-                            onClick={() => openEdit(inst)}
-                            className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-                            title="Edit EMI"
-                          >
+                          <button onClick={() => openEdit(inst)} className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors" title="Edit EMI">
                             <Pencil className="w-4 h-4" />
                           </button>
-                          <button
-                            onClick={() => handleDelete(inst._id)}
-                            className="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
-                            title="Delete EMI"
-                          >
+                          <button onClick={() => handleDelete(inst._id)} className="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors" title="Delete EMI">
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
@@ -460,6 +476,7 @@ export default function InstallmentsPage() {
           </table>
         </div>
       </div>
+
 
       {/* Form Modal (Shared Add/Edit) */}
       {(isAddOpen || editItem) && (

@@ -357,103 +357,179 @@ export default function TransactionsPage() {
         </div>
       </div>
 
-      {/* Transactions Data Table */}
+      {/* Transactions Data */}
       <div className="glass-card rounded-3xl overflow-hidden border border-border">
         {isLoading ? (
           <TableSkeleton columns={7} rows={10} />
         ) : transactions.length > 0 ? (
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader className="sticky top-0 z-10 bg-secondary/95 backdrop-blur-md">
-                <TableRow className="text-muted-foreground text-[11px] font-bold uppercase tracking-wider border-b border-border">
-                  <TableHead className="p-4 w-10">
-                    <input
-                      type="checkbox"
-                      className="rounded border-border bg-background accent-primary"
-                      checked={
-                        transactions.length > 0 &&
-                        selectedIds.length === transactions.length
-                      }
-                      onChange={toggleSelectAll}
-                    />
-                  </TableHead>
-                  <TableHead className="p-4">Date</TableHead>
-                  <TableHead className="p-4">Description / Notes</TableHead>
-                  <TableHead className="p-4">Category</TableHead>
-                  <TableHead className="p-4">Account</TableHead>
-                  <TableHead className="p-4">Type</TableHead>
-                  <TableHead className="p-4 text-right">Amount</TableHead>
-                  <TableHead className="p-4 text-center">Action</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody className="divide-y divide-border text-xs font-medium">
-                {transactions.map((tx: any) => (
-                  <TableRow
-                    key={tx._id}
-                    className={`transition-colors ${selectedIds.includes(tx._id) ? "bg-primary/5 hover:bg-primary/10" : "hover:bg-secondary/30"}`}
-                  >
-                    <TableCell className="p-4">
+          <>
+            {/* ── Mobile Card View (< md) ── */}
+            <div className="md:hidden divide-y divide-border">
+              {transactions.map((tx: any) => (
+                <div
+                  key={tx._id}
+                  className={`p-4 transition-colors ${
+                    selectedIds.includes(tx._id)
+                      ? "bg-primary/5"
+                      : "hover:bg-secondary/30"
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-3 min-w-0">
                       <input
                         type="checkbox"
-                        className="rounded border-border bg-background accent-primary"
+                        className="rounded border-border bg-background accent-primary shrink-0 mt-0.5"
                         checked={selectedIds.includes(tx._id)}
                         onChange={() => toggleSelect(tx._id)}
                       />
-                    </TableCell>
-                    <TableCell className="p-4 whitespace-nowrap text-muted-foreground font-semibold">
-                      {formatDate(tx.date)}
-                    </TableCell>
-                    <TableCell className="p-4 font-bold text-foreground">
-                      {tx.notes || tx.category_id?.name || "Transaction"}
-                      {tx.reference_number && (
-                        <span className="block text-[10px] text-muted-foreground font-normal">
-                          Ref: {tx.reference_number}
-                        </span>
-                      )}
-                    </TableCell>
-                    <TableCell className="p-4 whitespace-nowrap">
-                      <span className="px-2.5 py-1 rounded-full bg-secondary border border-border font-semibold text-[11px] text-foreground">
-                        {tx.category_id?.name || "General"}
-                      </span>
-                    </TableCell>
-                    <TableCell className="p-4 whitespace-nowrap text-foreground font-semibold">
-                      {tx.account_id?.name || "Account"}
-                    </TableCell>
-                    <TableCell className="p-4 whitespace-nowrap">
+                      <div className="min-w-0">
+                        <p className="font-bold text-foreground text-sm truncate">
+                          {tx.notes || tx.category_id?.name || "Transaction"}
+                        </p>
+                        {tx.reference_number && (
+                          <span className="text-[10px] text-muted-foreground">
+                            Ref: {tx.reference_number}
+                          </span>
+                        )}
+                        <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                          <span className="text-[10px] text-muted-foreground font-medium">
+                            {formatDate(tx.date)}
+                          </span>
+                          <span
+                            className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold uppercase border ${
+                              tx.type === "income"
+                                ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
+                                : "bg-rose-500/10 text-rose-500 border-rose-500/20"
+                            }`}
+                          >
+                            {tx.type}
+                          </span>
+                          <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-secondary border border-border font-semibold text-foreground">
+                            {tx.category_id?.name || "General"}
+                          </span>
+                        </div>
+                        <p className="text-[10px] text-muted-foreground mt-0.5">
+                          {tx.account_id?.name || "Account"}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-end gap-2 shrink-0">
                       <span
-                        className={`px-2 py-0.5 rounded-full text-[10px] uppercase font-bold ${
+                        className={`font-black text-sm ${
                           tx.type === "income"
-                            ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
-                            : "bg-rose-500/10 text-rose-500 border border-rose-500/20"
+                            ? "text-emerald-500"
+                            : "text-rose-500"
                         }`}
                       >
-                        {tx.type}
+                        {tx.type === "income" ? "+" : "-"}{formatCurrency(tx.amount)}
                       </span>
-                    </TableCell>
-                    <TableCell
-                      className={`p-4 text-right whitespace-nowrap font-black text-sm ${
-                        tx.type === "income"
-                          ? "text-emerald-500"
-                          : "text-rose-500"
-                      }`}
-                    >
-                      {tx.type === "income" ? "+" : "-"}
-                      {formatCurrency(tx.amount)}
-                    </TableCell>
-                    <TableCell className="p-4 text-center whitespace-nowrap">
                       <button
                         onClick={() => handleDelete(tx._id)}
                         className="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
                         title="Delete Transaction"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-3.5 h-3.5" />
                       </button>
-                    </TableCell>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* ── Desktop Table View (md+) ── */}
+            <div className="hidden md:block overflow-x-auto">
+              <Table>
+                <TableHeader className="sticky top-0 z-10 bg-secondary/95 backdrop-blur-md">
+                  <TableRow className="text-muted-foreground text-[11px] font-bold uppercase tracking-wider border-b border-border">
+                    <TableHead className="p-4 w-10">
+                      <input
+                        type="checkbox"
+                        className="rounded border-border bg-background accent-primary"
+                        checked={
+                          transactions.length > 0 &&
+                          selectedIds.length === transactions.length
+                        }
+                        onChange={toggleSelectAll}
+                      />
+                    </TableHead>
+                    <TableHead className="p-4">Date</TableHead>
+                    <TableHead className="p-4">Description / Notes</TableHead>
+                    <TableHead className="p-4">Category</TableHead>
+                    <TableHead className="p-4">Account</TableHead>
+                    <TableHead className="p-4">Type</TableHead>
+                    <TableHead className="p-4 text-right">Amount</TableHead>
+                    <TableHead className="p-4 text-center">Action</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+                </TableHeader>
+                <TableBody className="divide-y divide-border text-xs font-medium">
+                  {transactions.map((tx: any) => (
+                    <TableRow
+                      key={tx._id}
+                      className={`transition-colors ${selectedIds.includes(tx._id) ? "bg-primary/5 hover:bg-primary/10" : "hover:bg-secondary/30"}`}
+                    >
+                      <TableCell className="p-4">
+                        <input
+                          type="checkbox"
+                          className="rounded border-border bg-background accent-primary"
+                          checked={selectedIds.includes(tx._id)}
+                          onChange={() => toggleSelect(tx._id)}
+                        />
+                      </TableCell>
+                      <TableCell className="p-4 whitespace-nowrap text-muted-foreground font-semibold">
+                        {formatDate(tx.date)}
+                      </TableCell>
+                      <TableCell className="p-4 font-bold text-foreground">
+                        {tx.notes || tx.category_id?.name || "Transaction"}
+                        {tx.reference_number && (
+                          <span className="block text-[10px] text-muted-foreground font-normal">
+                            Ref: {tx.reference_number}
+                          </span>
+                        )}
+                      </TableCell>
+                      <TableCell className="p-4 whitespace-nowrap">
+                        <span className="px-2.5 py-1 rounded-full bg-secondary border border-border font-semibold text-[11px] text-foreground">
+                          {tx.category_id?.name || "General"}
+                        </span>
+                      </TableCell>
+                      <TableCell className="p-4 whitespace-nowrap text-foreground font-semibold">
+                        {tx.account_id?.name || "Account"}
+                      </TableCell>
+                      <TableCell className="p-4 whitespace-nowrap">
+                        <span
+                          className={`px-2 py-0.5 rounded-full text-[10px] uppercase font-bold ${
+                            tx.type === "income"
+                              ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
+                              : "bg-rose-500/10 text-rose-500 border border-rose-500/20"
+                          }`}
+                        >
+                          {tx.type}
+                        </span>
+                      </TableCell>
+                      <TableCell
+                        className={`p-4 text-right whitespace-nowrap font-black text-sm ${
+                          tx.type === "income"
+                            ? "text-emerald-500"
+                            : "text-rose-500"
+                        }`}
+                      >
+                        {tx.type === "income" ? "+" : "-"}
+                        {formatCurrency(tx.amount)}
+                      </TableCell>
+                      <TableCell className="p-4 text-center whitespace-nowrap">
+                        <button
+                          onClick={() => handleDelete(tx._id)}
+                          className="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+                          title="Delete Transaction"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </>
         ) : (
           <EmptyState
             title="No transactions found"

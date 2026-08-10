@@ -325,28 +325,77 @@ export default function InvestmentsPage() {
 
       {/* Data Grid */}
       <div className="glass-card rounded-3xl overflow-hidden border border-border">
-        <div className="overflow-x-auto">
+        {/* ── Mobile Card View (< md) ── */}
+        <div className="md:hidden divide-y divide-border">
+          {investmentsLoading ? (
+            <div className="p-8 text-center">
+              <Loader2 className="w-6 h-6 animate-spin text-muted-foreground mx-auto" />
+            </div>
+          ) : investments.length === 0 ? (
+            <div className="px-6 py-12 flex flex-col items-center space-y-3 text-center">
+              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                <Activity className="w-6 h-6 text-primary" />
+              </div>
+              <p className="text-sm font-semibold text-foreground">No Investments Found</p>
+              <p className="text-xs text-muted-foreground">Start building your portfolio by adding a new holding.</p>
+            </div>
+          ) : investments.filter((inv: any) => inv.name.toLowerCase().includes(searchTerm.toLowerCase()) || (inv.symbol || "").toLowerCase().includes(searchTerm.toLowerCase())).map((inv: any) => {
+            const invested = inv.purchase_price * inv.quantity;
+            const current = inv.current_price * inv.quantity;
+            const pnl = current - invested;
+            const pnlPercent = invested > 0 ? (pnl / invested) * 100 : 0;
+            const isProfit = pnl >= 0;
+            return (
+              <div key={inv._id} className="p-4 hover:bg-secondary/20 transition-colors">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold text-xs uppercase shrink-0">
+                      {inv.symbol || inv.name.substring(0, 3)}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-bold text-foreground text-sm truncate">{inv.name}</p>
+                      <p className="text-[10px] text-muted-foreground uppercase">{inv.type.replace("_", " ")}</p>
+                      <div className="flex items-center gap-2 mt-1 flex-wrap">
+                        <span className="text-[10px] text-muted-foreground">Qty: {inv.quantity}</span>
+                        <span className="text-[10px] text-muted-foreground">Avg: {formatCurrency(inv.purchase_price)}</span>
+                        <span className="text-[10px] text-muted-foreground">Now: {formatCurrency(inv.current_price)}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end gap-1.5 shrink-0">
+                    <span className={`font-bold text-sm ${isProfit ? "text-emerald-500" : "text-destructive"}`}>
+                      {isProfit ? "+" : ""}{formatCurrency(pnl)}
+                    </span>
+                    <span className={`text-[10px] font-semibold flex items-center gap-0.5 ${isProfit ? "text-emerald-500" : "text-destructive"}`}>
+                      {isProfit ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+                      {pnlPercent.toFixed(2)}%
+                    </span>
+                    <div className="flex items-center gap-1 mt-1">
+                      <button onClick={() => openEdit(inv)} className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors">
+                        <Pencil className="w-3.5 h-3.5" />
+                      </button>
+                      <button onClick={() => handleDelete(inv._id)} className="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors">
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* ── Desktop Table (md+) ── */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead className="sticky top-0 z-10 bg-secondary/95 backdrop-blur-md text-muted-foreground border-b border-border">
               <tr>
-                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider">
-                  Asset
-                </th>
-                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">
-                  Holdings
-                </th>
-                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">
-                  Avg Price
-                </th>
-                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">
-                  Market Price
-                </th>
-                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">
-                  Return
-                </th>
-                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">
-                  Actions
-                </th>
+                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider">Asset</th>
+                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">Holdings</th>
+                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">Avg Price</th>
+                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">Market Price</th>
+                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">Return</th>
+                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -363,12 +412,8 @@ export default function InvestmentsPage() {
                       <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
                         <Activity className="w-6 h-6 text-primary" />
                       </div>
-                      <p className="text-sm font-semibold text-foreground">
-                        No Investments Found
-                      </p>
-                      <p className="text-xs text-muted-foreground max-w-xs">
-                        Start building your portfolio by adding a new holding.
-                      </p>
+                      <p className="text-sm font-semibold text-foreground">No Investments Found</p>
+                      <p className="text-xs text-muted-foreground max-w-xs">Start building your portfolio by adding a new holding.</p>
                     </div>
                   </td>
                 </tr>
@@ -379,79 +424,46 @@ export default function InvestmentsPage() {
                   const pnl = current - invested;
                   const pnlPercent = invested > 0 ? (pnl / invested) * 100 : 0;
                   const isProfit = pnl >= 0;
-
                   return (
-                    <tr
-                      key={inv._id}
-                      className="hover:bg-secondary/30 transition-colors"
-                    >
+                    <tr key={inv._id} className="hover:bg-secondary/30 transition-colors">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold text-xs uppercase shadow-sm">
                             {inv.symbol || inv.name.substring(0, 3)}
                           </div>
                           <div>
-                            <p className="font-bold text-foreground line-clamp-1">
-                              {inv.name}
-                            </p>
-                            <p className="text-[10px] text-muted-foreground uppercase">
-                              {inv.type.replace("_", " ")}
-                            </p>
+                            <p className="font-bold text-foreground line-clamp-1">{inv.name}</p>
+                            <p className="text-[10px] text-muted-foreground uppercase">{inv.type.replace("_", " ")}</p>
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <p className="font-semibold text-foreground">
-                          {inv.quantity.toLocaleString()}
-                        </p>
+                        <p className="font-semibold text-foreground">{inv.quantity.toLocaleString()}</p>
                         <p className="text-[10px] text-muted-foreground">Qty</p>
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <p className="font-semibold text-foreground">
-                          {formatCurrency(inv.purchase_price)}
-                        </p>
-                        <p className="text-[10px] text-muted-foreground">
-                          Total: {formatCurrency(invested)}
-                        </p>
+                        <p className="font-semibold text-foreground">{formatCurrency(inv.purchase_price)}</p>
+                        <p className="text-[10px] text-muted-foreground">Total: {formatCurrency(invested)}</p>
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <p className="font-semibold text-foreground">
-                          {formatCurrency(inv.current_price)}
-                        </p>
-                        <p className="text-[10px] text-muted-foreground">
-                          Total: {formatCurrency(current)}
-                        </p>
+                        <p className="font-semibold text-foreground">{formatCurrency(inv.current_price)}</p>
+                        <p className="text-[10px] text-muted-foreground">Total: {formatCurrency(current)}</p>
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <p
-                          className={`font-bold ${isProfit ? "text-emerald-500" : "text-destructive"}`}
-                        >
-                          {isProfit ? "+" : ""}
-                          {formatCurrency(pnl)}
+                        <p className={`font-bold ${isProfit ? "text-emerald-500" : "text-destructive"}`}>
+                          {isProfit ? "+" : ""}{formatCurrency(pnl)}
                         </p>
-                        <div
-                          className={`inline-flex items-center gap-1 text-[10px] font-bold mt-1 ${isProfit ? "text-emerald-500" : "text-destructive"}`}
-                        >
-                          {isProfit ? (
-                            <TrendingUp className="w-3 h-3" />
-                          ) : (
-                            <TrendingDown className="w-3 h-3" />
-                          )}
+                        <div className={`inline-flex items-center gap-1 text-[10px] font-bold mt-1 ${isProfit ? "text-emerald-500" : "text-destructive"}`}>
+                          {isProfit ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
                           {pnlPercent.toFixed(2)}%
                         </div>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center justify-end gap-2">
-                          <button
-                            onClick={() => openEdit(inv)}
-                            className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
-                          >
+                          <button onClick={() => openEdit(inv)} className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors">
                             <Pencil className="w-4 h-4" />
                           </button>
-                          <button
-                            onClick={() => handleDelete(inv._id)}
-                            className="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
-                          >
+                          <button onClick={() => handleDelete(inv._id)} className="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors">
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
@@ -464,6 +476,7 @@ export default function InvestmentsPage() {
           </table>
         </div>
       </div>
+
 
       {/* Form Modal (Shared Add/Edit) */}
       {(isAddOpen || editItem) && (

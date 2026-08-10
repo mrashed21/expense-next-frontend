@@ -121,8 +121,10 @@ export function Header() {
         {/* Notifications Dropdown */}
         <NotificationDropdown />
 
-        {/* Theme Toggle */}
-        <ThemeToggle />
+        {/* Theme Toggle - hidden on mobile to save space */}
+        <span className="hidden sm:inline-flex">
+          <ThemeToggle />
+        </span>
 
         {/* User Menu */}
         <DropdownMenu>

@@ -267,7 +267,7 @@ export default function SettingsPage() {
         <h2 className="text-base font-bold text-rose-500 border-b border-rose-500/20 pb-3">
           Danger Zone
         </h2>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <h3 className="text-xs font-bold text-foreground">
               Delete Account Permanently
@@ -279,7 +279,7 @@ export default function SettingsPage() {
           </div>
           <button
             onClick={() => setIsDeleteModalOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-rose-500/10 text-rose-500 border border-rose-500/20 text-xs font-bold hover:bg-rose-500/20 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-rose-500/10 text-rose-500 border border-rose-500/20 text-xs font-bold hover:bg-rose-500/20 transition-colors shrink-0 self-start sm:self-auto"
           >
             <Trash2 className="w-4 h-4" />
             <span>Delete Account</span>
