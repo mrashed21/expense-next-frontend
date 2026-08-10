@@ -1,5 +1,6 @@
 "use client";
 
+import AvatarCropper from "@/components/custom/avatar-cropper";
 import FormSelect from "@/components/custom/form-select";
 import PhonesInput from "@/components/custom/phone-input";
 import { bangladeshCities, cityAreas } from "@/lib/location-data";
@@ -33,11 +34,10 @@ import {
   ShieldAlert,
   Smartphone,
   Trash2,
-  Upload,
   X,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
@@ -98,7 +98,27 @@ export default function ProfilePage() {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
 
-  const user = authUser?.isAdmin ? authUser : profileData?.data || {};
+  const rawUser = authUser?.isAdmin ? authUser : profileData?.data;
+
+  // Admin documents store the same profile fields under an `admin_` prefix.
+  // Normalise both shapes onto the `user_` keys the form and UI read, otherwise
+  // an admin's saved area/city/phone never make it back into the form and the
+  // next save writes them back as empty strings.
+  const user = useMemo(() => {
+    const u: any = rawUser || {};
+    return {
+      ...u,
+      user_name: u.user_name || u.admin_name || "",
+      user_email: u.user_email || u.admin_email || "",
+      user_phone: u.user_phone || u.admin_phone || "",
+      user_area: u.user_area || u.admin_area || "",
+      user_city: u.user_city || u.admin_city || "",
+      user_country: u.user_country || u.admin_country || "",
+      user_role: u.user_role || u.admin_role || "",
+      user_profile_image: u.user_profile_image || u.admin_profile_image || "",
+    };
+  }, [rawUser]);
+
   const history = historyData?.data || [];
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -108,7 +128,6 @@ export default function ProfilePage() {
   const [twoFaCode, setTwoFaCode] = useState("");
   const [recoveryCodes, setRecoveryCodes] = useState<string[] | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const completionScore = useMemo(() => {
     let score = 0;
@@ -125,6 +144,8 @@ export default function ProfilePage() {
     handleSubmit: handleSubmitProfile,
     control: profileControl,
     clearErrors: clearProfileErrors,
+    getValues: getProfileValues,
+    setValue: setProfileValue,
     formState: { errors: profileErrors },
   } = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
@@ -139,6 +160,16 @@ export default function ProfilePage() {
   });
 
   const selectedCity = useWatch({ control: profileControl, name: "user_city" });
+
+  // Areas are city-specific. Without this the previous city's area stays in
+  // form state (invisible, since it is no longer an option) and gets saved.
+  useEffect(() => {
+    if (!selectedCity) return;
+    const currentArea = getProfileValues("user_area");
+    if (currentArea && !(cityAreas[selectedCity] || []).includes(currentArea)) {
+      setProfileValue("user_area", "");
+    }
+  }, [selectedCity, getProfileValues, setProfileValue]);
 
   const {
     register: registerPassword,
@@ -160,13 +191,15 @@ export default function ProfilePage() {
           admin_country: data.user_country,
           currency: data.currency,
         };
-        await updateAdminProfileApi(adminData).unwrap();
+        const res: any = await updateAdminProfileApi(adminData).unwrap();
+        // Mirror every saved field back into the store — it is the only source
+        // the admin profile form reads from (there is no admin GET profile).
         dispatch(
           updateUser({
+            ...(res?.data || adminData),
             user_name: data.user_name,
-            admin_name: data.user_name,
           } as any),
-        ); 
+        );
       } else {
         await updateProfileApi(data).unwrap();
       }
@@ -241,31 +274,42 @@ export default function ProfilePage() {
     }
   };
 
-  const handleProfileImageChange = async (
+  const handleProfileImageChange = (
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const file = e.target.files?.[0];
+    // Reset the input so re-picking the same file still fires onChange.
+    e.target.value = "";
     if (!file) return;
 
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please choose an image file.");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image must be smaller than 5MB.");
+      return;
+    }
+
     setSelectedFile(file);
-    setPreviewUrl(URL.createObjectURL(file));
     setIsCropModalOpen(true);
   };
 
-  const handleUploadCroppedImage = async () => {
-    if (!selectedFile) return;
-
+  const handleUploadCroppedImage = async (croppedFile: File) => {
     const formData = new FormData();
     formData.append(
       authUser?.isAdmin ? "admin_profile_image" : "user_profile_image",
-      selectedFile,
+      croppedFile,
     );
 
     try {
       if (authUser?.isAdmin) {
         const res = await updateAdminProfileImageApi(formData).unwrap();
         dispatch(
-          updateUser({ user_profile_image: res.data.admin_profile_image }),
+          updateUser({
+            user_profile_image: res.data.admin_profile_image,
+            admin_profile_image: res.data.admin_profile_image,
+          } as any),
         );
       } else {
         await updateProfileImageApi(formData).unwrap();
@@ -273,7 +317,6 @@ export default function ProfilePage() {
       toast.success("Profile image updated!");
       setIsCropModalOpen(false);
       setSelectedFile(null);
-      setPreviewUrl(null);
     } catch (err: any) {
       toast.error(err?.data?.message || "Failed to upload image");
     }
@@ -842,69 +885,16 @@ export default function ProfilePage() {
       )}
 
       {/* Avatar Crop Modal */}
-      {isCropModalOpen && previewUrl && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="crop-modal-title"
-            className="w-full max-w-sm bg-card border border-border p-6 rounded-3xl space-y-4 shadow-2xl"
-          >
-            <div className="flex items-center justify-between border-b border-border pb-3">
-              <h3
-                id="crop-modal-title"
-                className="text-base font-bold text-foreground"
-              >
-                Adjust Avatar
-              </h3>
-              <button
-                onClick={() => setIsCropModalOpen(false)}
-                className="text-muted-foreground hover:text-foreground"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="relative w-full aspect-square bg-secondary rounded-2xl overflow-hidden flex items-center justify-center">
-              <img
-                src={previewUrl}
-                alt="Preview"
-                className="w-full h-full object-cover"
-              />
-              <div
-                className="absolute inset-0 ring-4 ring-primary/50 rounded-full pointer-events-none"
-                style={{ margin: "10%" }}
-              ></div>
-            </div>
-
-            <p className="text-[10px] text-muted-foreground text-center">
-              Drag or pinch to adjust your avatar (simulated for native upload).
-            </p>
-
-            <div className="flex items-center gap-3 pt-2">
-              <button
-                onClick={() => setIsCropModalOpen(false)}
-                className="w-1/2 py-2.5 rounded-xl bg-secondary text-foreground font-semibold text-xs border border-border hover:bg-secondary/80"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleUploadCroppedImage}
-                disabled={isUploadingImage}
-                className="w-1/2 py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-xs shadow-md hover:bg-primary/90 flex items-center justify-center gap-2"
-              >
-                {isUploadingImage ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <>
-                    <Upload className="w-4 h-4" />
-                    Upload
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
+      {isCropModalOpen && selectedFile && (
+        <AvatarCropper
+          file={selectedFile}
+          isUploading={isUploadingImage}
+          onCancel={() => {
+            setIsCropModalOpen(false);
+            setSelectedFile(null);
+          }}
+          onCropped={handleUploadCroppedImage}
+        />
       )}
 
       {/* 2FA Setup Modal */}

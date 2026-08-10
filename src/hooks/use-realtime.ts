@@ -17,7 +17,12 @@ export const useRealtime = () => {
   useEffect(() => {
     if (!user?._id) return;
 
-    if (!ablyClient) return;
+    if (!ablyClient) {
+      console.warn(
+        "[Realtime] Disabled: NEXT_PUBLIC_ABLY_KEY is not set. Notifications will only appear after a refetch.",
+      );
+      return;
+    }
 
     const channelName = `user:${user._id}`;
     const channel = ablyClient.channels.get(channelName);

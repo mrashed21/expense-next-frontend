@@ -93,6 +93,8 @@ export default function RegisterPage() {
     handleSubmit,
     control,
     watch,
+    getValues,
+    setValue,
     formState: { errors },
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
@@ -100,6 +102,14 @@ export default function RegisterPage() {
 
   const selectedCity = watch("user_city");
   const currentPassword = watch("user_password");
+
+  useEffect(() => {
+    if (!selectedCity) return;
+    const currentArea = getValues("user_area");
+    if (currentArea && !(cityAreas[selectedCity] || []).includes(currentArea)) {
+      setValue("user_area", "");
+    }
+  }, [selectedCity, getValues, setValue]);
 
   const onSubmit = async (data: RegisterFormValues) => {
     try {
