@@ -21,7 +21,7 @@ import {
   HandCoins,
   Home,
   LayoutDashboard,
-  Megaphone,
+  MessageSquare,
   PiggyBank,
   Receipt,
   RefreshCw,
@@ -29,13 +29,12 @@ import {
   SendHorizonal,
   Settings,
   ShieldAlert,
+  Star,
   Target,
   TrendingUp,
   User,
   Users,
-  Wallet,
-  MessageSquare,
-  Star,
+  Wallet
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -208,7 +207,7 @@ export function Sidebar() {
     <TooltipProvider>
       <aside
         className={cn(
-          "hidden md:flex flex-col border-r border-border bg-card transition-all duration-300 z-30 sticky top-0 h-screen",
+          "hidden md:flex flex-col border-r border-border bg-card transition-all duration-300 z-30 sticky top-0 self-start h-screen",
           sidebarCollapsed ? "w-15" : "w-60",
         )}
       >
@@ -232,9 +231,6 @@ export function Sidebar() {
               <div className="flex flex-col min-w-0">
                 <span className="font-semibold text-sm tracking-tight text-foreground truncate">
                   Expense Tracker
-                </span>
-                <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-widest">
-                  SaaS
                 </span>
               </div>
             </Link>

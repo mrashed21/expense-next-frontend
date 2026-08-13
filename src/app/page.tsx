@@ -1052,7 +1052,7 @@ export default function HomePage() {
                       Muhammad Rashed
                     </h3>
                     <p className="text-sm font-semibold text-primary mt-1 tracking-wide uppercase">
-                      Full-Stack Software DeveloperFull-Stack Software Developer
+                      Full-Stack Software Developer
                     </p>
                   </div>
                   

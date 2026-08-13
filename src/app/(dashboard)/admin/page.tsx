@@ -182,12 +182,12 @@ export default function AdminDashboardPage() {
                   <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
                     <stop
                       offset="5%"
-                      stopColor="hsl(var(--primary))"
+                      stopColor="var(--primary)"
                       stopOpacity={0.3}
                     />
                     <stop
                       offset="95%"
-                      stopColor="hsl(var(--primary))"
+                      stopColor="var(--primary)"
                       stopOpacity={0}
                     />
                   </linearGradient>
@@ -200,30 +200,30 @@ export default function AdminDashboardPage() {
                       day: "numeric",
                     })
                   }
-                  stroke="hsl(var(--muted-foreground))"
+                  stroke="var(--muted-foreground)"
                   fontSize={12}
                   tickLine={false}
                   axisLine={false}
                 />
                 <YAxis
-                  stroke="hsl(var(--muted-foreground))"
+                  stroke="var(--muted-foreground)"
                   fontSize={12}
                   tickLine={false}
                   axisLine={false}
                 />
                 <RechartsTooltip
                   contentStyle={{
-                    backgroundColor: "hsl(var(--card))",
-                    borderColor: "hsl(var(--border))",
+                    backgroundColor: "var(--card)",
+                    borderColor: "var(--border)",
                     borderRadius: "8px",
-                    color: "hsl(var(--foreground))",
+                    color: "var(--foreground)",
                   }}
-                  itemStyle={{ color: "hsl(var(--foreground))" }}
+                  itemStyle={{ color: "var(--foreground)" }}
                 />
                 <Area
                   type="monotone"
                   dataKey="users"
-                  stroke="hsl(var(--primary))"
+                  stroke="var(--primary)"
                   strokeWidth={2}
                   fillOpacity={1}
                   fill="url(#colorUsers)"
