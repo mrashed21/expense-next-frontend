@@ -3,6 +3,7 @@
 import AvatarCropper from "@/components/custom/avatar-cropper";
 import FormSelect from "@/components/custom/form-select";
 import PhonesInput from "@/components/custom/phone-input";
+import { SearchableSelect } from "@/components/custom/searchable-select";
 import { bangladeshCities, cityAreas } from "@/lib/location-data";
 import { formatDate } from "@/lib/utils";
 import { logout, updateUser } from "@/redux/slices/auth-slice";
@@ -139,6 +140,9 @@ export default function ProfilePage() {
     return score;
   }, [user]);
 
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [isEditingPassword, setIsEditingPassword] = useState(false);
+
   const {
     register: registerProfile,
     handleSubmit: handleSubmitProfile,
@@ -159,7 +163,8 @@ export default function ProfilePage() {
     },
   });
 
-  const selectedCity = useWatch({ control: profileControl, name: "user_city" });
+  const watchedCity = useWatch({ control: profileControl, name: "user_city" });
+  const selectedCity = watchedCity || user.user_city || "";
 
   // Areas are city-specific. Without this the previous city's area stays in
   // form state (invisible, since it is no longer an option) and gets saved.
@@ -208,6 +213,7 @@ export default function ProfilePage() {
         dispatch(updateUser((res?.data || data) as any));
       }
       toast.success("Profile updated successfully!");
+      setIsEditingProfile(false);
     } catch (err: any) {
       toast.error(err?.data?.message || "Failed to update profile");
     }
@@ -218,6 +224,7 @@ export default function ProfilePage() {
       await changePasswordApi(data).unwrap();
       toast.success("Password changed! Please log in again.");
       resetPasswordForm();
+      setIsEditingPassword(false);
       setTimeout(() => {
         dispatch(logout());
         router.push("/login");
@@ -489,9 +496,30 @@ export default function ProfilePage() {
         <div className="md:col-span-2 space-y-6">
           {/* Personal Info Form */}
           <div className="glass-card p-6 rounded-3xl space-y-4">
-            <h3 className="text-base font-bold text-foreground border-b border-border pb-3">
-              Update Personal Details
-            </h3>
+            <div className="flex items-center justify-between border-b border-border pb-3">
+              <h3 className="text-base font-bold text-foreground">
+                Update Personal Details
+              </h3>
+              {!isEditingProfile ? (
+                <button
+                  type="button"
+                  onClick={() => setIsEditingProfile(true)}
+                  className="text-xs font-semibold text-primary hover:underline px-2 py-1"
+                >
+                  Edit
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsEditingProfile(false);
+                  }}
+                  className="text-xs font-semibold text-muted-foreground hover:underline px-2 py-1"
+                >
+                  Cancel
+                </button>
+              )}
+            </div>
             <form
               onSubmit={handleSubmitProfile(onUpdateProfile)}
               className="space-y-3"
@@ -503,7 +531,8 @@ export default function ProfilePage() {
                   </label>
                   <input
                     {...registerProfile("user_name")}
-                    className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
+                    disabled={!isEditingProfile}
+                    className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary disabled:opacity-50"
                   />
                   {profileErrors.user_name && (
                     <p className="text-[10px] text-destructive">
@@ -522,6 +551,7 @@ export default function ProfilePage() {
                       <PhonesInput
                         value={field.value}
                         onChange={field.onChange}
+                        disabled={!isEditingProfile}
                       />
                     )}
                   />
@@ -535,83 +565,166 @@ export default function ProfilePage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div className="space-y-1">
-                  <FormSelect
-                    label="City"
+                  <label className="text-xs font-semibold text-foreground">
+                    City
+                  </label>
+                  <Controller
                     name="user_city"
                     control={profileControl}
-                    options={bangladeshCities.map((c) => ({
-                      label: c,
-                      value: c,
-                    }))}
-                    searchable={true}
-                    clearErrors={clearProfileErrors}
-                    error={profileErrors.user_city}
+                    render={({ field }) => (
+                      <SearchableSelect
+                        options={bangladeshCities.map((c) => ({
+                          label: c,
+                          value: c,
+                        }))}
+                        value={field.value || undefined}
+                        onChange={(val) => {
+                          field.onChange(val);
+                          clearProfileErrors("user_city");
+                        }}
+                        disabled={!isEditingProfile}
+                        placeholder="Select City"
+                      />
+                    )}
                   />
+                  {profileErrors.user_city && (
+                    <p className="text-[10px] text-destructive">
+                      {profileErrors.user_city.message}
+                    </p>
+                  )}
                 </div>
                 <div className="space-y-1">
-                  <FormSelect
-                    label="Area"
+                  <label className="text-xs font-semibold text-foreground">
+                    Area
+                  </label>
+                  <Controller
                     name="user_area"
                     control={profileControl}
-                    options={(selectedCity && cityAreas[selectedCity]
-                      ? cityAreas[selectedCity]
-                      : []
-                    ).map((a) => ({ label: a, value: a }))}
-                    searchable={true}
-                    clearErrors={clearProfileErrors}
-                    error={profileErrors.user_area}
+                    render={({ field }) => (
+                      <SearchableSelect
+                        options={(selectedCity && cityAreas[selectedCity]
+                          ? cityAreas[selectedCity]
+                          : []
+                        ).map((a) => ({ label: a, value: a }))}
+                        value={field.value || undefined}
+                        onChange={(val) => {
+                          field.onChange(val);
+                          clearProfileErrors("user_area");
+                        }}
+                        disabled={!isEditingProfile || !selectedCity}
+                        placeholder="Select Area"
+                      />
+                    )}
                   />
+                  {profileErrors.user_area && (
+                    <p className="text-[10px] text-destructive">
+                      {profileErrors.user_area.message}
+                    </p>
+                  )}
                 </div>
                 <div className="space-y-1">
-                  <FormSelect
-                    label="Country"
+                  <label className="text-xs font-semibold text-foreground">
+                    Country
+                  </label>
+                  <Controller
                     name="user_country"
                     control={profileControl}
-                    options={[{ label: "Bangladesh", value: "Bangladesh" }]}
-                    searchable={false}
-                    clearErrors={clearProfileErrors}
-                    error={profileErrors.user_country}
+                    render={({ field }) => (
+                      <SearchableSelect
+                        options={[{ label: "Bangladesh", value: "Bangladesh" }]}
+                        value={field.value || undefined}
+                        onChange={(val) => {
+                          field.onChange(val);
+                          clearProfileErrors("user_country");
+                        }}
+                        disabled={!isEditingProfile}
+                        placeholder="Select Country"
+                      />
+                    )}
                   />
+                  {profileErrors.user_country && (
+                    <p className="text-[10px] text-destructive">
+                      {profileErrors.user_country.message}
+                    </p>
+                  )}
                 </div>
               </div>
 
               <div className="space-y-1">
-                <FormSelect
-                  label="Default Currency"
+                <label className="text-xs font-semibold text-foreground">
+                  Default Currency
+                </label>
+                <Controller
                   name="currency"
                   control={profileControl}
-                  options={[
-                    { label: "USD ($) - US Dollar", value: "USD" },
-                    { label: "BDT (৳) - Bangladeshi Taka", value: "BDT" },
-                    { label: "EUR (€) - Euro", value: "EUR" },
-                    { label: "GBP (£) - British Pound", value: "GBP" },
-                    { label: "INR (₹) - Indian Rupee", value: "INR" },
-                  ]}
-                  searchable={false}
-                  clearErrors={clearProfileErrors}
-                  error={profileErrors.currency}
+                  render={({ field }) => (
+                    <SearchableSelect
+                      options={[
+                        { label: "USD ($) - US Dollar", value: "USD" },
+                        { label: "BDT (৳) - Bangladeshi Taka", value: "BDT" },
+                        { label: "EUR (€) - Euro", value: "EUR" },
+                        { label: "GBP (£) - British Pound", value: "GBP" },
+                        { label: "INR (₹) - Indian Rupee", value: "INR" },
+                      ]}
+                      value={field.value || undefined}
+                      onChange={(val) => {
+                        field.onChange(val);
+                        clearProfileErrors("currency");
+                      }}
+                      disabled={!isEditingProfile}
+                      placeholder="Select Currency"
+                    />
+                  )}
                 />
+                {profileErrors.currency && (
+                  <p className="text-[10px] text-destructive">
+                    {profileErrors.currency.message}
+                  </p>
+                )}
               </div>
 
-              <button
-                type="submit"
-                disabled={isUpdatingProfile}
-                className="py-2.5 px-6 rounded-xl bg-primary text-primary-foreground font-semibold text-xs shadow-md hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
-              >
-                {isUpdatingProfile ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  "Save Changes"
-                )}
-              </button>
+              {isEditingProfile && (
+                <button
+                  type="submit"
+                  disabled={isUpdatingProfile}
+                  className="py-2.5 px-6 rounded-xl bg-primary text-primary-foreground font-semibold text-xs shadow-md hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
+                >
+                  {isUpdatingProfile ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : null}
+                  Save Changes
+                </button>
+              )}
             </form>
           </div>
 
           {/* Change Password Form */}
-          <div className="glass-card p-6 rounded-3xl space-y-4">
-            <h3 className="text-base font-bold text-foreground border-b border-border pb-3">
-              Change Security Password
-            </h3>
+          <div className="glass-card p-6 rounded-3xl space-y-4 mt-6">
+            <div className="flex items-center justify-between border-b border-border pb-3">
+              <h3 className="text-base font-bold text-foreground">
+                Change Password
+              </h3>
+              {!isEditingPassword ? (
+                <button
+                  type="button"
+                  onClick={() => setIsEditingPassword(true)}
+                  className="text-xs font-semibold text-primary hover:underline px-2 py-1"
+                >
+                  Edit
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsEditingPassword(false);
+                    resetPasswordForm();
+                  }}
+                  className="text-xs font-semibold text-muted-foreground hover:underline px-2 py-1"
+                >
+                  Cancel
+                </button>
+              )}
+            </div>
             <form
               onSubmit={handleSubmitPassword(onChangePassword)}
               className="space-y-3"
@@ -625,7 +738,8 @@ export default function ProfilePage() {
                     <input
                       {...registerPassword("current_password")}
                       type={showCurrentPassword ? "text" : "password"}
-                      className="w-full pl-3 pr-9 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
+                      disabled={!isEditingPassword}
+                      className="w-full px-3 py-2 pr-10 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary disabled:opacity-50"
                     />
                     <button
                       type="button"
@@ -655,7 +769,8 @@ export default function ProfilePage() {
                     <input
                       {...registerPassword("new_password")}
                       type={showNewPassword ? "text" : "password"}
-                      className="w-full pl-3 pr-9 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
+                      disabled={!isEditingPassword}
+                      className="w-full px-3 py-2 pr-10 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary disabled:opacity-50"
                     />
                     <button
                       type="button"
@@ -677,17 +792,19 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              <button
-                type="submit"
-                disabled={isChangingPassword}
-                className="py-2.5 px-6 rounded-xl bg-secondary hover:bg-secondary/80 text-foreground font-semibold text-xs border border-border transition-colors flex items-center justify-center gap-2"
-              >
-                {isChangingPassword ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  "Update Password"
-                )}
-              </button>
+              {isEditingPassword && (
+                <button
+                  type="submit"
+                  disabled={isChangingPassword}
+                  className="py-2.5 px-6 rounded-xl bg-secondary hover:bg-secondary/80 text-foreground font-semibold text-xs border border-border transition-colors flex items-center justify-center gap-2"
+                >
+                  {isChangingPassword ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    "Update Password"
+                  )}
+                </button>
+              )}
             </form>
           </div>
 
