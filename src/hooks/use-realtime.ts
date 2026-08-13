@@ -42,8 +42,30 @@ export const useRealtime = () => {
 
     channel.subscribe("new_notification", onNotification);
 
+    let adminChannel: any = null;
+
+    if (user.isAdmin) {
+      adminChannel = ablyClient.channels.get("admin_room");
+
+      const onAdminFeedback = (msg: Ably.Message) => {
+        toast.info("New Feedback Received", { description: "A user just submitted feedback." });
+        dispatch(apiSlice.util.invalidateTags(["Feedbacks"] as any));
+      };
+
+      const onAdminReview = (msg: Ably.Message) => {
+        toast.info("New Review Received", { description: "A user just submitted a review." });
+        dispatch(apiSlice.util.invalidateTags(["Reviews"] as any));
+      };
+
+      adminChannel.subscribe("new_feedback", onAdminFeedback);
+      adminChannel.subscribe("new_review", onAdminReview);
+    }
+
     return () => {
       channel.unsubscribe("new_notification", onNotification);
+      if (adminChannel) {
+        adminChannel.unsubscribe();
+      }
     };
-  }, [user?._id, dispatch]);
+  }, [user?._id, user?.isAdmin, dispatch]);
 };

@@ -34,6 +34,8 @@ import {
   User,
   Users,
   Wallet,
+  MessageSquare,
+  Star,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -68,6 +70,8 @@ const adminItems = [
   { name: "User Management", href: "/admin/users", icon: Users },
   { name: "Send Notification", href: "/admin/send-notification", icon: SendHorizonal },
   { name: "Activity", href: "/admin/activity", icon: Activity },
+  { name: "Feedbacks", href: "/admin/feedbacks", icon: MessageSquare },
+  { name: "Reviews", href: "/admin/reviews", icon: Star },
   { name: "Notifications", href: "/admin/notifications", icon: Bell },
   { name: "System Health", href: "/admin/system-health", icon: ShieldAlert },
 ];
@@ -78,6 +82,7 @@ const superAdminItems = [
 ];
 
 const bottomItems = [
+  { name: "Feedback", href: "/feedback", icon: MessageSquare },
   { name: "Settings", href: "/settings", icon: Settings },
   { name: "Profile", href: "/profile", icon: User },
 ];

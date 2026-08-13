@@ -29,6 +29,8 @@ import {
   User,
   Users,
   Wallet,
+  MessageSquare,
+  Star,
   X,
 } from "lucide-react";
 import Link from "next/link";
@@ -69,11 +71,15 @@ const moreItems = [
   { name: "Recurring", href: "/recurring", icon: RefreshCw },
   { name: "Calendar", href: "/calendar", icon: Calendar },
   { name: "Notifications", href: "/notifications", icon: Bell },
+  { name: "Feedback", href: "/feedback", icon: MessageSquare },
   { name: "Settings", href: "/settings", icon: Settings },
 ];
 
 const adminMoreItems = [
   { name: "Send Notification", href: "/admin/send-notification", icon: SendHorizonal },
+  { name: "Activity", href: "/admin/activity", icon: Activity },
+  { name: "Feedbacks", href: "/admin/feedbacks", icon: MessageSquare },
+  { name: "Reviews", href: "/admin/reviews", icon: Star },
   { name: "Logs", href: "/admin/logs", icon: ScrollText },
   { name: "Admins", href: "/admin/admins", icon: ShieldAlert },
 ];
