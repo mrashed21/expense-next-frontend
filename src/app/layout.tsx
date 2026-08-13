@@ -33,9 +33,19 @@ export const metadata: Metadata = {
     "BDT expense tracker",
     "Bangladesh expense tracker",
   ],
-  authors: [{ name: "Expense Tracker Team" }],
-  creator: "Expense Tracker",
-  publisher: "Expense Tracker",
+  authors: [{ name: "Muhammad Rashed Jaman Raju", url: "https://www.mrashed21.me/" }],
+  creator: "Muhammad Rashed Jaman Raju",
+  publisher: "Muhammad Rashed Jaman Raju",
+  icons: {
+    icon: [
+      { url: "/192-icon.png", sizes: "192x192", type: "image/png" },
+      { url: "/512-icon.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [
+      { url: "/192-icon.png", sizes: "192x192", type: "image/png" },
+    ],
+    shortcut: "/192-icon.png",
+  },
   robots: {
     index: true,
     follow: true,
