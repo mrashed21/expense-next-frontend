@@ -257,7 +257,7 @@ export default function SendNotificationPage() {
         {/* ── Left: Form ─────────────────────────────────── */}
         <div className="lg:col-span-3 space-y-5">
           {/* Step 1 — User Search */}
-          <Card className="p-5 border border-border shadow-sm bg-card/60 space-y-4">
+          <Card className="p-5 border border-border shadow-sm bg-card/60 space-y-4 overflow-visible">
             <div className="flex items-center gap-2 pb-1 border-b border-border">
               <span className="w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center shrink-0">
                 1
@@ -398,7 +398,7 @@ export default function SendNotificationPage() {
         </Card>
 
           {/* Step 2 — Compose */}
-          <Card className="p-5 border border-border shadow-sm bg-card/60 space-y-4">
+          <Card className="p-5 border border-border shadow-sm bg-card/60 space-y-4 overflow-visible">
             <div className="flex items-center gap-2 pb-1 border-b border-border">
               <span className="w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center shrink-0">
                 2
