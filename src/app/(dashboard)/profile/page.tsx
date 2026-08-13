@@ -201,7 +201,11 @@ export default function ProfilePage() {
           } as any),
         );
       } else {
-        await updateProfileApi(data).unwrap();
+        const res: any = await updateProfileApi(data).unwrap();
+        // Header/sidebar read from the auth store, not the profile query cache —
+        // without this the save succeeds but the name shown there stays stale
+        // until a full reload re-triggers AuthProvider's /auth/me call.
+        dispatch(updateUser((res?.data || data) as any));
       }
       toast.success("Profile updated successfully!");
     } catch (err: any) {
@@ -312,7 +316,12 @@ export default function ProfilePage() {
           } as any),
         );
       } else {
-        await updateProfileImageApi(formData).unwrap();
+        const res: any = await updateProfileImageApi(formData).unwrap();
+        dispatch(
+          updateUser({
+            user_profile_image: res?.data?.user_profile_image,
+          } as any),
+        );
       }
       toast.success("Profile image updated!");
       setIsCropModalOpen(false);
