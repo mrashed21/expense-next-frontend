@@ -125,32 +125,18 @@ export default function RegisterPage() {
   };
 
   return (
-    <>
-      <div className="w-full max-w-sm">
-        {/* Brand Mark */}
-        <div className="flex flex-col items-center text-center mb-8">
-          <div className="w-11 h-11 rounded-xl bg-primary flex items-center justify-center mb-4 shadow-lg shadow-primary/20">
-            <TrendingUp className="w-5 h-5 text-primary-foreground" />
-          </div>
-          <h1 className="text-xl font-semibold tracking-tight text-foreground">
-            Expense Tracker
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Create your free account
-          </p>
-        </div>
+    <div className="w-full space-y-6">
+      <div className="text-center md:text-left space-y-2 mb-6">
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">
+          Create an account
+        </h1>
+        <p className="text-sm text-muted-foreground">
+          Fill in your details to get started with Expense Tracker
+        </p>
+      </div>
 
-        <Card className="border-border/60 shadow-xl shadow-black/5">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-base font-semibold">
-              Get started
-            </CardTitle>
-            <CardDescription className="text-xs">
-              Fill in your details to create an account
-            </CardDescription>
-          </CardHeader>
-
-          <CardContent>
+        <Card className="border-0 shadow-none bg-transparent">
+          <CardContent className="p-0">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-3.5">
               {/* Full Name */}
               <div className="space-y-1.5">
@@ -396,8 +382,8 @@ export default function RegisterPage() {
             </form>
           </CardContent>
 
-          <CardFooter className="flex-col gap-0 pt-0 pb-5 px-6">
-            <Separator className="mb-4" />
+          <CardFooter className="flex-col gap-0 pt-6 p-0 mt-6">
+            <Separator className="mb-4 bg-border/50" />
             <p className="text-xs text-muted-foreground text-center">
               Already have an account?{" "}
               <Link
@@ -409,7 +395,6 @@ export default function RegisterPage() {
             </p>
           </CardFooter>
         </Card>
-      </div>
-    </>
+    </div>
   );
 }

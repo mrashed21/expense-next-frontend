@@ -70,6 +70,7 @@ const adminItems = [
   { name: "User Management", href: "/admin/users", icon: Users },
   { name: "Send Notification", href: "/admin/send-notification", icon: SendHorizonal },
   { name: "Activity", href: "/admin/activity", icon: Activity },
+  { name: "Feedbacks", href: "/admin/feedbacks", icon: MessageSquare },
   { name: "Reviews", href: "/admin/reviews", icon: Star },
   { name: "Notifications", href: "/admin/notifications", icon: Bell },
   { name: "System Health", href: "/admin/system-health", icon: ShieldAlert },
@@ -99,7 +100,9 @@ const NavItem = React.memo(
     sidebarCollapsed: boolean;
   }) => {
     const isActive =
-      pathname === item.href || pathname.startsWith(`${item.href}/`);
+      item.href === "/admin" || item.href === "/dashboard"
+        ? pathname === item.href
+        : pathname === item.href || pathname.startsWith(`${item.href}/`);
     const Icon = item.icon;
 
     const link = (
@@ -188,7 +191,10 @@ export function Sidebar() {
   }, [user, pathname, sidebarCollapsed]);
 
   const renderBottomItems = useMemo(() => {
-    return bottomItems.map((item) => (
+    const items = user?.isAdmin
+      ? bottomItems.filter((item) => item.href !== "/feedback")
+      : bottomItems;
+    return items.map((item) => (
       <NavItem
         key={item.name}
         item={item}
@@ -196,7 +202,7 @@ export function Sidebar() {
         sidebarCollapsed={sidebarCollapsed}
       />
     ));
-  }, [pathname, sidebarCollapsed]);
+  }, [user, pathname, sidebarCollapsed]);
 
   return (
     <TooltipProvider>

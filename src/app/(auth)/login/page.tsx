@@ -137,32 +137,18 @@ function LoginContent() {
   };
 
   return (
-    <>
-      <div className="w-full max-w-sm">
-        {/* Brand Mark */}
-        <div className="flex flex-col items-center text-center mb-8">
-          <div className="w-11 h-11 rounded-xl bg-primary flex items-center justify-center mb-4 shadow-lg shadow-primary/20">
-            <TrendingUp className="w-5 h-5 text-primary-foreground" />
-          </div>
-          <h1 className="text-xl font-semibold tracking-tight text-foreground">
-            Expense Tracker
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Sign in to your account
-          </p>
-        </div>
+    <div className="w-full space-y-6">
+      <div className="text-center md:text-left space-y-2 mb-6">
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">
+          Welcome back
+        </h1>
+        <p className="text-sm text-muted-foreground">
+          Enter your credentials to continue to your account
+        </p>
+      </div>
 
-        <Card className="border-border/60 shadow-xl shadow-black/5">
-          <CardHeader className="pb-4">
-            <CardTitle className="text-base font-semibold">
-              Welcome back
-            </CardTitle>
-            <CardDescription className="text-xs">
-              Enter your credentials to continue
-            </CardDescription>
-          </CardHeader>
-
-          <CardContent>
+        <Card className="border-0 shadow-none bg-transparent">
+          <CardContent className="p-0">
             {!requires2FA ? (
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 {/* Email */}
@@ -320,8 +306,8 @@ function LoginContent() {
             )}
           </CardContent>
 
-          <CardFooter className="flex-col gap-0 pt-0 pb-5 px-6">
-            <Separator className="mb-4" />
+          <CardFooter className="flex-col gap-0 pt-6 p-0 mt-6">
+            <Separator className="mb-4 bg-border/50" />
             <p className="text-xs text-muted-foreground text-center">
               Don&apos;t have an account?{" "}
               <Link
@@ -333,8 +319,7 @@ function LoginContent() {
             </p>
           </CardFooter>
         </Card>
-      </div>
-    </>
+    </div>
   );
 }
 

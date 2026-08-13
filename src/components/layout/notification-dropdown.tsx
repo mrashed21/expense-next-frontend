@@ -7,6 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { RootState } from "@/redux/store";
+import { useGetAdminFeedbacksQuery } from "@/services/feedback-api";
 import {
   useDeleteNotificationMutation,
   useGetNotificationsQuery,
@@ -74,6 +75,39 @@ export function NotificationDropdown() {
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"all" | "unread">("all");
   const { user } = useSelector((state: RootState) => state.auth);
+
+  // Admin: fetch pending feedbacks to show count badge on bell
+  const { data: adminFeedbackData } = useGetAdminFeedbacksQuery(
+    {},
+    { skip: !user?.isAdmin },
+  );
+  const pendingFeedbackCount = useMemo(() => {
+    if (!user?.isAdmin) return 0;
+    const feedbacks = adminFeedbackData?.data || [];
+    return feedbacks.filter((f: any) => f.status === "pending").length;
+  }, [adminFeedbackData, user]);
+
+  // Admin gets a simple link button — no user notification API
+  if (user?.isAdmin) {
+    return (
+      <Button
+        variant="ghost"
+        size="icon"
+        className="h-8 w-8 relative text-muted-foreground hover:text-foreground transition-colors"
+        aria-label={`Admin Notifications${pendingFeedbackCount > 0 ? ` (${pendingFeedbackCount} pending)` : ""}`}
+        asChild
+      >
+        <Link href="/admin/notifications">
+          <Bell className="w-4 h-4" />
+          {pendingFeedbackCount > 0 && (
+            <span className="absolute -top-0.5 -right-0.5 min-w-4 h-4 flex items-center justify-center rounded-full bg-amber-500 text-white text-[9px] font-bold px-1 leading-none animate-pulse">
+              {pendingFeedbackCount > 99 ? "99+" : pendingFeedbackCount}
+            </span>
+          )}
+        </Link>
+      </Button>
+    );
+  }
 
   const {
     data: notificationsData,

@@ -356,6 +356,12 @@ export default function ProfilePage() {
                   alt="User Avatar"
                   className="w-full h-full object-cover"
                 />
+              ) : authUser?.isAdmin ? (
+                <img
+                  src="/muhammad-rashed.jpg"
+                  alt="Muhammad Rashed"
+                  className="w-full h-full object-cover object-top"
+                />
               ) : (
                 user.user_name?.charAt(0).toUpperCase() || "U"
               )}
@@ -386,7 +392,7 @@ export default function ProfilePage() {
 
           <div>
             <h2 className="text-lg font-bold text-foreground">
-              {user.user_name || "User"}
+              {authUser?.isAdmin ? "Muhammad Rashed" : (user.user_name || "User")}
             </h2>
             <p className="text-xs text-muted-foreground">{user.user_email}</p>
             <div className="mt-2 inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-500 text-[11px] font-bold border border-emerald-500/20">
@@ -407,6 +413,22 @@ export default function ProfilePage() {
                 {user.currency || "USD"}
               </span>
             </div>
+            {(user.user_city || user.user_area) && (
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Location:</span>
+                <span className="font-bold text-foreground text-right max-w-[55%] truncate">
+                  {[user.user_area, user.user_city].filter(Boolean).join(", ")}
+                </span>
+              </div>
+            )}
+            {user.user_country && (
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Country:</span>
+                <span className="font-bold text-foreground">
+                  {user.user_country}
+                </span>
+              </div>
+            )}
             <div className="flex justify-between">
               <span className="text-muted-foreground">Last Login:</span>
               <span className="font-bold text-foreground">

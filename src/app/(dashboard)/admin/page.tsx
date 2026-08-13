@@ -216,6 +216,7 @@ export default function AdminDashboardPage() {
                     backgroundColor: "hsl(var(--card))",
                     borderColor: "hsl(var(--border))",
                     borderRadius: "8px",
+                    color: "hsl(var(--foreground))",
                   }}
                   itemStyle={{ color: "hsl(var(--foreground))" }}
                 />

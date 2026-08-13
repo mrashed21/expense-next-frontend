@@ -78,6 +78,7 @@ const moreItems = [
 const adminMoreItems = [
   { name: "Send Notification", href: "/admin/send-notification", icon: SendHorizonal },
   { name: "Activity", href: "/admin/activity", icon: Activity },
+  { name: "Feedbacks", href: "/admin/feedbacks", icon: MessageSquare },
   { name: "Reviews", href: "/admin/reviews", icon: Star },
   { name: "Logs", href: "/admin/logs", icon: ScrollText },
   { name: "Admins", href: "/admin/admins", icon: ShieldAlert },
@@ -96,7 +97,10 @@ export function MobileNav() {
     : moreItems;
 
   const isMoreActive = drawerItems.some(
-    (item) => pathname === item.href || pathname.startsWith(`${item.href}/`),
+    (item) =>
+      item.href === "/admin" || item.href === "/dashboard"
+        ? pathname === item.href
+        : pathname === item.href || pathname.startsWith(`${item.href}/`),
   );
 
   return (
@@ -106,7 +110,9 @@ export function MobileNav() {
         style={{ paddingBottom: "env(safe-area-inset-bottom)", height: "calc(60px + env(safe-area-inset-bottom))" }}>
         {tabItems.map((item) => {
           const isActive =
-            pathname === item.href || pathname.startsWith(`${item.href}/`);
+            item.href === "/admin" || item.href === "/dashboard"
+              ? pathname === item.href
+              : pathname === item.href || pathname.startsWith(`${item.href}/`);
           const Icon = item.icon;
           return (
             <Link
@@ -206,8 +212,9 @@ export function MobileNav() {
               <div className="grid grid-cols-3 gap-2.5 p-4">
                 {drawerItems.map((item) => {
                   const isActive =
-                    pathname === item.href ||
-                    pathname.startsWith(`${item.href}/`);
+                    item.href === "/admin" || item.href === "/dashboard"
+                      ? pathname === item.href
+                      : pathname === item.href || pathname.startsWith(`${item.href}/`);
                   const Icon = item.icon;
                   return (
                     <Link
