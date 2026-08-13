@@ -356,14 +356,10 @@ export default function ProfilePage() {
                   alt="User Avatar"
                   className="w-full h-full object-cover"
                 />
-              ) : authUser?.isAdmin ? (
-                <img
-                  src="/muhammad-rashed.jpg"
-                  alt="Muhammad Rashed"
-                  className="w-full h-full object-cover object-top"
-                />
+              ) : user.user_name ? (
+                <span>{user.user_name.charAt(0).toUpperCase()}</span>
               ) : (
-                user.user_name?.charAt(0).toUpperCase() || "U"
+                <span>U</span>
               )}
             </div>
 
@@ -392,7 +388,7 @@ export default function ProfilePage() {
 
           <div>
             <h2 className="text-lg font-bold text-foreground">
-              {authUser?.isAdmin ? "Muhammad Rashed" : (user.user_name || "User")}
+              {user.user_name || "User"}
             </h2>
             <p className="text-xs text-muted-foreground">{user.user_email}</p>
             <div className="mt-2 inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-500 text-[11px] font-bold border border-emerald-500/20">

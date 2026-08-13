@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { RootState } from "@/redux/store";
 import { useGetAdminFeedbacksQuery } from "@/services/feedback-api";
+import { useGetAdminReviewsQuery } from "@/services/review-api";
 import {
   useDeleteNotificationMutation,
   useGetNotificationsQuery,
@@ -29,8 +30,11 @@ import {
   TrendingUp,
   User,
   Wallet,
+  MessageSquare,
+  Star,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "sonner";
@@ -68,6 +72,12 @@ export function getNotificationIcon(type?: string, category?: string) {
   if (catKey.includes("system")) {
     return <Info className="w-4 h-4 text-blue-500" />;
   }
+  if (catKey.includes("feedback")) {
+    return <MessageSquare className="w-4 h-4 text-cyan-500" />;
+  }
+  if (catKey.includes("review")) {
+    return <Star className="w-4 h-4 text-yellow-500" />;
+  }
   return <Wallet className="w-4 h-4 text-primary" />;
 }
 
@@ -75,46 +85,51 @@ export function NotificationDropdown() {
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"all" | "unread">("all");
   const { user } = useSelector((state: RootState) => state.auth);
+  const router = useRouter();
 
-  // Admin: fetch pending feedbacks to show count badge on bell
+  // Admin: fetch pending feedbacks and reviews
   const { data: adminFeedbackData } = useGetAdminFeedbacksQuery(
     {},
     { skip: !user?.isAdmin },
   );
-  const pendingFeedbackCount = useMemo(() => {
-    if (!user?.isAdmin) return 0;
-    const feedbacks = adminFeedbackData?.data || [];
-    return feedbacks.filter((f: any) => f.status === "pending").length;
-  }, [adminFeedbackData, user]);
+  const { data: adminReviewData } = useGetAdminReviewsQuery(
+    {},
+    { skip: !user?.isAdmin },
+  );
 
-  // Admin gets a simple link button — no user notification API
-  if (user?.isAdmin) {
-    return (
-      <Button
-        variant="ghost"
-        size="icon"
-        className="h-8 w-8 relative text-muted-foreground hover:text-foreground transition-colors"
-        aria-label={`Admin Notifications${pendingFeedbackCount > 0 ? ` (${pendingFeedbackCount} pending)` : ""}`}
-        asChild
-      >
-        <Link href="/admin/notifications">
-          <Bell className="w-4 h-4" />
-          {pendingFeedbackCount > 0 && (
-            <span className="absolute -top-0.5 -right-0.5 min-w-4 h-4 flex items-center justify-center rounded-full bg-amber-500 text-white text-[9px] font-bold px-1 leading-none animate-pulse">
-              {pendingFeedbackCount > 99 ? "99+" : pendingFeedbackCount}
-            </span>
-          )}
-        </Link>
-      </Button>
-    );
-  }
+  const adminNotifications = useMemo(() => {
+    if (!user?.isAdmin) return [];
+    
+    const feedbacks = (adminFeedbackData?.data || []).filter((f: any) => f.status === "pending").map((f: any) => ({
+      _id: f._id,
+      type: "feedback",
+      title: "New Feedback",
+      message: `${f.user_id?.user_name || "Someone"} sent a feedback`,
+      createdAt: f.createdAt,
+      is_read: false,
+      url: "/admin/feedbacks"
+    }));
+
+    const reviews = (adminReviewData?.data || []).filter((r: any) => r.status === "pending").map((r: any) => ({
+      _id: r._id,
+      type: "review",
+      title: "New Review",
+      message: `${r.user_id?.user_name || "Someone"} submitted a review`,
+      createdAt: r.createdAt,
+      is_read: false,
+      url: "/admin/reviews"
+    }));
+
+    return [...feedbacks, ...reviews].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }, [adminFeedbackData, adminReviewData, user?.isAdmin]);
+
 
   const {
     data: notificationsData,
-    isLoading,
-    isError,
+    isLoading: isNotificationsLoading,
+    isError: isNotificationsError,
   } = useGetNotificationsQuery(undefined, {
-    skip: user?.isAdmin,
+    skip: !!user?.isAdmin,
     refetchOnFocus: false,
     refetchOnReconnect: true,
   });
@@ -124,9 +139,12 @@ export function NotificationDropdown() {
     useMarkAllAsReadMutation();
   const [deleteNotificationApi] = useDeleteNotificationMutation();
 
+  const isLoading = user?.isAdmin ? false : isNotificationsLoading;
+  const isError = user?.isAdmin ? false : isNotificationsError;
+
   const notifications = useMemo(
-    () => notificationsData?.data || [],
-    [notificationsData],
+    () => user?.isAdmin ? adminNotifications : (notificationsData?.data || []),
+    [user?.isAdmin, adminNotifications, notificationsData],
   );
 
   const unreadCount = useMemo(
@@ -143,6 +161,7 @@ export function NotificationDropdown() {
 
   const handleMarkAsRead = async (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
+    if (user?.isAdmin) return;
     try {
       await markAsReadApi(id).unwrap();
     } catch {
@@ -151,6 +170,7 @@ export function NotificationDropdown() {
   };
 
   const handleMarkAllAsRead = async () => {
+    if (user?.isAdmin) return;
     try {
       await markAllAsReadApi({}).unwrap();
       toast.success("All notifications marked as read");
@@ -161,6 +181,7 @@ export function NotificationDropdown() {
 
   const handleDelete = async (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
+    if (user?.isAdmin) return;
     try {
       await deleteNotificationApi(id).unwrap();
       toast.success("Notification removed");
@@ -205,7 +226,7 @@ export function NotificationDropdown() {
           </div>
 
           <div className="flex items-center gap-1">
-            {unreadCount > 0 && (
+            {unreadCount > 0 && !user?.isAdmin && (
               <Button
                 variant="ghost"
                 size="sm"
@@ -270,7 +291,7 @@ export function NotificationDropdown() {
                 className="h-7 text-xs font-semibold text-primary hover:text-primary hover:bg-primary/10 gap-1"
                 onClick={() => setIsOpen(false)}
               >
-                <Link href="/notifications">
+                <Link href={user?.isAdmin ? "/admin/notifications" : "/notifications"}>
                   View All Notifications
                   <ArrowRight className="w-3 h-3" />
                 </Link>
@@ -280,8 +301,15 @@ export function NotificationDropdown() {
             filteredNotifications.map((n: any) => (
               <div
                 key={n._id}
-                onClick={!n.is_read ? (e) => handleMarkAsRead(e, n._id) : undefined}
-                className={`p-3 transition-colors flex items-start gap-3 relative group ${!n.is_read ? "cursor-pointer" : ""} ${
+                onClick={(e) => {
+                  if (user?.isAdmin) {
+                    setIsOpen(false);
+                    router.push(n.url);
+                  } else if (!n.is_read) {
+                    handleMarkAsRead(e, n._id);
+                  }
+                }}
+                className={`p-3 transition-colors flex items-start gap-3 relative group ${!n.is_read || user?.isAdmin ? "cursor-pointer" : ""} ${
                   !n.is_read
                     ? "bg-primary/5 dark:bg-primary/10 hover:bg-primary/10"
                     : "hover:bg-secondary/40"
@@ -310,24 +338,26 @@ export function NotificationDropdown() {
                 </div>
 
                 {/* Inline Action Buttons */}
-                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-                  {!n.is_read && (
+                {!user?.isAdmin && (
+                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                    {!n.is_read && (
+                      <button
+                        onClick={(e) => handleMarkAsRead(e, n._id)}
+                        title="Mark as read"
+                        className="p-1 rounded-lg hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
+                      >
+                        <Check className="w-3.5 h-3.5" />
+                      </button>
+                    )}
                     <button
-                      onClick={(e) => handleMarkAsRead(e, n._id)}
-                      title="Mark as read"
-                      className="p-1 rounded-lg hover:bg-primary/10 text-muted-foreground hover:text-primary transition-colors"
+                      onClick={(e) => handleDelete(e, n._id)}
+                      title="Delete notification"
+                      className="p-1 rounded-lg hover:bg-rose-500/10 text-muted-foreground hover:text-rose-500 transition-colors"
                     >
-                      <Check className="w-3.5 h-3.5" />
+                      <Trash2 className="w-3.5 h-3.5" />
                     </button>
-                  )}
-                  <button
-                    onClick={(e) => handleDelete(e, n._id)}
-                    title="Delete notification"
-                    className="p-1 rounded-lg hover:bg-rose-500/10 text-muted-foreground hover:text-rose-500 transition-colors"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                </div>
+                  </div>
+                )}
               </div>
             ))
           ) : (
@@ -354,7 +384,7 @@ export function NotificationDropdown() {
             className="w-full h-8 text-xs font-semibold text-primary hover:text-primary hover:bg-primary/10 justify-center gap-1"
             onClick={() => setIsOpen(false)}
           >
-            <Link href="/notifications">
+            <Link href={user?.isAdmin ? "/admin/notifications" : "/notifications"}>
               View All Notifications
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>

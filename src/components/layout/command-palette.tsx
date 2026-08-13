@@ -2,8 +2,8 @@
 
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useDebounce } from "@/hooks/use-debounce";
-import { useLazyGlobalAdminSearchQuery } from "@/services/admin-api";
-import { useLazyGlobalSearchQuery } from "@/services/search-api";
+import { useGlobalAdminSearchQuery } from "@/services/admin-api";
+import { useGlobalSearchQuery } from "@/services/search-api";
 import {
   Command,
   CreditCard,
@@ -27,10 +27,14 @@ export function CommandPalette() {
   const router = useRouter();
   const user = useSelector((state: RootState) => state.auth.user);
 
-  const [triggerUserSearch, { data: userData, isFetching: isUserFetching }] =
-    useLazyGlobalSearchQuery();
-  const [triggerAdminSearch, { data: adminData, isFetching: isAdminFetching }] =
-    useLazyGlobalAdminSearchQuery();
+  const { data: userData, isFetching: isUserFetching } =
+    useGlobalSearchQuery(debouncedQuery, {
+      skip: !debouncedQuery || debouncedQuery.length < 2 || !!user?.isAdmin,
+    });
+  const { data: adminData, isFetching: isAdminFetching } =
+    useGlobalAdminSearchQuery(debouncedQuery, {
+      skip: !debouncedQuery || debouncedQuery.length < 2 || !user?.isAdmin,
+    });
 
   const isFetching = isUserFetching || isAdminFetching;
   const results = (user?.isAdmin ? adminData?.data : userData?.data) || [];
@@ -48,15 +52,6 @@ export function CommandPalette() {
     return () => document.removeEventListener("keydown", down);
   }, []);
 
-  useEffect(() => {
-    if (debouncedQuery.length >= 2) {
-      if (user?.isAdmin) {
-        triggerAdminSearch(debouncedQuery);
-      } else {
-        triggerUserSearch(debouncedQuery);
-      }
-    }
-  }, [debouncedQuery, triggerUserSearch, triggerAdminSearch, user]);
 
   const handleSelect = (url: string) => {
     setIsOpen(false);

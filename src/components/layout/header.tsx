@@ -86,9 +86,8 @@ export function Header() {
         .slice(0, 2)
     : "U";
 
-  // Admin override: always show Muhammad Rashed with local profile photo
-  const displayName = user?.isAdmin ? "Muhammad Rashed" : (user?.user_name || "Account");
-  const displayImage = user?.isAdmin ? "/muhammad-rashed.jpg" : user?.user_profile_image;
+  const displayName = user?.user_name || "Account";
+  const displayImage = user?.user_profile_image;
 
   return (
     <header className="sticky top-0 z-20 h-14 bg-card border-b border-border px-4 md:px-5 flex items-center justify-between gap-3">
