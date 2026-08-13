@@ -26,6 +26,7 @@ import {
   Receipt,
   RefreshCw,
   ScrollText,
+  SendHorizonal,
   Settings,
   ShieldAlert,
   Target,
@@ -65,6 +66,7 @@ const navigationItems = [
 const adminItems = [
   { name: "Admin Dashboard", href: "/admin", icon: LayoutDashboard },
   { name: "User Management", href: "/admin/users", icon: Users },
+  { name: "Send Notification", href: "/admin/send-notification", icon: SendHorizonal },
   { name: "Activity", href: "/admin/activity", icon: Activity },
   { name: "Notifications", href: "/admin/notifications", icon: Bell },
   { name: "System Health", href: "/admin/system-health", icon: ShieldAlert },

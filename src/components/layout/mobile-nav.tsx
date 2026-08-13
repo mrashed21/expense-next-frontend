@@ -21,6 +21,7 @@ import {
   Receipt,
   RefreshCw,
   ScrollText,
+  SendHorizonal,
   Settings,
   ShieldAlert,
   Target,
@@ -72,6 +73,7 @@ const moreItems = [
 ];
 
 const adminMoreItems = [
+  { name: "Send Notification", href: "/admin/send-notification", icon: SendHorizonal },
   { name: "Logs", href: "/admin/logs", icon: ScrollText },
   { name: "Broadcast", href: "/admin/broadcast", icon: Megaphone },
   { name: "Admins", href: "/admin/admins", icon: ShieldAlert },
