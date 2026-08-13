@@ -1,6 +1,8 @@
 "use client";
 
+import { CardSkeleton } from "@/components/custom/card-skeleton";
 import { ConfirmDialog } from "@/components/custom/confirm-dialog";
+import { EmptyState } from "@/components/custom/empty-state";
 import FormSelect from "@/components/custom/form-select";
 import { useCurrency } from "@/hooks/use-currency";
 import {
@@ -34,7 +36,7 @@ type BudgetFormValues = z.infer<typeof budgetSchema>;
 export default function BudgetsPage() {
   const { formatCurrency } = useCurrency();
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const { data: budgetsData } = useGetBudgetsQuery(undefined);
+  const { data: budgetsData, isLoading } = useGetBudgetsQuery(undefined);
   const { data: categoriesData } = useGetCategoriesQuery({});
   const [createBudgetApi, { isLoading: isCreating }] =
     useCreateBudgetMutation();
@@ -106,7 +108,21 @@ export default function BudgetsPage() {
 
       {/* Budgets Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {budgets.map((b: any) => {
+        {isLoading ? (
+          <CardSkeleton count={4} />
+        ) : budgets.length === 0 ? (
+          <div className="col-span-full">
+            <EmptyState 
+              title="No Budgets Set" 
+              description="Set monthly category budgets to keep your expenditure in check."
+              actionLabel="Set Budget"
+              icon={<AlertTriangle className="w-8 h-8" />}
+              onAction={() => setIsOpen(true)}
+            />
+          </div>
+        ) : (
+          <>
+            {budgets.map((b: any) => {
           const isWarning = b.percentage >= b.warning_threshold;
           const isOver = b.percentage >= 100;
 
@@ -187,6 +203,8 @@ export default function BudgetsPage() {
             </div>
           );
         })}
+          </>
+        )}
       </div>
 
       {/* Modal */}

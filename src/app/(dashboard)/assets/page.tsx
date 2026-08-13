@@ -1,6 +1,8 @@
 "use client";
 
+import { CardSkeleton } from "@/components/custom/card-skeleton";
 import { ConfirmDialog } from "@/components/custom/confirm-dialog";
+import { EmptyState } from "@/components/custom/empty-state";
 import FormDatePicker from "@/components/custom/form-date-picker";
 import FormSelect from "@/components/custom/form-select";
 import { useCurrency } from "@/hooks/use-currency";
@@ -213,24 +215,16 @@ export default function AssetsPage() {
       {/* Assets Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {assetsLoading ? (
-          <div className="col-span-full flex items-center justify-center py-12">
-            <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-          </div>
+          <CardSkeleton count={6} />
         ) : assets.length === 0 ? (
-          <div className="col-span-full glass-card p-12 rounded-3xl flex flex-col items-center justify-center text-center space-y-3">
-            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-              <Home className="w-6 h-6 text-primary" />
-            </div>
-            <div className="space-y-1">
-              <p className="text-sm font-semibold text-foreground">
-                No Assets Found
-              </p>
-              <p className="text-xs text-muted-foreground max-w-xs">
-                {searchTerm
-                  ? "No assets match your search criteria."
-                  : "Start tracking your physical assets and valuables here."}
-              </p>
-            </div>
+          <div className="col-span-full">
+            <EmptyState 
+              title="No Assets Found" 
+              description={searchTerm ? "No assets match your search criteria." : "Start tracking your physical assets and valuables here."}
+              actionLabel="Add Asset"
+              icon={<Home className="w-8 h-8" />}
+              onAction={() => setIsAddAssetOpen(true)}
+            />
           </div>
         ) : (
           assets.map((asset: any) => (

@@ -1,8 +1,10 @@
 "use client";
 
 import { ConfirmDialog } from "@/components/custom/confirm-dialog";
+import { EmptyState } from "@/components/custom/empty-state";
 import FormDatePicker from "@/components/custom/form-date-picker";
 import FormSelect from "@/components/custom/form-select";
+import { TableSkeleton } from "@/components/custom/table-skeleton";
 import { useCurrency } from "@/hooks/use-currency";
 import { formatDate } from "@/lib/utils";
 import {
@@ -267,24 +269,24 @@ export default function DebtsPage() {
       </div>
 
       {/* Data Grid */}
-      <div className="glass-card rounded-3xl overflow-hidden border border-border">
-        {/* ── Mobile Card View (< md) ── */}
-        <div className="md:hidden divide-y divide-border">
-          {debtsLoading ? (
-            <div className="p-8 text-center">
-              <Loader2 className="w-6 h-6 animate-spin text-muted-foreground mx-auto" />
-            </div>
-          ) : debts.length === 0 ? (
-            <div className="px-6 py-12 text-center flex flex-col items-center space-y-3">
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                <HandCoins className="w-6 h-6 text-primary" />
-              </div>
-              <p className="text-sm font-semibold text-foreground">No Debts Found</p>
-              <p className="text-xs text-muted-foreground max-w-xs">
-                Record who owes you money or your outstanding loans.
-              </p>
-            </div>
-          ) : debts.map((debt: any) => {
+      {debtsLoading ? (
+        <TableSkeleton columns={6} rows={5} />
+      ) : debts.length === 0 ? (
+        <EmptyState 
+          title="No Debts Found"
+          description="Record who owes you money or your outstanding loans."
+          actionLabel="Add Debt"
+          icon={<HandCoins className="w-8 h-8" />}
+          onAction={() => {
+            reset();
+            setIsAddOpen(true);
+          }}
+        />
+      ) : (
+        <div className="glass-card rounded-3xl overflow-hidden border border-border">
+          {/* ── Mobile Card View (< md) ── */}
+          <div className="md:hidden divide-y divide-border">
+            {debts.map((debt: any) => {
             const isPaid = debt.derived_status === "paid";
             const isLent = debt.type === "lent";
             return (
@@ -385,28 +387,7 @@ export default function DebtsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {debtsLoading ? (
-                <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center">
-                    <Loader2 className="w-6 h-6 animate-spin text-muted-foreground mx-auto" />
-                  </td>
-                </tr>
-              ) : debts.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center">
-                    <div className="flex flex-col items-center justify-center space-y-3">
-                      <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                        <HandCoins className="w-6 h-6 text-primary" />
-                      </div>
-                      <p className="text-sm font-semibold text-foreground">No Debts Found</p>
-                      <p className="text-xs text-muted-foreground max-w-xs">
-                        Record who owes you money or your outstanding loans.
-                      </p>
-                    </div>
-                  </td>
-                </tr>
-              ) : (
-                debts.map((debt: any) => {
+              {debts.map((debt: any) => {
                   const isPaid = debt.derived_status === "paid";
                   const isLent = debt.type === "lent";
                   return (
@@ -471,12 +452,12 @@ export default function DebtsPage() {
                       </td>
                     </tr>
                   );
-                })
-              )}
+                })}
             </tbody>
           </table>
         </div>
-      </div>
+        </div>
+      )}
 
       {/* Form Modal (Shared Add/Edit) */}
       {(isAddOpen || editItem) && (

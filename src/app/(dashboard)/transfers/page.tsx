@@ -1,6 +1,8 @@
 "use client";
 
+import { EmptyState } from "@/components/custom/empty-state";
 import FormSelect from "@/components/custom/form-select";
+import { TableSkeleton } from "@/components/custom/table-skeleton";
 import {
   Table,
   TableBody,
@@ -137,10 +139,17 @@ export default function TransfersPage() {
         </div>
         <div className="border-t border-border">
           {isLoading ? (
-            <div className="flex items-center justify-center py-10">
-              <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+            <TableSkeleton columns={6} rows={5} />
+          ) : transfers.length === 0 ? (
+            <div className="py-12">
+              <EmptyState 
+                title="No Transfers Found"
+                description="Move funds between your accounts to log transfers."
+                actionLabel="New Transfer"
+                onAction={() => setIsOpen(true)}
+              />
             </div>
-          ) : transfers.length > 0 ? (
+          ) : (
             <>
               {/* ── Mobile Card View (< md) ── */}
               <div className="md:hidden divide-y divide-border">
@@ -203,11 +212,6 @@ export default function TransfersPage() {
                 </Table>
               </div>
             </>
-          ) : (
-            <div className="text-center py-12 text-xs text-muted-foreground">
-              No transfers yet. Click &quot;New Transfer&quot; to move funds between
-              accounts.
-            </div>
           )}
         </div>
       </div>

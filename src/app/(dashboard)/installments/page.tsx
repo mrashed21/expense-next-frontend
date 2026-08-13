@@ -1,8 +1,10 @@
 "use client";
 
 import { ConfirmDialog } from "@/components/custom/confirm-dialog";
+import { EmptyState } from "@/components/custom/empty-state";
 import FormDatePicker from "@/components/custom/form-date-picker";
 import FormSelect from "@/components/custom/form-select";
+import { TableSkeleton } from "@/components/custom/table-skeleton";
 import { useCurrency } from "@/hooks/use-currency";
 import { formatDate } from "@/lib/utils";
 import { useGetAccountsQuery } from "@/services/account-api";
@@ -294,22 +296,24 @@ export default function InstallmentsPage() {
       </div>
 
       {/* Data Grid */}
-      <div className="glass-card rounded-3xl overflow-hidden border border-border">
-        {/* ── Mobile Card View (< md) ── */}
-        <div className="md:hidden divide-y divide-border">
-          {installmentsLoading ? (
-            <div className="p-8 text-center">
-              <Loader2 className="w-6 h-6 animate-spin text-muted-foreground mx-auto" />
-            </div>
-          ) : installments.length === 0 ? (
-            <div className="px-6 py-12 flex flex-col items-center space-y-3 text-center">
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                <Calendar className="w-6 h-6 text-primary" />
-              </div>
-              <p className="text-sm font-semibold text-foreground">No EMIs Found</p>
-              <p className="text-xs text-muted-foreground">Start tracking your car loan, mortgage, or device installments.</p>
-            </div>
-          ) : installments.filter((inst: any) =>
+      {installmentsLoading ? (
+        <TableSkeleton columns={7} rows={5} />
+      ) : installments.length === 0 ? (
+        <EmptyState 
+          title="No EMIs Found"
+          description="Start tracking your car loan, mortgage, or device installments."
+          actionLabel="Add EMI"
+          icon={<Calendar className="w-8 h-8" />}
+          onAction={() => {
+            reset();
+            setIsAddOpen(true);
+          }}
+        />
+      ) : (
+        <div className="glass-card rounded-3xl overflow-hidden border border-border">
+          {/* ── Mobile Card View (< md) ── */}
+          <div className="md:hidden divide-y divide-border">
+            {installments.filter((inst: any) =>
               statusFilter === "all" ? true : !inst.is_completed
             ).filter((inst: any) =>
               inst.title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -386,26 +390,7 @@ export default function InstallmentsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {installmentsLoading ? (
-                <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center">
-                    <Loader2 className="w-6 h-6 animate-spin text-muted-foreground mx-auto" />
-                  </td>
-                </tr>
-              ) : installments.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center">
-                    <div className="flex flex-col items-center justify-center space-y-3">
-                      <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                        <Calendar className="w-6 h-6 text-primary" />
-                      </div>
-                      <p className="text-sm font-semibold text-foreground">No EMIs Found</p>
-                      <p className="text-xs text-muted-foreground max-w-xs">Start tracking your car loan, mortgage, or device installments.</p>
-                    </div>
-                  </td>
-                </tr>
-              ) : (
-                installments.map((inst: any) => {
+              {installments.map((inst: any) => {
                   const progressPercent = Math.min(100, Math.max(0, (inst.months_paid / inst.total_months) * 100));
                   return (
                     <tr key={inst._id} className={`hover:bg-secondary/30 transition-colors ${inst.is_completed ? "opacity-60" : ""}`}>
@@ -470,12 +455,12 @@ export default function InstallmentsPage() {
                       </td>
                     </tr>
                   );
-                })
-              )}
+                })}
             </tbody>
           </table>
         </div>
-      </div>
+        </div>
+      )}
 
 
       {/* Form Modal (Shared Add/Edit) */}

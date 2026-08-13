@@ -80,11 +80,11 @@ export default function DashboardPage() {
     sortBy: "date",
     sortOrder: "desc",
   });
-  const { data: installmentsData } = useGetInstallmentsQuery({
+  const { data: installmentsData, isLoading: isLoadingInstallments } = useGetInstallmentsQuery({
     status: "active",
   });
-  const { data: billsData } = useGetBillsQuery({});
-  const { data: goalsData } = useGetGoalsQuery({});
+  const { data: billsData, isLoading: isLoadingBills } = useGetBillsQuery({});
+  const { data: goalsData, isLoading: isLoadingGoals } = useGetGoalsQuery({});
   const { data: analyticsData } = useGetAnalyticsSummaryQuery({});
 
   const netWorthInfo = netWorthData?.data || {
@@ -529,7 +529,20 @@ export default function DashboardPage() {
               View all →
             </Link>
           </div>
-          {recentTransactions.length === 0 ? (
+          {isLoadingTx ? (
+            <div className="space-y-3 py-4">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="flex items-center gap-3 animate-pulse">
+                  <div className="w-8 h-8 rounded-lg bg-secondary shrink-0" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-3 bg-secondary rounded w-1/3" />
+                    <div className="h-2 bg-secondary rounded w-1/4" />
+                  </div>
+                  <div className="w-16 h-4 bg-secondary rounded shrink-0" />
+                </div>
+              ))}
+            </div>
+          ) : recentTransactions.length === 0 ? (
             <p className="text-xs text-muted-foreground text-center py-8">
               No transactions yet. Start tracking!
             </p>
@@ -598,7 +611,9 @@ export default function DashboardPage() {
                 All →
               </Link>
             </h3>
-            {upcomingBills.length > 0 ? (
+            {isLoadingBills ? (
+              <div className="h-12 bg-secondary rounded-xl animate-pulse" />
+            ) : upcomingBills.length > 0 ? (
               upcomingBills.map((bill: any) => (
                 <div
                   key={bill._id}
@@ -640,7 +655,9 @@ export default function DashboardPage() {
                 All →
               </Link>
             </h3>
-            {upcomingEMIs.length > 0 ? (
+            {isLoadingInstallments ? (
+              <div className="h-12 bg-secondary rounded-xl animate-pulse" />
+            ) : upcomingEMIs.length > 0 ? (
               upcomingEMIs.map((emi: any) => (
                 <div
                   key={emi._id}
@@ -682,7 +699,9 @@ export default function DashboardPage() {
                 All →
               </Link>
             </h3>
-            {nearCompletionGoals.length > 0 ? (
+            {isLoadingGoals ? (
+              <div className="h-12 bg-secondary rounded-xl animate-pulse" />
+            ) : nearCompletionGoals.length > 0 ? (
               nearCompletionGoals.map((goal: any) => {
                 const percent = Math.min(
                   100,

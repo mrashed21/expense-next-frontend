@@ -1,6 +1,8 @@
 "use client";
 
+import { CardSkeleton } from "@/components/custom/card-skeleton";
 import { ConfirmDialog } from "@/components/custom/confirm-dialog";
+import { EmptyState } from "@/components/custom/empty-state";
 import FormSelect from "@/components/custom/form-select";
 import { RootState } from "@/redux/store";
 import {
@@ -188,8 +190,8 @@ export default function CategoriesPage() {
           </div>
 
           {isLoading ? (
-            <div className="flex items-center justify-center py-6">
-              <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <CardSkeleton count={2} />
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -197,9 +199,12 @@ export default function CategoriesPage() {
                 <CategoryCard key={cat._id} cat={cat} />
               ))}
               {expenseCategories.length === 0 && (
-                <p className="col-span-2 text-xs text-muted-foreground text-center py-4">
-                  No expense categories yet.
-                </p>
+                <div className="col-span-1 sm:col-span-2">
+                  <EmptyState 
+                    title="No Expense Categories"
+                    description="Create categories to track your spending."
+                  />
+                </div>
               )}
             </div>
           )}
@@ -220,8 +225,8 @@ export default function CategoriesPage() {
           </div>
 
           {isLoading ? (
-            <div className="flex items-center justify-center py-6">
-              <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <CardSkeleton count={2} />
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -229,9 +234,12 @@ export default function CategoriesPage() {
                 <CategoryCard key={cat._id} cat={cat} />
               ))}
               {incomeCategories.length === 0 && (
-                <p className="col-span-2 text-xs text-muted-foreground text-center py-4">
-                  No income categories yet.
-                </p>
+                <div className="col-span-1 sm:col-span-2">
+                  <EmptyState 
+                    title="No Income Categories"
+                    description="Create categories to track your earnings."
+                  />
+                </div>
               )}
             </div>
           )}

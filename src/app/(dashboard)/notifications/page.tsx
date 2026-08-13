@@ -1,6 +1,7 @@
 "use client";
 
 import { ConfirmDialog } from "@/components/custom/confirm-dialog";
+import { EmptyState } from "@/components/custom/empty-state";
 import {
   getNotificationIcon,
   getRelativeTime,
@@ -332,39 +333,32 @@ export default function NotificationsPage() {
             ))}
           </div>
         ) : (
-          <div className="p-12 flex flex-col items-center gap-4 text-center">
-            <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 flex items-center justify-center">
-              {activeFilter === "unread" ? (
-                <BellOff className="w-6 h-6 text-emerald-500" />
-              ) : (
-                <CheckCircle2 className="w-6 h-6 text-emerald-500" />
-              )}
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-foreground">
-                {activeFilter === "unread"
+          <div className="py-12">
+            <EmptyState 
+              title={
+                activeFilter === "unread"
                   ? "You're all caught up!"
                   : activeFilter === "all"
                     ? "No notifications yet"
-                    : `No ${activeFilter} notifications`}
-              </p>
-              <p className="text-xs text-muted-foreground mt-1 max-w-xs">
-                {activeFilter === "unread"
+                    : `No ${activeFilter} notifications`
+              }
+              description={
+                activeFilter === "unread"
                   ? "No unread notifications right now."
                   : activeFilter === "all"
                     ? "Alerts for budget breaches, bills, and account changes will appear here."
-                    : `No notifications in the ${activeFilter} category.`}
-              </p>
-            </div>
-            {activeFilter !== "all" && (
-              <button
-                onClick={() => setActiveFilter("all")}
-                className="flex items-center gap-1.5 text-xs text-primary font-medium hover:underline"
-              >
-                View all notifications
-                <ChevronRight className="w-3.5 h-3.5" />
-              </button>
-            )}
+                    : `No notifications in the ${activeFilter} category.`
+              }
+              icon={
+                activeFilter === "unread" ? (
+                  <BellOff className="w-8 h-8" />
+                ) : (
+                  <CheckCircle2 className="w-8 h-8" />
+                )
+              }
+              actionLabel={activeFilter !== "all" ? "View all notifications" : undefined}
+              onAction={activeFilter !== "all" ? () => setActiveFilter("all") : undefined}
+            />
           </div>
         )}
       </div>

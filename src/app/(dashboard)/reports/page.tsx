@@ -6,6 +6,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useCurrency } from "@/hooks/use-currency";
 import { exportToCsv, exportToPdf } from "@/lib/export";
 import { formatDate } from "@/lib/utils";
@@ -172,8 +173,18 @@ export default function ReportsPage() {
   };
 
   const renderLoader = () => (
-    <div className="flex items-center justify-center h-96">
-      <Loader2 className="w-8 h-8 animate-spin text-primary" />
+    <div className="p-6 md:p-8 space-y-6">
+      <Skeleton className="h-8 w-1/3 mb-6" />
+      <div className="space-y-4">
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-10 w-full" />
+      </div>
+      <Skeleton className="h-8 w-1/4 mt-8 mb-4" />
+      <div className="space-y-4">
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-10 w-full" />
+      </div>
     </div>
   );
 

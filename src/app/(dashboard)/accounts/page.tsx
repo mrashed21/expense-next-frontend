@@ -1,6 +1,8 @@
 "use client";
 
+import { CardSkeleton } from "@/components/custom/card-skeleton";
 import { ConfirmDialog } from "@/components/custom/confirm-dialog";
+import { EmptyState } from "@/components/custom/empty-state";
 import FormSelect from "@/components/custom/form-select";
 import { useCurrency } from "@/hooks/use-currency";
 import { formatDate } from "@/lib/utils";
@@ -233,12 +235,15 @@ export default function AccountsPage() {
       {/* Accounts Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {accountsLoading ? (
-          <div className="col-span-full flex items-center justify-center py-12">
-            <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-          </div>
+          <CardSkeleton count={6} />
         ) : accounts.length === 0 ? (
-          <div className="col-span-full text-center py-12 text-xs text-muted-foreground">
-            No accounts created yet. Click "Add Account" to get started.
+          <div className="col-span-full">
+            <EmptyState 
+              title="No accounts found" 
+              description="You haven't created any accounts yet. Create one to start tracking your balances."
+              actionLabel="Add Account"
+              onAction={() => setIsAddAccountOpen(true)}
+            />
           </div>
         ) : (
           accounts.map((acc: any) => (
