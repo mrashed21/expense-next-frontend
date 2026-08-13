@@ -2,38 +2,24 @@
 
 import { PasswordStrength } from "@/components/auth/password-strength";
 import PhonesInput from "@/components/custom/phone-input";
+import { SearchableSelect } from "@/components/custom/searchable-select";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
 import { Separator } from "@/components/ui/separator";
 import { bangladeshCities, cityAreas } from "@/lib/location-data";
 import { RootState } from "@/redux/store";
 import { useRegisterMutation } from "@/services/auth-api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  ArrowRight,
-  Eye,
-  EyeOff,
-  Loader2,
-  Lock,
-  Mail,
-  TrendingUp,
-  User,
+    ArrowRight,
+    Eye,
+    EyeOff,
+    Loader2,
+    Lock,
+    Mail,
+    User
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -126,7 +112,7 @@ export default function RegisterPage() {
 
   return (
     <div className="w-full space-y-6">
-      <div className="text-center md:text-left space-y-2 mb-6">
+      <div className="text-center space-y-2 mb-8">
         <h1 className="text-3xl font-bold tracking-tight text-foreground">
           Create an account
         </h1>
@@ -135,10 +121,8 @@ export default function RegisterPage() {
         </p>
       </div>
 
-        <Card className="border-0 shadow-none bg-transparent">
-          <CardContent className="p-0">
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-3.5">
-              {/* Full Name */}
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        {/* Full Name */}
               <div className="space-y-1.5">
                 <Label
                   htmlFor="name"
@@ -152,8 +136,8 @@ export default function RegisterPage() {
                     id="name"
                     {...register("user_name")}
                     type="text"
-                    placeholder="John Doe"
-                    className="pl-9 h-9 text-sm bg-secondary/40 border-border/60"
+                    placeholder="Muhammad Rashed"
+                    className="pl-9 h-9 text-sm bg-background border-input hover:border-primary/50 transition-colors focus-visible:ring-primary/20"
                   />
                 </div>
                 {errors.user_name && (
@@ -177,8 +161,8 @@ export default function RegisterPage() {
                     id="email"
                     {...register("user_email")}
                     type="email"
-                    placeholder="name@example.com"
-                    className="pl-9 h-9 text-sm bg-secondary/40 border-border/60"
+                    placeholder="rashedjaman768@gmail.com"
+                    className="pl-9 h-9 text-sm bg-background border-input hover:border-primary/50 transition-colors focus-visible:ring-primary/20"
                   />
                 </div>
                 {errors.user_email && (
@@ -203,7 +187,7 @@ export default function RegisterPage() {
                     {...register("user_password")}
                     type={showPassword ? "text" : "password"}
                     placeholder="Min. 8 characters"
-                    className="pl-9 pr-9 h-9 text-sm bg-secondary/40 border-border/60"
+                    className="pl-9 pr-9 h-9 text-sm bg-background border-input hover:border-primary/50 transition-colors focus-visible:ring-primary/20"
                   />
                   <button
                     type="button"
@@ -243,7 +227,7 @@ export default function RegisterPage() {
                     {...register("user_confirm_password")}
                     type={showConfirmPassword ? "text" : "password"}
                     placeholder="••••••••"
-                    className="pl-9 pr-9 h-9 text-sm bg-secondary/40 border-border/60"
+                    className="pl-9 pr-9 h-9 text-sm bg-background border-input hover:border-primary/50 transition-colors focus-visible:ring-primary/20"
                   />
                   <button
                     type="button"
@@ -293,7 +277,7 @@ export default function RegisterPage() {
               </div>
 
               {/* City & Area */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <Label className="text-xs font-medium text-foreground">
                     City (Bangladesh)
@@ -302,23 +286,16 @@ export default function RegisterPage() {
                     name="user_city"
                     control={control}
                     render={({ field }) => (
-                      <Select
-                        onValueChange={(value) => {
+                      <SearchableSelect
+                        options={bangladeshCities.map(city => ({ label: city, value: city }))}
+                        value={field.value || undefined}
+                        onChange={(value) => {
                           field.onChange(value);
+                          // Auto reset area when city changes if area is no longer valid
+                          // But to keep it simple, just update the value
                         }}
-                        value={field.value || ""}
-                      >
-                        <SelectTrigger className="h-9 text-sm bg-secondary/40 border-border/60">
-                          <SelectValue placeholder="Select City" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {bangladeshCities.map((city) => (
-                            <SelectItem key={city} value={city}>
-                              {city}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                        placeholder="Select City"
+                      />
                     )}
                   />
                 </div>
@@ -337,28 +314,15 @@ export default function RegisterPage() {
                           : [];
 
                       return (
-                        <Select
-                          onValueChange={field.onChange}
-                          value={field.value || ""}
+                        <SearchableSelect
+                          options={availableAreas.map(area => ({ label: area, value: area }))}
+                          value={field.value || undefined}
+                          onChange={field.onChange}
+                          placeholder={
+                            selectedCity ? "Select Area" : "Select City first"
+                          }
                           disabled={!selectedCity}
-                        >
-                          <SelectTrigger className="h-9 text-sm bg-secondary/40 border-border/60">
-                            <SelectValue
-                              placeholder={
-                                selectedCity
-                                  ? "Select Area"
-                                  : "Select City first"
-                              }
-                            />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {availableAreas.map((area) => (
-                              <SelectItem key={area} value={area}>
-                                {area}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        />
                       );
                     }}
                   />
@@ -368,7 +332,7 @@ export default function RegisterPage() {
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="w-full h-9 text-sm font-medium mt-1"
+                className="w-full h-10 text-sm font-medium mt-2"
               >
                 {isLoading ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -380,21 +344,19 @@ export default function RegisterPage() {
                 )}
               </Button>
             </form>
-          </CardContent>
 
-          <CardFooter className="flex-col gap-0 pt-6 p-0 mt-6">
-            <Separator className="mb-4 bg-border/50" />
-            <p className="text-xs text-muted-foreground text-center">
-              Already have an account?{" "}
-              <Link
-                href="/login"
-                className="font-medium text-primary hover:underline underline-offset-4"
-              >
-                Sign in
-              </Link>
-            </p>
-          </CardFooter>
-        </Card>
+            <div className="flex-col gap-0 pt-6 p-0 mt-6">
+              <Separator className="mb-4 bg-border/50" />
+              <p className="text-xs text-muted-foreground text-center">
+                Already have an account?{" "}
+                <Link
+                  href="/login"
+                  className="font-medium text-primary hover:underline underline-offset-4"
+                >
+                  Sign in
+                </Link>
+              </p>
+            </div>
     </div>
   );
 }

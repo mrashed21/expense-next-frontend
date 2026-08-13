@@ -6,24 +6,24 @@ import FormSelect from "@/components/custom/form-select";
 import { useCurrency } from "@/hooks/use-currency";
 import { formatDate } from "@/lib/utils";
 import {
-  useAddPaymentMutation,
-  useCreateDebtMutation,
-  useDeleteDebtMutation,
-  useGetDebtsQuery,
-  useUpdateDebtMutation,
+    useAddPaymentMutation,
+    useCreateDebtMutation,
+    useDeleteDebtMutation,
+    useGetDebtsQuery,
+    useUpdateDebtMutation,
 } from "@/services/debt-api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  CheckCircle2,
-  Clock,
-  CreditCard,
-  HandCoins,
-  Loader2,
-  Pencil,
-  Plus,
-  Search,
-  Trash2,
-  X,
+    CheckCircle2,
+    Clock,
+    CreditCard,
+    HandCoins,
+    Loader2,
+    Pencil,
+    Plus,
+    Search,
+    Trash2,
+    X,
 } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -510,7 +510,7 @@ export default function DebtsPage() {
                 </label>
                 <input
                   {...registerForm("person_name")}
-                  placeholder="e.g. John Doe, Bank of America"
+                  placeholder="e.g. Muhammad Rashed, Bank of America"
                   className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                 />
                 {errors.person_name && (

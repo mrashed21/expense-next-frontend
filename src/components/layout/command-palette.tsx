@@ -2,6 +2,7 @@
 
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useDebounce } from "@/hooks/use-debounce";
+import { getNavGroups } from "@/lib/navigation";
 import { useGlobalAdminSearchQuery } from "@/services/admin-api";
 import { useGlobalSearchQuery } from "@/services/search-api";
 import {
@@ -9,13 +10,14 @@ import {
   CreditCard,
   FileText,
   Folder,
+  LayoutDashboard,
   Loader2,
   Search,
   Wallet,
   X,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { RootState } from "@/redux/store";
 import { useSelector } from "react-redux";
@@ -37,7 +39,34 @@ export function CommandPalette() {
     });
 
   const isFetching = isUserFetching || isAdminFetching;
-  const results = (user?.isAdmin ? adminData?.data : userData?.data) || [];
+  
+  // Get frontend routes
+  const routeResults = useMemo(() => {
+    if (!debouncedQuery || debouncedQuery.length < 2) return [];
+    
+    const allGroups = getNavGroups(user);
+    const searchLower = debouncedQuery.toLowerCase();
+    const matches: any[] = [];
+    
+    allGroups.forEach((group) => {
+      group.items.forEach((item) => {
+        if (item.name.toLowerCase().includes(searchLower)) {
+          matches.push({
+            id: item.href,
+            type: "route",
+            title: item.name,
+            subtitle: `Route • ${group.label}`,
+            url: item.href,
+          });
+        }
+      });
+    });
+    
+    return matches;
+  }, [debouncedQuery, user]);
+
+  const apiResults = (user?.isAdmin ? adminData?.data : userData?.data) || [];
+  const results = [...routeResults, ...apiResults];
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -73,6 +102,8 @@ export function CommandPalette() {
         return <Folder className="w-4 h-4 text-emerald-500" />;
       case "admin":
         return <Wallet className="w-4 h-4 text-rose-500" />;
+      case "route":
+        return <LayoutDashboard className="w-4 h-4 text-sky-500" />;
       default:
         return <Command className="w-4 h-4 text-muted-foreground" />;
     }
@@ -99,7 +130,11 @@ export function CommandPalette() {
               ref={inputRef}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search transactions, accounts, bills..."
+              placeholder={
+                user?.isAdmin
+                  ? "Search users and admins by name or email..."
+                  : "Search transactions, accounts, bills..."
+              }
               className="flex-1 bg-transparent border-none outline-none ring-0 px-3 py-2 text-foreground placeholder:text-muted-foreground text-base"
               autoFocus
             />
@@ -125,6 +160,11 @@ export function CommandPalette() {
               <div className="p-8 text-center text-sm text-muted-foreground">
                 No results found for{" "}
                 <span className="font-bold text-foreground">"{query}"</span>
+                {user?.isAdmin && (
+                  <p className="mt-2 text-xs opacity-70">
+                    Admin search only looks for Users and Admins.
+                  </p>
+                )}
               </div>
             ) : (
               <div className="space-y-1">

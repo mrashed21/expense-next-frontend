@@ -1,32 +1,23 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { setCredentials } from "@/redux/slices/auth-slice";
 import { RootState } from "@/redux/store";
 import {
-  useLoginMutation,
-  useVerifyLogin2FAMutation,
+    useLoginMutation,
+    useVerifyLogin2FAMutation,
 } from "@/services/auth-api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  ArrowRight,
-  Eye,
-  EyeOff,
-  Loader2,
-  Lock,
-  Mail,
-  TrendingUp,
+    ArrowRight,
+    Eye,
+    EyeOff,
+    Loader2,
+    Lock,
+    Mail
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -138,7 +129,7 @@ function LoginContent() {
 
   return (
     <div className="w-full space-y-6">
-      <div className="text-center md:text-left space-y-2 mb-6">
+      <div className="text-center md:text-left space-y-2 mb-8">
         <h1 className="text-3xl font-bold tracking-tight text-foreground">
           Welcome back
         </h1>
@@ -147,10 +138,8 @@ function LoginContent() {
         </p>
       </div>
 
-        <Card className="border-0 shadow-none bg-transparent">
-          <CardContent className="p-0">
-            {!requires2FA ? (
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      {!requires2FA ? (
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 {/* Email */}
                 <div className="space-y-1.5">
                   <Label
@@ -165,8 +154,8 @@ function LoginContent() {
                       id="email"
                       {...register("user_email")}
                       type="email"
-                      placeholder="name@example.com"
-                      className="pl-9 h-9 text-sm bg-secondary/40 border-border/60"
+                      placeholder="rashedjaman768@gmail.com"
+                      className="pl-9 h-9 text-sm bg-background border-input hover:border-primary/50 transition-colors focus-visible:ring-primary/20"
                     />
                   </div>
                   {errors.user_email && (
@@ -199,7 +188,7 @@ function LoginContent() {
                       {...register("user_password")}
                       type={showPassword ? "text" : "password"}
                       placeholder="••••••••"
-                      className="pl-9 pr-9 h-9 text-sm bg-secondary/40 border-border/60"
+                      className="pl-9 pr-9 h-9 text-sm bg-background border-input hover:border-primary/50 transition-colors focus-visible:ring-primary/20"
                     />
                     <button
                       type="button"
@@ -226,7 +215,7 @@ function LoginContent() {
                 <Button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full h-9 text-sm font-medium mt-2"
+                  className="w-full h-10 text-sm font-medium mt-2"
                 >
                   {isLoading ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -266,7 +255,7 @@ function LoginContent() {
                       inputMode="text"
                       placeholder="000000"
                       maxLength={20}
-                      className="pl-9 h-9 text-sm bg-secondary/40 border-border/60 text-center tracking-widest font-mono uppercase"
+                      className="pl-9 h-9 text-sm bg-background border-input hover:border-primary/50 transition-colors focus-visible:ring-primary/20 text-center tracking-widest font-mono uppercase"
                     />
                   </div>
                   {errors2FA.code && (
@@ -279,7 +268,7 @@ function LoginContent() {
                 <Button
                   type="submit"
                   disabled={isVerifying2FA}
-                  className="w-full h-9 text-sm font-medium mt-2"
+                  className="w-full h-10 text-sm font-medium mt-2"
                 >
                   {isVerifying2FA ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -298,15 +287,14 @@ function LoginContent() {
                     setRequires2FA(false);
                     setTempToken(null);
                   }}
-                  className="w-full h-9 text-xs"
+                  className="w-full h-10 text-xs"
                 >
                   Cancel
                 </Button>
               </form>
             )}
-          </CardContent>
 
-          <CardFooter className="flex-col gap-0 pt-6 p-0 mt-6">
+          <div className="flex-col gap-0 pt-6 p-0 mt-6">
             <Separator className="mb-4 bg-border/50" />
             <p className="text-xs text-muted-foreground text-center">
               Don&apos;t have an account?{" "}
@@ -317,8 +305,7 @@ function LoginContent() {
                 Create account
               </Link>
             </p>
-          </CardFooter>
-        </Card>
+          </div>
     </div>
   );
 }

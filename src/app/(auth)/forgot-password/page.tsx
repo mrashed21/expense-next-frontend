@@ -2,12 +2,12 @@
 
 import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -98,7 +98,7 @@ export default function ForgotPasswordPage() {
                         id="email"
                         {...register("user_email")}
                         type="email"
-                        placeholder="name@example.com"
+                        placeholder="rashedjaman768@gmail.com"
                         className="pl-9 h-9 text-sm bg-secondary/40 border-border/60"
                       />
                     </div>

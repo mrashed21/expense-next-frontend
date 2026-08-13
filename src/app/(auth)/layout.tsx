@@ -38,8 +38,7 @@ export default function AuthLayout({
       {/* Right Panel - Form */}
       <div className="flex items-center justify-center p-6 md:p-12 bg-background relative">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-20%,oklch(0.54_0.19_264/0.05),transparent)] dark:bg-[radial-gradient(ellipse_80%_60%_at_50%_-20%,oklch(0.62_0.19_264/0.08),transparent)] pointer-events-none" />
-        
-        <div className="w-full max-w-sm relative z-10">
+        <div className="w-full max-w-[420px] relative z-10">
           {/* Mobile logo (hidden on desktop) */}
           <div className="md:hidden flex items-center gap-2 mb-8 justify-center">
             <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
