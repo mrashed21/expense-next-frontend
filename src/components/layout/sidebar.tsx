@@ -70,7 +70,6 @@ const adminItems = [
   { name: "User Management", href: "/admin/users", icon: Users },
   { name: "Send Notification", href: "/admin/send-notification", icon: SendHorizonal },
   { name: "Activity", href: "/admin/activity", icon: Activity },
-  { name: "Feedbacks", href: "/admin/feedbacks", icon: MessageSquare },
   { name: "Reviews", href: "/admin/reviews", icon: Star },
   { name: "Notifications", href: "/admin/notifications", icon: Bell },
   { name: "System Health", href: "/admin/system-health", icon: ShieldAlert },

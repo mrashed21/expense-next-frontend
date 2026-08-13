@@ -78,7 +78,6 @@ const moreItems = [
 const adminMoreItems = [
   { name: "Send Notification", href: "/admin/send-notification", icon: SendHorizonal },
   { name: "Activity", href: "/admin/activity", icon: Activity },
-  { name: "Feedbacks", href: "/admin/feedbacks", icon: MessageSquare },
   { name: "Reviews", href: "/admin/reviews", icon: Star },
   { name: "Logs", href: "/admin/logs", icon: ScrollText },
   { name: "Admins", href: "/admin/admins", icon: ShieldAlert },

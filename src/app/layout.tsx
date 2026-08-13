@@ -33,9 +33,9 @@ export const metadata: Metadata = {
     "BDT expense tracker",
     "Bangladesh expense tracker",
   ],
-  authors: [{ name: "Muhammad Rashed Jaman Raju", url: "https://www.mrashed21.me/" }],
-  creator: "Muhammad Rashed Jaman Raju",
-  publisher: "Muhammad Rashed Jaman Raju",
+  authors: [{ name: "Muhammad Rashed", url: "https://www.mrashed21.me/" }],
+  creator: "Muhammad Rashed",
+  publisher: "Muhammad Rashed",
   icons: {
     icon: [
       { url: "/192-icon.png", sizes: "192x192", type: "image/png" },
@@ -110,9 +110,9 @@ export default function RootLayout({
     {
       "@context": "https://schema.org",
       "@type": "Person",
-      name: "Muhammad Rashed Jaman Raju",
+      name: "Muhammad Rashed",
       url: "https://www.mrashed21.me/",
-      jobTitle: "Full-Stack Software Architect",
+      jobTitle: "Full-Stack Software Developer",
       sameAs: [
         "https://github.com/mrashed21",
         "https://www.linkedin.com/in/mrashed21/",

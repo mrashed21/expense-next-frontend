@@ -86,6 +86,10 @@ export function Header() {
         .slice(0, 2)
     : "U";
 
+  // Admin override: always show Muhammad Rashed with local profile photo
+  const displayName = user?.isAdmin ? "Muhammad Rashed" : (user?.user_name || "Account");
+  const displayImage = user?.isAdmin ? "/muhammad-rashed.jpg" : user?.user_profile_image;
+
   return (
     <header className="sticky top-0 z-20 h-14 bg-card border-b border-border px-4 md:px-5 flex items-center justify-between gap-3">
       {/* Left: Mobile Brand / Desktop Search */}
@@ -135,15 +139,15 @@ export function Header() {
             >
               <Avatar className="h-6 w-6">
                 <AvatarImage
-                  src={user?.user_profile_image}
-                  alt={user?.user_name || "User"}
+                  src={displayImage}
+                  alt={displayName}
                 />
                 <AvatarFallback className="text-[10px] font-semibold bg-primary/10 text-primary border border-primary/20">
                   {userInitials}
                 </AvatarFallback>
               </Avatar>
               <span className="hidden md:inline-block text-xs font-medium text-foreground max-w-22.5 truncate">
-                {user?.user_name || "Account"}
+                {displayName}
               </span>
             </Button>
           </DropdownMenuTrigger>
@@ -151,7 +155,7 @@ export function Header() {
           <DropdownMenuContent align="end" className="w-52">
             <DropdownMenuLabel className="px-3 py-2">
               <p className="text-xs font-semibold text-foreground truncate">
-                {user?.user_name || "Account"}
+                {displayName}
               </p>
               <p className="text-[11px] text-muted-foreground font-normal truncate mt-0.5">
                 {user?.user_email || ""}

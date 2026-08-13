@@ -8,16 +8,22 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { RootState } from "@/redux/store";
+import { useGetReviewsQuery } from "@/services/review-api";
 import {
   ArrowRight,
   BarChart3,
   Bell,
-  Check,
   ChevronRight,
+  Facebook,
   FileSpreadsheet,
   FileText,
+  Github,
   Globe,
+  Instagram,
+  Linkedin,
   Lock,
+  Mail,
+  MessageCircle,
   Paperclip,
   PieChart as PieIcon,
   RefreshCw,
@@ -31,18 +37,11 @@ import {
   TrendingDown,
   TrendingUp,
   Wallet,
-  Zap,
-  Github,
-  Linkedin,
-  Facebook,
-  Instagram,
-  Mail,
-  MessageCircle,
+  Zap
 } from "lucide-react";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { useGetReviewsQuery } from "@/services/review-api";
 import {
   Bar,
   BarChart,
@@ -1034,12 +1033,14 @@ export default function HomePage() {
 
             <div className="p-8 md:p-12 rounded-[2rem] bg-card border border-border/60 shadow-xl relative overflow-hidden group hover:border-primary/30 transition-colors">
               <div className="flex flex-col md:flex-row gap-8 items-center md:items-start text-center md:text-left">
-                {/* Avatar Placeholder */}
+                {/* Avatar */}
                 <div className="relative shrink-0">
-                  <div className="w-32 h-32 md:w-40 md:h-40 rounded-full bg-secondary/80 border-4 border-background shadow-2xl flex items-center justify-center overflow-hidden z-10 relative">
-                    <span className="text-5xl font-black text-primary/40 tracking-tighter">
-                      MR
-                    </span>
+                  <div className="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-background shadow-2xl overflow-hidden z-10 relative">
+                    <img
+                      src="/muhammad-rashed.jpg"
+                      alt="Muhammad Rashed"
+                      className="w-full h-full object-cover object-top"
+                    />
                   </div>
                   <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full scale-150 -z-10 group-hover:bg-primary/40 transition-colors duration-500" />
                 </div>
@@ -1048,10 +1049,10 @@ export default function HomePage() {
                 <div className="flex-1 space-y-5">
                   <div>
                     <h3 className="text-2xl md:text-3xl font-black text-foreground">
-                      Muhammad Rashed Jaman Raju
+                      Muhammad Rashed
                     </h3>
                     <p className="text-sm font-semibold text-primary mt-1 tracking-wide uppercase">
-                      Full-Stack Software Architect
+                      Full-Stack Software DeveloperFull-Stack Software Developer
                     </p>
                   </div>
                   

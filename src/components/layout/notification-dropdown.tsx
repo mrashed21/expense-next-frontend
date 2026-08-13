@@ -6,6 +6,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { RootState } from "@/redux/store";
 import {
   useDeleteNotificationMutation,
   useGetNotificationsQuery,
@@ -30,6 +31,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import React, { useMemo, useState } from "react";
+import { useSelector } from "react-redux";
 import { toast } from "sonner";
 
 export function getRelativeTime(dateStr: string | Date) {
@@ -71,12 +73,14 @@ export function getNotificationIcon(type?: string, category?: string) {
 export function NotificationDropdown() {
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"all" | "unread">("all");
+  const { user } = useSelector((state: RootState) => state.auth);
 
   const {
     data: notificationsData,
     isLoading,
     isError,
   } = useGetNotificationsQuery(undefined, {
+    skip: user?.isAdmin,
     refetchOnFocus: false,
     refetchOnReconnect: true,
   });
@@ -221,8 +225,22 @@ export function NotificationDropdown() {
               ))}
             </div>
           ) : isError ? (
-            <div className="p-6 text-center text-xs text-rose-500 font-medium">
-              Failed to load notifications. Please try again.
+            <div className="p-6 text-center space-y-3">
+              <p className="text-xs text-rose-500 font-medium">
+                Failed to load notifications. Please try again.
+              </p>
+              <Button
+                asChild
+                variant="ghost"
+                size="sm"
+                className="h-7 text-xs font-semibold text-primary hover:text-primary hover:bg-primary/10 gap-1"
+                onClick={() => setIsOpen(false)}
+              >
+                <Link href="/notifications">
+                  View All Notifications
+                  <ArrowRight className="w-3 h-3" />
+                </Link>
+              </Button>
             </div>
           ) : filteredNotifications.length > 0 ? (
             filteredNotifications.map((n: any) => (
