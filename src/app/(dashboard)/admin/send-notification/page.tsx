@@ -18,6 +18,7 @@ import {
   useGetNotificationHistoryQuery,
   useGetUsersQuery,
   useSendUserNotificationMutation,
+  useBroadcastNotificationMutation,
 } from "@/services/admin-api";
 import {
   AlertTriangle,
@@ -30,6 +31,7 @@ import {
   Send,
   ShieldAlert,
   User,
+  Users,
   X,
   XCircle,
 } from "lucide-react";
@@ -115,7 +117,7 @@ export default function SendNotificationPage() {
     if (user && !user.isAdmin) router.replace("/dashboard");
   }, [user, router]);
 
-  /* ── State ── */
+  const [targetType, setTargetType] = useState<"specific" | "all">("specific");
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [selectedUser, setSelectedUser] = useState<TargetUser | null>(null);
@@ -154,6 +156,11 @@ export default function SendNotificationPage() {
   const [sendNotification, { isLoading: sending }] =
     useSendUserNotificationMutation();
 
+  const [broadcastNotification, { isLoading: broadcasting }] =
+    useBroadcastNotificationMutation();
+    
+  const isActionLoading = sending || broadcasting;
+
   /* ── Derived ── */
   const searchResults: TargetUser[] = usersResponse?.data?.users ?? [];
   const recentNotifications = historyData?.data?.notifications ?? [];
@@ -177,7 +184,7 @@ export default function SendNotificationPage() {
   };
 
   const handleSend = async () => {
-    if (!selectedUser) {
+    if (targetType === "specific" && !selectedUser) {
       toast.error("Please select a target user first.");
       return;
     }
@@ -191,19 +198,29 @@ export default function SendNotificationPage() {
     }
 
     try {
-      await sendNotification({
-        id: selectedUser._id,
-        title: title.trim(),
-        message: message.trim(),
-        type,
-      }).unwrap();
+      if (targetType === "specific" && selectedUser) {
+        await sendNotification({
+          id: selectedUser._id,
+          title: title.trim(),
+          message: message.trim(),
+          type,
+        }).unwrap();
+        toast.success(`Notification sent to ${selectedUser.user_name} successfully!`);
+      } else if (targetType === "all") {
+        await broadcastNotification({
+          title: title.trim(),
+          message: message.trim(),
+          type,
+        }).unwrap();
+        toast.success("Broadcast notification sent to all active users!");
+      }
 
-      toast.success(
-        `Notification sent to ${selectedUser.user_name} successfully!`,
-      );
       setTitle("");
       setMessage("");
       setType("info");
+      if (targetType === "all") {
+        setTargetType("specific");
+      }
     } catch (err: any) {
       toast.error(err?.data?.message ?? "Failed to send notification.");
     }
@@ -248,10 +265,40 @@ export default function SendNotificationPage() {
               <h2 className="text-sm font-bold">Select Target User</h2>
             </div>
 
-            <div className="space-y-2" ref={searchRef}>
-              <Label htmlFor="user-search" className="text-xs text-muted-foreground font-medium">
-                Search by name or email
-              </Label>
+            <div className="space-y-4">
+              <div className="flex bg-secondary/30 p-1 rounded-xl">
+                <button
+                  onClick={() => setTargetType("specific")}
+                  className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 ${
+                    targetType === "specific"
+                      ? "bg-background shadow-sm text-foreground"
+                      : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                  }`}
+                >
+                  <User className="w-4 h-4" />
+                  Specific User
+                </button>
+                <button
+                  onClick={() => {
+                    setTargetType("all");
+                    handleClearUser();
+                  }}
+                  className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-colors flex items-center justify-center gap-2 ${
+                    targetType === "all"
+                      ? "bg-background shadow-sm text-foreground"
+                      : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                  }`}
+                >
+                  <Users className="w-4 h-4" />
+                  All Users
+                </button>
+              </div>
+
+              {targetType === "specific" ? (
+                <div className="space-y-2" ref={searchRef}>
+                  <Label htmlFor="user-search" className="text-xs text-muted-foreground font-medium">
+                    Search by name or email
+                  </Label>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                 <Input
@@ -282,7 +329,7 @@ export default function SendNotificationPage() {
                 )}
 
                 {/* Dropdown */}
-                {showDropdown && debouncedSearch.length >= 2 && !selectedUser && (
+                {showDropdown && searchQuery.length >= 2 && !selectedUser && (
                   <div className="absolute top-full mt-1.5 left-0 right-0 z-50 bg-card border border-border rounded-xl shadow-xl overflow-hidden">
                     {searchFetching ? (
                       <div className="flex items-center justify-center py-6">
@@ -346,7 +393,9 @@ export default function SendNotificationPage() {
                 </div>
               )}
             </div>
-          </Card>
+          ) : null}
+          </div>
+        </Card>
 
           {/* Step 2 — Compose */}
           <Card className="p-5 border border-border shadow-sm bg-card/60 space-y-4">
@@ -436,11 +485,11 @@ export default function SendNotificationPage() {
             <div className="pt-2 border-t border-border">
               <Button
                 onClick={handleSend}
-                disabled={sending || !selectedUser}
+                disabled={isActionLoading || (targetType === "specific" && !selectedUser)}
                 className="w-full flex items-center gap-2"
                 size="lg"
               >
-                {sending ? (
+                {isActionLoading ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
                     Sending...
@@ -448,11 +497,11 @@ export default function SendNotificationPage() {
                 ) : (
                   <>
                     <Send className="w-4 h-4" />
-                    Send Notification
+                    {targetType === "all" ? "Broadcast to All Users" : "Send Notification"}
                   </>
                 )}
               </Button>
-              {!selectedUser && (
+              {targetType === "specific" && !selectedUser && (
                 <p className="text-center text-xs text-muted-foreground mt-2">
                   Select a user above to enable sending.
                 </p>
@@ -491,7 +540,7 @@ export default function SendNotificationPage() {
                   >
                     {message || "Your notification message will appear here."}
                   </p>
-                  {selectedUser && (
+                  {targetType === "specific" && selectedUser ? (
                     <p className="text-[10px] text-muted-foreground mt-2 flex items-center gap-1">
                       <User className="w-3 h-3" />
                       To:{" "}
@@ -499,7 +548,15 @@ export default function SendNotificationPage() {
                         {selectedUser.user_name}
                       </span>
                     </p>
-                  )}
+                  ) : targetType === "all" ? (
+                    <p className="text-[10px] text-muted-foreground mt-2 flex items-center gap-1">
+                      <Users className="w-3 h-3" />
+                      To:{" "}
+                      <span className={`font-semibold ${typeConfig.text}`}>
+                        All Active Users
+                      </span>
+                    </p>
+                  ) : null}
                 </div>
               </div>
             </div>

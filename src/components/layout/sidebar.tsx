@@ -74,7 +74,6 @@ const adminItems = [
 
 const superAdminItems = [
   { name: "Logs", href: "/admin/logs", icon: ScrollText },
-  { name: "Broadcast", href: "/admin/broadcast", icon: Megaphone },
   { name: "Admins", href: "/admin/admins", icon: ShieldAlert },
 ];
 
