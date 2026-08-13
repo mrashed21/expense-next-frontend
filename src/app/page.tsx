@@ -32,10 +32,17 @@ import {
   TrendingUp,
   Wallet,
   Zap,
+  Github,
+  Linkedin,
+  Facebook,
+  Instagram,
+  Mail,
+  MessageCircle,
 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
+import { useGetReviewsQuery } from "@/services/review-api";
 import {
   Bar,
   BarChart,
@@ -153,35 +160,16 @@ const features = [
   },
 ];
 
-const testimonials = [
-  {
-    name: "Sarah Jenkins",
-    role: "Senior Software Engineer",
-    avatar:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80",
-    rating: 5,
-    review:
-      "Expense Tracker completely transformed how I manage my monthly budget. The real-time alerts saved me over $500 last month alone!",
-  },
-  {
-    name: "David Chen",
-    role: "Small Business Owner",
-    avatar:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
-    rating: 5,
-    review:
-      "The PDF and Excel export features save me hours during tax season. Having multi-account sync and receipt attachments is a game changer.",
-  },
-  {
-    name: "Elena Rostova",
-    role: "Freelance Designer",
-    avatar:
-      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-    rating: 5,
-    review:
-      "The UI is breathtaking! Dark mode looks stunning, the charts are responsive, and setting recurring bills takes seconds.",
-  },
-];
+// Developer Social Links
+const socialLinks = {
+  portfolio: "https://www.mrashed21.me/",
+  github: "https://github.com/mrashed21",
+  linkedin: "https://www.linkedin.com/in/mrashed21/",
+  facebook: "https://www.facebook.com/mrasheed21",
+  instagram: "https://www.instagram.com/mrashed21/",
+  whatsapp: "https://wa.me/@mrashed21",
+  email: "rashedjaman768@gmail.com"
+};
 
 const faqs = [
   {
@@ -208,12 +196,24 @@ const faqs = [
 
 export default function HomePage() {
   const { user } = useSelector((state: RootState) => state.auth);
-  const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">(
-    "monthly",
-  );
   const [activePreviewTab, setActivePreviewTab] = useState<
     "dashboard" | "analytics" | "transactions" | "mobile"
   >("dashboard");
+
+  // Dynamic Reviews
+  const { data: reviewsResponse, isLoading: reviewsLoading } = useGetReviewsQuery({});
+  const reviews = reviewsResponse?.data || [];
+  
+  const [currentReviewIndex, setCurrentReviewIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+
+  useEffect(() => {
+    if (reviews.length <= 1 || isHovered) return;
+    const timer = setInterval(() => {
+      setCurrentReviewIndex((prev) => (prev + 1) % reviews.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [reviews.length, isHovered]);
 
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-primary/20 selection:text-primary">
@@ -255,12 +255,6 @@ export default function HomePage() {
               className="hover:text-foreground transition-colors"
             >
               How It Works
-            </a>
-            <a
-              href="#pricing"
-              className="hover:text-foreground transition-colors"
-            >
-              Pricing
             </a>
             <a href="#faq" className="hover:text-foreground transition-colors">
               FAQ
@@ -311,7 +305,7 @@ export default function HomePage() {
             {/* Release Badge */}
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold shadow-xs animate-bounce">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Next-Gen SaaS Expense Tracker v2.0 Released</span>
+              <span>100% Free Personal Finance Tracker</span>
             </div>
 
             {/* Headline */}
@@ -377,7 +371,7 @@ export default function HomePage() {
                         Total Balance
                       </p>
                       <p className="text-lg font-black text-foreground mt-0.5">
-                        $27,900.00
+                        ৳27,900.00
                       </p>
                       <p className="text-[10px] text-emerald-500 font-bold flex items-center gap-0.5 mt-1">
                         <TrendingUp className="w-3 h-3" /> +12.4% this month
@@ -388,7 +382,7 @@ export default function HomePage() {
                         Monthly Income
                       </p>
                       <p className="text-lg font-black text-emerald-500 mt-0.5">
-                        $5,800.00
+                        ৳5,800.00
                       </p>
                       <p className="text-[10px] text-muted-foreground mt-1">
                         2 Salary Records
@@ -399,7 +393,7 @@ export default function HomePage() {
                         Monthly Expense
                       </p>
                       <p className="text-lg font-black text-rose-500 mt-0.5">
-                        $2,800.00
+                        ৳2,800.00
                       </p>
                       <p className="text-[10px] text-rose-500 font-bold flex items-center gap-0.5 mt-1">
                         <TrendingDown className="w-3 h-3" /> -4.1% vs last month
@@ -410,7 +404,7 @@ export default function HomePage() {
                         Net Savings
                       </p>
                       <p className="text-lg font-black text-primary mt-0.5">
-                        $3,000.00
+                        ৳3,000.00
                       </p>
                       <p className="text-[10px] text-emerald-500 font-bold mt-1">
                         51.7% Savings Rate
@@ -450,7 +444,7 @@ export default function HomePage() {
                   </div>
                   <div>
                     <p className="text-xs font-bold">
-                      $4,850 Saved This Quarter
+                      ৳4,850 Saved This Quarter
                     </p>
                     <p className="text-[10px] text-muted-foreground">
                       Automated goal tracker
@@ -623,7 +617,7 @@ export default function HomePage() {
                         Cash Balance
                       </p>
                       <p className="text-xl font-extrabold text-foreground mt-1">
-                        $14,250.00
+                        ৳14,250.00
                       </p>
                     </div>
                     <div className="p-4 rounded-2xl bg-secondary/50 border border-border">
@@ -631,7 +625,7 @@ export default function HomePage() {
                         Investments
                       </p>
                       <p className="text-xl font-extrabold text-emerald-500 mt-1">
-                        $13,650.00
+                        ৳13,650.00
                       </p>
                     </div>
                     <div className="p-4 rounded-2xl bg-secondary/50 border border-border">
@@ -639,7 +633,7 @@ export default function HomePage() {
                         Monthly Bills Due
                       </p>
                       <p className="text-xl font-extrabold text-amber-500 mt-1">
-                        $450.00
+                        ৳450.00
                       </p>
                     </div>
                   </div>
@@ -697,7 +691,7 @@ export default function HomePage() {
                         </p>
                       </div>
                       <span className="font-extrabold text-rose-500">
-                        -$999.00
+                        -৳999.00
                       </span>
                     </div>
                     <div className="p-3 rounded-xl bg-secondary/40 border border-border flex justify-between items-center">
@@ -708,7 +702,7 @@ export default function HomePage() {
                         </p>
                       </div>
                       <span className="font-extrabold text-emerald-500">
-                        +$4,500.00
+                        +৳4,500.00
                       </span>
                     </div>
                   </div>
@@ -939,7 +933,11 @@ export default function HomePage() {
         </section>
 
         {/* 9. Testimonials Section */}
-        <section className="py-20 bg-secondary/30 border-y border-border/60">
+        <section 
+          className="py-20 bg-secondary/30 border-y border-border/60"
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+        >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
             <div className="text-center space-y-3 max-w-3xl mx-auto">
               <h2 className="text-xs font-extrabold uppercase tracking-widest text-primary">
@@ -950,211 +948,138 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {testimonials.map((t, idx) => (
-                <div
-                  key={idx}
-                  className="p-6 rounded-3xl bg-card border border-border space-y-4 shadow-xs"
-                >
-                  <div className="flex items-center gap-1 text-amber-400">
-                    {[...Array(t.rating)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-amber-400" />
-                    ))}
-                  </div>
-                  <p className="text-xs text-muted-foreground leading-relaxed italic">
-                    "{t.review}"
-                  </p>
-                  <div className="flex items-center gap-3 pt-2 border-t border-border/60">
-                    <img
-                      src={t.avatar}
-                      alt={t.name}
-                      className="w-9 h-9 rounded-full object-cover"
-                    />
-                    <div>
-                      <p className="text-xs font-bold text-foreground">
-                        {t.name}
-                      </p>
-                      <p className="text-[10px] text-muted-foreground">
-                        {t.role}
-                      </p>
+            {reviewsLoading ? (
+              <div className="flex justify-center items-center h-40">
+                <RefreshCw className="w-8 h-8 animate-spin text-primary/50" />
+              </div>
+            ) : reviews.length === 0 ? (
+              <div className="text-center text-muted-foreground p-10 bg-card rounded-3xl border border-border">
+                <MessageCircle className="w-10 h-10 mx-auto mb-3 opacity-20" />
+                <p>No reviews yet. Be the first to share your experience!</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
+                {/* Show up to 3 reviews starting from currentReviewIndex (wrapping around) */}
+                {[0, 1, 2].map((offset) => {
+                  if (reviews.length === 0) return null;
+                  const idx = (currentReviewIndex + offset) % reviews.length;
+                  const t = reviews[idx];
+                  if (!t) return null;
+
+                  return (
+                    <div
+                      key={`${t._id}-${offset}`}
+                      className="p-6 rounded-3xl bg-card border border-border space-y-4 shadow-xs flex flex-col justify-between transition-all duration-500 hover:-translate-y-1 hover:border-primary/50"
+                    >
+                      <div>
+                        <div className="flex items-center gap-1 text-amber-400 mb-3">
+                          {[...Array(5)].map((_, i) => (
+                            <Star key={i} className={`w-4 h-4 ${i < (t.rating || 5) ? 'fill-amber-400' : 'text-muted-foreground/30'}`} />
+                          ))}
+                        </div>
+                        <p className="text-xs text-muted-foreground leading-relaxed italic line-clamp-4">
+                          "{t.comment}"
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-3 pt-4 border-t border-border/60 mt-auto">
+                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold shadow-inner">
+                          {t.user_id?.user_name?.charAt(0).toUpperCase() || "U"}
+                        </div>
+                        <div>
+                          <p className="text-xs font-bold text-foreground capitalize">
+                            {t.user_id?.user_name || "Anonymous User"}
+                          </p>
+                          <p className="text-[10px] text-muted-foreground">
+                            Verified User
+                          </p>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+                  );
+                })}
+              </div>
+            )}
+            
+            {/* Pagination Dots */}
+            {reviews.length > 3 && (
+              <div className="flex justify-center gap-2 pt-4">
+                {reviews.map((_:any, idx:any) => (
+                  <button
+                    key={idx}
+                    onClick={() => setCurrentReviewIndex(idx)}
+                    className={`w-2 h-2 rounded-full transition-all ${
+                      idx === currentReviewIndex ? "bg-primary w-6" : "bg-primary/20 hover:bg-primary/40"
+                    }`}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </section>
 
-        {/* 10. Pricing Section */}
-        <section id="pricing" className="py-20 md:py-28">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
-            <div className="text-center space-y-4 max-w-3xl mx-auto">
+        {/* 10. Developer Section */}
+        <section id="developer" className="py-20 md:py-28 relative overflow-hidden">
+          {/* Background Elements */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-3xl -z-10 pointer-events-none" />
+          
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12 relative z-10">
+            <div className="text-center space-y-4">
               <h2 className="text-xs font-extrabold uppercase tracking-widest text-primary">
-                Simple Pricing
+                About The Developer
               </h2>
               <p className="text-2xl sm:text-3xl font-black tracking-tight">
-                Transparent Plans for Every Budget
+                Built with Passion
               </p>
-              <p className="text-xs sm:text-sm text-muted-foreground">
-                No hidden fees. Upgrade or cancel anytime.
-              </p>
-
-              {/* Monthly/Yearly Toggle */}
-              <div className="inline-flex items-center p-1 rounded-2xl bg-secondary border border-border">
-                <button
-                  onClick={() => setBillingCycle("monthly")}
-                  className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                    billingCycle === "monthly"
-                      ? "bg-card text-foreground shadow-xs"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  Monthly Billing
-                </button>
-                <button
-                  onClick={() => setBillingCycle("yearly")}
-                  className={`px-4 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                    billingCycle === "yearly"
-                      ? "bg-primary text-primary-foreground shadow-xs"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  Yearly Billing (Save 20%)
-                </button>
-              </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
-              {/* Free Plan */}
-              <div className="p-8 rounded-3xl bg-card border border-border flex flex-col justify-between space-y-6">
-                <div className="space-y-4">
-                  <h3 className="font-extrabold text-lg">Free Starter</h3>
-                  <p className="text-xs text-muted-foreground">
-                    Essential tracking for individuals.
-                  </p>
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-3xl font-black">৳0</span>
-                    <span className="text-xs text-muted-foreground">
-                      / month
+            <div className="p-8 md:p-12 rounded-[2rem] bg-card border border-border/60 shadow-xl relative overflow-hidden group hover:border-primary/30 transition-colors">
+              <div className="flex flex-col md:flex-row gap-8 items-center md:items-start text-center md:text-left">
+                {/* Avatar Placeholder */}
+                <div className="relative shrink-0">
+                  <div className="w-32 h-32 md:w-40 md:h-40 rounded-full bg-secondary/80 border-4 border-background shadow-2xl flex items-center justify-center overflow-hidden z-10 relative">
+                    <span className="text-5xl font-black text-primary/40 tracking-tighter">
+                      MR
                     </span>
                   </div>
-                  <ul className="space-y-2 text-xs pt-4 border-t border-border">
-                    <li className="flex items-center gap-2 text-foreground">
-                      <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                      <span>Up to 100 Transactions / mo</span>
-                    </li>
-                    <li className="flex items-center gap-2 text-foreground">
-                      <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                      <span>3 Financial Accounts</span>
-                    </li>
-                    <li className="flex items-center gap-2 text-foreground">
-                      <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                      <span>Basic Category Analytics</span>
-                    </li>
-                    <li className="flex items-center gap-2 text-muted-foreground line-through">
-                      <span>PDF & Excel Exports</span>
-                    </li>
-                  </ul>
+                  <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full scale-150 -z-10 group-hover:bg-primary/40 transition-colors duration-500" />
                 </div>
-                <Link
-                  href="/register"
-                  className="w-full py-3 rounded-2xl bg-secondary text-foreground font-bold text-xs hover:bg-secondary/80 transition-colors text-center"
-                >
-                  Get Started Free
-                </Link>
-              </div>
 
-              {/* Pro Plan (Highlighted) */}
-              <div className="p-8 rounded-3xl bg-linear-to-b from-primary/10 via-card to-card border-2 border-primary relative flex flex-col justify-between space-y-6 shadow-2xl shadow-primary/15">
-                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-primary text-primary-foreground text-[10px] font-black uppercase tracking-wider">
-                  Most Popular
-                </div>
-                <div className="space-y-4">
-                  <h3 className="font-extrabold text-lg text-primary">
-                    Pro Unlimited
-                  </h3>
-                  <p className="text-xs text-muted-foreground">
-                    For active savers & freelancers.
-                  </p>
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-3xl font-black">
-                      {billingCycle === "monthly" ? "৳299" : "৳239"}
-                    </span>
-                    <span className="text-xs text-muted-foreground">
-                      / month
-                    </span>
+                {/* Info */}
+                <div className="flex-1 space-y-5">
+                  <div>
+                    <h3 className="text-2xl md:text-3xl font-black text-foreground">
+                      Muhammad Rashed Jaman Raju
+                    </h3>
+                    <p className="text-sm font-semibold text-primary mt-1 tracking-wide uppercase">
+                      Full-Stack Software Architect
+                    </p>
                   </div>
-                  <ul className="space-y-2 text-xs pt-4 border-t border-border">
-                    <li className="flex items-center gap-2 text-foreground font-semibold">
-                      <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                      <span>Unlimited Transactions</span>
-                    </li>
-                    <li className="flex items-center gap-2 text-foreground font-semibold">
-                      <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                      <span>Unlimited Financial Accounts</span>
-                    </li>
-                    <li className="flex items-center gap-2 text-foreground font-semibold">
-                      <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                      <span>PDF & Formatted Excel Exports</span>
-                    </li>
-                    <li className="flex items-center gap-2 text-foreground font-semibold">
-                      <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                      <span>Recurring Bill Automations</span>
-                    </li>
-                    <li className="flex items-center gap-2 text-foreground font-semibold">
-                      <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                      <span>Receipt Attachments & Storage</span>
-                    </li>
-                  </ul>
-                </div>
-                <Link
-                  href="/register"
-                  className="w-full py-3 rounded-2xl bg-primary text-primary-foreground font-bold text-xs shadow-lg shadow-primary/25 hover:bg-primary/90 transition-colors text-center"
-                >
-                  Start 14-Day Free Trial
-                </Link>
-              </div>
+                  
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    I built Expense Tracker to provide a seamless, premium-grade financial tracking experience completely free of charge. My goal is to empower individuals and small businesses to take control of their finances without worrying about subscription fees.
+                  </p>
 
-              {/* Business Plan */}
-              <div className="p-8 rounded-3xl bg-card border border-border flex flex-col justify-between space-y-6">
-                <div className="space-y-4">
-                  <h3 className="font-extrabold text-lg">Business Suite</h3>
-                  <p className="text-xs text-muted-foreground">
-                    For business teams & accountants.
-                  </p>
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-3xl font-black">
-                      {billingCycle === "monthly" ? "৳999" : "৳799"}
-                    </span>
-                    <span className="text-xs text-muted-foreground">
-                      / month
-                    </span>
+                  <div className="flex flex-wrap gap-3 justify-center md:justify-start pt-2">
+                    <a href={socialLinks.portfolio} target="_blank" rel="noreferrer" className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-full text-xs font-bold hover:bg-primary/90 transition-transform hover:-translate-y-0.5">
+                      <Zap className="w-3.5 h-3.5" /> Portfolio
+                    </a>
+                    <a href={socialLinks.github} target="_blank" rel="noreferrer" className="flex items-center gap-2 px-4 py-2 bg-secondary text-foreground rounded-full text-xs font-bold hover:bg-secondary/80 transition-transform hover:-translate-y-0.5 border border-border">
+                      <Github className="w-3.5 h-3.5" /> GitHub
+                    </a>
+                    <a href={socialLinks.linkedin} target="_blank" rel="noreferrer" className="flex items-center gap-2 px-4 py-2 bg-secondary text-foreground rounded-full text-xs font-bold hover:bg-secondary/80 transition-transform hover:-translate-y-0.5 border border-border">
+                      <Linkedin className="w-3.5 h-3.5 text-[#0A66C2]" /> LinkedIn
+                    </a>
+                    <a href={socialLinks.facebook} target="_blank" rel="noreferrer" className="flex items-center justify-center w-9 h-9 bg-secondary text-foreground rounded-full hover:bg-secondary/80 transition-transform hover:-translate-y-0.5 border border-border">
+                      <Facebook className="w-4 h-4 text-[#1877F2]" />
+                    </a>
+                    <a href={socialLinks.instagram} target="_blank" rel="noreferrer" className="flex items-center justify-center w-9 h-9 bg-secondary text-foreground rounded-full hover:bg-secondary/80 transition-transform hover:-translate-y-0.5 border border-border">
+                      <Instagram className="w-4 h-4 text-[#E4405F]" />
+                    </a>
+                    <a href={`mailto:${socialLinks.email}`} className="flex items-center justify-center w-9 h-9 bg-secondary text-foreground rounded-full hover:bg-secondary/80 transition-transform hover:-translate-y-0.5 border border-border">
+                      <Mail className="w-4 h-4" />
+                    </a>
                   </div>
-                  <ul className="space-y-2 text-xs pt-4 border-t border-border">
-                    <li className="flex items-center gap-2 text-foreground">
-                      <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                      <span>Everything in Pro Plan</span>
-                    </li>
-                    <li className="flex items-center gap-2 text-foreground">
-                      <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                      <span>Multi-User Role-Based Access</span>
-                    </li>
-                    <li className="flex items-center gap-2 text-foreground">
-                      <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                      <span>Audit Logs & Admin Panel</span>
-                    </li>
-                    <li className="flex items-center gap-2 text-foreground">
-                      <Check className="w-4 h-4 text-emerald-500 shrink-0" />
-                      <span>Dedicated Priority Support</span>
-                    </li>
-                  </ul>
                 </div>
-                <Link
-                  href="/register"
-                  className="w-full py-3 rounded-2xl bg-secondary text-foreground font-bold text-xs hover:bg-secondary/80 transition-colors text-center"
-                >
-                  Contact Business Sales
-                </Link>
               </div>
             </div>
           </div>
@@ -1259,8 +1184,8 @@ export default function HomePage() {
                   </a>
                 </li>
                 <li>
-                  <a href="#pricing" className="hover:text-foreground">
-                    Pricing Plans
+                  <a href="#developer" className="hover:text-foreground text-primary font-semibold">
+                    About Developer
                   </a>
                 </li>
                 <li>
@@ -1317,7 +1242,14 @@ export default function HomePage() {
           </div>
 
           <div className="pt-8 border-t border-border/60 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
-            <p>© 2026 Expense Tracker SaaS. All rights reserved.</p>
+            <div className="flex flex-col sm:flex-row items-center gap-4 text-xs text-muted-foreground">
+              <div className="flex gap-4">
+                <a href={socialLinks.github} target="_blank" rel="noreferrer" className="hover:text-foreground transition-colors"><Github className="w-4 h-4"/></a>
+                <a href={socialLinks.linkedin} target="_blank" rel="noreferrer" className="hover:text-foreground transition-colors"><Linkedin className="w-4 h-4"/></a>
+                <a href={socialLinks.facebook} target="_blank" rel="noreferrer" className="hover:text-foreground transition-colors"><Facebook className="w-4 h-4"/></a>
+              </div>
+              <p>© 2026 Expense Tracker. Free and Open to Use.</p>
+            </div>
             <div className="flex items-center gap-4">
               <span>English (US)</span>
               <span>BDT (৳)</span>

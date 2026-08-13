@@ -16,22 +16,22 @@ const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://expense-trecker-bd.v
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: {
-    default:
-      "Expense Tracker - Premium SaaS Expense Tracker & Financial Analytics",
+    default: "Free Expense Tracker – Track Income, Expenses & Savings",
     template: "%s | Expense Tracker",
   },
   description:
-    "Take full control of your personal and business finances with Expense Tracker. Track income, manage budget limits, automate recurring bills, and export custom PDF & Excel reports.",
+    "Track your income, expenses, budgets and savings with a free, easy-to-use Expense Tracker. Get clear financial insights and manage your money smarter.",
   keywords: [
-    "Expense Tracker",
-    "SaaS Financial Manager",
-    "Budget Planner",
-    "Personal Finance App",
-    "Income and Expense Tracker",
-    "Financial Analytics",
-    "PDF Expense Reports",
-    "Excel Export",
-    "Money Management",
+    "free expense tracker",
+    "expense tracker",
+    "income tracker",
+    "budget tracker",
+    "personal finance tracker",
+    "expense management",
+    "money management",
+    "savings tracker",
+    "BDT expense tracker",
+    "Bangladesh expense tracker",
   ],
   authors: [{ name: "Expense Tracker Team" }],
   creator: "Expense Tracker",
@@ -54,26 +54,25 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: baseUrl,
-    title:
-      "Expense Tracker - Premium SaaS Expense Tracker & Financial Analytics",
+    title: "Free Expense Tracker – Track Income, Expenses & Savings",
     description:
-      "Modern, secure, and intuitive expense tracking application. Real-time budget alerts, instant search, multi-account transfers, and financial visual charts.",
+      "Track your income, expenses, budgets and savings with a free, easy-to-use Expense Tracker. Get clear financial insights and manage your money smarter.",
     siteName: "Expense Tracker",
     images: [
       {
         url: `${baseUrl}/og-image.jpg`,
         width: 1200,
         height: 630,
-        alt: "Expense Tracker SaaS Dashboard Preview",
+        alt: "Expense Tracker Dashboard Preview",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Expense Tracker - Smart Expense Tracker & Finance Dashboard",
+    title: "Free Expense Tracker – Track Income, Expenses & Savings",
     description:
-      "Track daily expenses, set budget alerts, and generate automated PDF/Excel reports in seconds.",
-    creator: "@expensetracker",
+      "Track your income, expenses, budgets and savings with a free, easy-to-use Expense Tracker.",
+    creator: "@mrashed21",
     images: [`${baseUrl}/og-image.jpg`],
   },
 };
@@ -83,20 +82,35 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    name: "Expense Tracker",
-    operatingSystem: "Web, iOS, Android",
-    applicationCategory: "FinanceApplication",
-    offers: {
-      "@type": "Offer",
-      price: "0",
-      priceCurrency: "USD",
+  const jsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      name: "Expense Tracker",
+      operatingSystem: "Web, iOS, Android",
+      applicationCategory: "FinanceApplication",
+      offers: {
+        "@type": "Offer",
+        price: "0",
+        priceCurrency: "BDT",
+      },
+      description:
+        "100% Free Expense Tracker for individuals and businesses with real-time analytics, budgeting, and export tools.",
     },
-    description:
-      "Production-ready SaaS Expense Tracker for individuals and businesses with real-time analytics, budgeting, and export tools.",
-  };
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      name: "Muhammad Rashed Jaman Raju",
+      url: "https://www.mrashed21.me/",
+      jobTitle: "Full-Stack Software Architect",
+      sameAs: [
+        "https://github.com/mrashed21",
+        "https://www.linkedin.com/in/mrashed21/",
+        "https://www.facebook.com/mrasheed21",
+        "https://www.instagram.com/mrashed21/",
+      ]
+    }
+  ];
 
   return (
     <html lang="en" suppressHydrationWarning>
