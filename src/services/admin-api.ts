@@ -98,6 +98,13 @@ export const adminApi = apiSlice.injectEndpoints({
         body: data,
       }),
     }),
+    sendUserNotification: builder.mutation({
+      query: ({ id, ...data }) => ({
+        url: `/admin/users/${id}/notify`,
+        method: "POST",
+        body: data,
+      }),
+    }),
     updateAdminProfile: builder.mutation({
       query: (data) => ({
         url: "/admin/profile",
@@ -137,6 +144,7 @@ export const {
   useGetErrorLogsQuery,
   useGetAuditLogsQuery,
   useBroadcastNotificationMutation,
+  useSendUserNotificationMutation,
   useUpdateAdminProfileMutation,
   useUpdateAdminProfileImageMutation,
   useGlobalAdminSearchQuery,

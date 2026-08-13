@@ -17,6 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -36,14 +37,17 @@ import { formatDate } from "@/lib/utils";
 import { RootState } from "@/redux/store";
 import {
   useGetUsersQuery,
+  useSendUserNotificationMutation,
   useUpdateUserStatusMutation,
 } from "@/services/admin-api";
 import {
   Ban,
+  Bell,
   CheckCircle,
   Loader2,
   MoreVertical,
   Search,
+  Send,
   ShieldAlert,
   Trash2,
   UserCog,
@@ -67,6 +71,15 @@ export default function AdminUsersPage() {
   >(null);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
+  const [isNotifyDialogOpen, setIsNotifyDialogOpen] = useState(false);
+  const [notifyTarget, setNotifyTarget] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
+  const [notifyTitle, setNotifyTitle] = useState("");
+  const [notifyMessage, setNotifyMessage] = useState("");
+  const [notifyType, setNotifyType] = useState("info");
+
   useEffect(() => {
     if (user && !user.isAdmin) {
       router.replace("/dashboard");
@@ -86,6 +99,8 @@ export default function AdminUsersPage() {
 
   const [updateUserStatus, { isLoading: updatingStatus }] =
     useUpdateUserStatusMutation();
+  const [sendUserNotification, { isLoading: isSendingNotification }] =
+    useSendUserNotificationMutation();
 
   if (!user || !user.isAdmin) {
     return (
@@ -130,6 +145,39 @@ export default function AdminUsersPage() {
     setSelectedUserId(id);
     setActionType(type);
     setIsDialogOpen(true);
+  };
+
+  const openNotifyDialog = (id: string, name: string) => {
+    setNotifyTarget({ id, name });
+    setNotifyTitle("");
+    setNotifyMessage("");
+    setNotifyType("info");
+    setIsNotifyDialogOpen(true);
+  };
+
+  const handleSendNotification = async () => {
+    if (!notifyTarget) return;
+    if (notifyTitle.trim().length < 3) {
+      toast.error("Title must be at least 3 characters");
+      return;
+    }
+    if (notifyMessage.trim().length < 5) {
+      toast.error("Message must be at least 5 characters");
+      return;
+    }
+
+    try {
+      await sendUserNotification({
+        id: notifyTarget.id,
+        title: notifyTitle.trim(),
+        message: notifyMessage.trim(),
+        type: notifyType,
+      }).unwrap();
+      toast.success(`Notification sent to ${notifyTarget.name}`);
+      setIsNotifyDialogOpen(false);
+    } catch (err: any) {
+      toast.error(err?.data?.message || "Failed to send notification");
+    }
   };
 
   return (
@@ -263,6 +311,12 @@ export default function AdminUsersPage() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
+                          <DropdownMenuItem
+                            onClick={() => openNotifyDialog(u._id, u.user_name)}
+                          >
+                            <Bell className="h-4 w-4 mr-2 text-primary" /> Send
+                            Notification
+                          </DropdownMenuItem>
                           {u.user_status !== "active" && (
                             <DropdownMenuItem
                               onClick={() => openActionDialog(u._id, "active")}
@@ -369,6 +423,80 @@ export default function AdminUsersPage() {
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
               ) : null}
               Confirm
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Send Notification Dialog */}
+      <Dialog open={isNotifyDialogOpen} onOpenChange={setIsNotifyDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Send Notification</DialogTitle>
+            <DialogDescription>
+              Send a real-time notification to{" "}
+              <span className="font-semibold">{notifyTarget?.name}</span>.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label htmlFor="notify-title">Title</Label>
+              <Input
+                id="notify-title"
+                placeholder="e.g. Account Verification"
+                value={notifyTitle}
+                onChange={(e) => setNotifyTitle(e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="notify-message">Message</Label>
+              <textarea
+                id="notify-message"
+                rows={4}
+                placeholder="Provide details about this notification..."
+                value={notifyMessage}
+                onChange={(e) => setNotifyMessage(e.target.value)}
+                className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Type</Label>
+              <Select value={notifyType} onValueChange={setNotifyType}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select notification type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="info">Information (Blue)</SelectItem>
+                  <SelectItem value="success">Success (Green)</SelectItem>
+                  <SelectItem value="warning">Warning (Yellow)</SelectItem>
+                  <SelectItem value="alert">Alert (Red)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <DialogFooter className="mt-2">
+            <Button
+              variant="outline"
+              onClick={() => setIsNotifyDialogOpen(false)}
+              disabled={isSendingNotification}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSendNotification}
+              disabled={isSendingNotification}
+              className="flex items-center gap-2"
+            >
+              {isSendingNotification ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Send className="w-4 h-4" />
+              )}
+              Send
             </Button>
           </DialogFooter>
         </DialogContent>
