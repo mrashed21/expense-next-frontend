@@ -213,8 +213,8 @@ export default function DebtsPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-3 w-full sm:w-auto">
-          <div className="relative flex-1 sm:flex-none sm:w-64">
+        <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+          <div className="relative w-full sm:w-64">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <input
               type="text"
@@ -229,10 +229,10 @@ export default function DebtsPage() {
               reset();
               setIsAddOpen(true);
             }}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-primary-foreground font-semibold text-xs shadow-md shadow-primary/20 hover:bg-primary/90 transition-colors shrink-0"
+            className="w-full sm:w-auto flex justify-center items-center gap-2 px-4 py-2.5 sm:py-2 rounded-xl bg-primary text-primary-foreground font-semibold text-sm sm:text-xs shadow-md shadow-primary/20 hover:bg-primary/90 transition-colors shrink-0"
           >
-            <Plus className="w-4 h-4" />
-            <span className="hidden sm:inline">Add Debt</span>
+            <Plus className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
+            <span>Add Debt</span>
           </button>
         </div>
       </div>
