@@ -67,11 +67,11 @@ export default function ProfilePage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const authUser = useSelector((state: any) => state.auth.user);
-  const { data: profileData } = useGetProfileQuery(
+  const { data: profileData, isLoading: isProfileLoading } = useGetProfileQuery(
     {},
     { skip: !!authUser?.isAdmin },
   );
-  const { data: historyData } = useGetLoginHistoryQuery({});
+  const { data: historyData, isLoading: isHistoryLoading } = useGetLoginHistoryQuery({});
   const [updateProfileApi, { isLoading: isUpdatingUserProfile }] =
     useUpdateProfileMutation();
   const [updateProfileImageApi, { isLoading: isUploadingUserImage }] =
@@ -90,7 +90,7 @@ export default function ProfilePage() {
     useDeleteAccountMutation();
   const [logoutAllApi] = useLogoutAllDevicesMutation();
 
-  const { data: devicesData } = useGetDevicesQuery({});
+  const { data: devicesData, isLoading: isDevicesLoading } = useGetDevicesQuery({});
   const [generate2FA] = useGenerate2FAMutation();
   const [verify2FA, { isLoading: isVerifying2FA }] = useVerify2FAMutation();
   const [disable2FA, { isLoading: isDisabling2FA }] = useDisable2FAMutation();
@@ -348,6 +348,48 @@ export default function ProfilePage() {
       toast.error(err?.data?.message || "Failed to delete account");
     }
   };
+
+  const isLoading = isProfileLoading || isHistoryLoading || isDevicesLoading;
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6 max-w-5xl mx-auto animate-pulse">
+        <div>
+          <div className="h-7 w-48 sm:w-64 bg-secondary rounded-lg mb-2"></div>
+          <div className="h-4 w-64 sm:w-96 bg-secondary rounded-lg"></div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="glass-card p-6 rounded-3xl space-y-6 flex flex-col items-center justify-center border border-border">
+            <div className="w-24 h-24 rounded-full bg-secondary"></div>
+            <div className="h-5 w-32 bg-secondary rounded-lg"></div>
+            <div className="h-4 w-48 bg-secondary rounded-lg"></div>
+            <div className="w-full h-2 bg-secondary rounded-full mt-4"></div>
+          </div>
+          <div className="md:col-span-2 glass-card p-6 rounded-3xl space-y-6 border border-border">
+            <div className="h-6 w-48 bg-secondary rounded-lg mb-6"></div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="h-10 bg-secondary rounded-xl"></div>
+              <div className="h-10 bg-secondary rounded-xl"></div>
+              <div className="h-10 bg-secondary rounded-xl"></div>
+              <div className="h-10 bg-secondary rounded-xl"></div>
+              <div className="h-10 bg-secondary rounded-xl"></div>
+              <div className="h-10 bg-secondary rounded-xl"></div>
+            </div>
+            <div className="flex justify-end mt-4">
+               <div className="h-10 w-32 bg-secondary rounded-xl"></div>
+            </div>
+          </div>
+        </div>
+        <div className="glass-card p-6 rounded-3xl space-y-6 border border-border">
+            <div className="h-6 w-48 bg-secondary rounded-lg mb-6"></div>
+            <div className="space-y-4">
+              <div className="h-16 w-full bg-secondary rounded-xl"></div>
+              <div className="h-16 w-full bg-secondary rounded-xl"></div>
+            </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto">
@@ -809,8 +851,8 @@ export default function ProfilePage() {
           </div>
 
           {/* 2FA Security Form */}
-          <div className="glass-card p-6 rounded-3xl space-y-4">
-            <h3 className="text-base font-bold text-foreground border-b border-border pb-3 flex justify-between items-center">
+          <div className="glass-card p-4 sm:p-6 rounded-3xl space-y-4">
+            <h3 className="text-base font-bold text-foreground border-b border-border pb-3 flex flex-col sm:flex-row sm:justify-between items-start sm:items-center gap-2">
               <span>Two-Factor Authentication (2FA)</span>
               {user.two_factor_enabled ? (
                 <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] font-bold border border-emerald-500/20">
@@ -831,7 +873,7 @@ export default function ProfilePage() {
               <button
                 onClick={handleDisable2FA}
                 disabled={isDisabling2FA}
-                className="py-2.5 px-6 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 font-semibold text-xs border border-rose-500/20 transition-colors flex items-center justify-center gap-2"
+                className="py-2.5 px-6 w-full sm:w-auto rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-500 font-semibold text-xs border border-rose-500/20 transition-colors flex items-center justify-center gap-2"
               >
                 {isDisabling2FA ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -842,7 +884,7 @@ export default function ProfilePage() {
             ) : (
               <button
                 onClick={handleEnable2FA}
-                className="py-2.5 px-6 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-xs shadow-md transition-colors flex items-center justify-center gap-2"
+                className="py-2.5 px-6 w-full sm:w-auto rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-xs shadow-md transition-colors flex items-center justify-center gap-2"
               >
                 Setup 2FA
               </button>
@@ -852,7 +894,7 @@ export default function ProfilePage() {
       </div>
 
       {/* Trusted Devices Table */}
-      <div className="glass-card p-6 rounded-3xl space-y-4">
+      <div className="glass-card p-4 sm:p-6 rounded-3xl space-y-4">
         <h2 className="text-base font-bold text-foreground flex items-center gap-2">
           <Smartphone className="w-5 h-5 text-primary" />
           Trusted Devices
@@ -861,20 +903,20 @@ export default function ProfilePage() {
           Devices that have securely logged into your account. You can revoke
           access to any unrecognized device.
         </p>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto scrollbar-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
               <tr className="bg-secondary/60 text-muted-foreground uppercase text-[10px] font-bold border-b border-border">
-                <th scope="col" className="p-3">
+                <th scope="col" className="p-3 whitespace-nowrap">
                   Device Name
                 </th>
-                <th scope="col" className="p-3">
+                <th scope="col" className="p-3 whitespace-nowrap">
                   IP Address
                 </th>
-                <th scope="col" className="p-3">
+                <th scope="col" className="p-3 whitespace-nowrap">
                   Last Active
                 </th>
-                <th scope="col" className="p-3 text-right">
+                <th scope="col" className="p-3 text-right whitespace-nowrap">
                   Action
                 </th>
               </tr>
@@ -886,20 +928,20 @@ export default function ProfilePage() {
                     key={d._id}
                     className="hover:bg-secondary/30 transition-colors"
                   >
-                    <td className="p-3 text-foreground font-bold flex items-center gap-2">
-                      <Smartphone className="w-4 h-4 text-muted-foreground" />
+                    <td className="p-3 text-foreground font-bold flex items-center gap-2 whitespace-nowrap">
+                      <Smartphone className="w-4 h-4 text-muted-foreground shrink-0" />
                       {d.device_name}
                     </td>
-                    <td className="p-3 font-mono text-muted-foreground">
+                    <td className="p-3 font-mono text-muted-foreground whitespace-nowrap">
                       {d.ip_address}
                     </td>
-                    <td className="p-3 text-muted-foreground">
+                    <td className="p-3 text-muted-foreground whitespace-nowrap">
                       {formatDate(d.last_active)}
                     </td>
-                    <td className="p-3 text-right">
+                    <td className="p-3 text-right whitespace-nowrap">
                       <button
                         onClick={() => handleRevokeDevice(d._id)}
-                        className="px-3 py-1.5 rounded-lg bg-rose-500/10 text-rose-500 hover:bg-rose-500/20 text-[10px] font-bold transition-colors"
+                        className="px-3 py-1.5 rounded-lg bg-rose-500/10 text-rose-500 hover:bg-rose-500/20 text-[10px] font-bold transition-colors w-full sm:w-auto text-center"
                       >
                         Revoke
                       </button>
@@ -910,7 +952,7 @@ export default function ProfilePage() {
                 <tr>
                   <td
                     colSpan={4}
-                    className="text-center py-6 text-muted-foreground"
+                    className="text-center py-6 text-muted-foreground whitespace-nowrap"
                   >
                     No trusted devices found.
                   </td>
@@ -922,21 +964,21 @@ export default function ProfilePage() {
       </div>
 
       {/* Login History Table */}
-      <div className="glass-card p-6 rounded-3xl space-y-4">
+      <div className="glass-card p-4 sm:p-6 rounded-3xl space-y-4">
         <h2 className="text-base font-bold text-foreground">
           Recent Security Login History
         </h2>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto scrollbar-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
               <tr className="bg-secondary/60 text-muted-foreground uppercase text-[10px] font-bold border-b border-border">
-                <th scope="col" className="p-3">
+                <th scope="col" className="p-3 whitespace-nowrap">
                   IP Address
                 </th>
-                <th scope="col" className="p-3">
+                <th scope="col" className="p-3 whitespace-nowrap">
                   Device / Browser
                 </th>
-                <th scope="col" className="p-3 text-right">
+                <th scope="col" className="p-3 text-right whitespace-nowrap">
                   Timestamp
                 </th>
               </tr>
@@ -948,13 +990,13 @@ export default function ProfilePage() {
                     key={h._id}
                     className="hover:bg-secondary/30 transition-colors"
                   >
-                    <td className="p-3 font-mono text-foreground font-bold">
+                    <td className="p-3 font-mono text-foreground font-bold whitespace-nowrap">
                       {h.ip_address}
                     </td>
-                    <td className="p-3 text-muted-foreground">
+                    <td className="p-3 text-muted-foreground whitespace-nowrap">
                       {h.device_info || h.user_agent || "Unknown"}
                     </td>
-                    <td className="p-3 text-right text-muted-foreground">
+                    <td className="p-3 text-right text-muted-foreground whitespace-nowrap">
                       {formatDate(h.timestamp)}
                     </td>
                   </tr>
@@ -963,7 +1005,7 @@ export default function ProfilePage() {
                 <tr>
                   <td
                     colSpan={3}
-                    className="text-center py-6 text-muted-foreground"
+                    className="text-center py-6 text-muted-foreground whitespace-nowrap"
                   >
                     No login history found.
                   </td>
