@@ -230,7 +230,7 @@ export default function InvestmentsPage() {
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
             Total Invested
           </p>
-          <p className="text-2xl font-black text-foreground mt-1">
+          <p className="text-xl sm:text-2xl font-black text-foreground mt-1 truncate">
             {formatCurrency(metrics.totalInvested)}
           </p>
         </div>
@@ -238,7 +238,7 @@ export default function InvestmentsPage() {
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
             Current Value
           </p>
-          <p className="text-2xl font-black text-foreground mt-1">
+          <p className="text-xl sm:text-2xl font-black text-foreground mt-1 truncate">
             {formatCurrency(metrics.totalCurrentValue)}
           </p>
         </div>
@@ -251,7 +251,7 @@ export default function InvestmentsPage() {
                 Total Profit / Loss
               </p>
               <p
-                className={`text-2xl font-black mt-1 ${metrics.totalPnL >= 0 ? "text-emerald-500" : "text-destructive"}`}
+                className={`text-xl sm:text-2xl font-black mt-1 truncate ${metrics.totalPnL >= 0 ? "text-emerald-500" : "text-destructive"}`}
               >
                 {metrics.totalPnL > 0 ? "+" : ""}
                 {formatCurrency(metrics.totalPnL)}

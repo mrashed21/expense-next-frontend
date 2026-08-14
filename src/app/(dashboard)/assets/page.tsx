@@ -176,8 +176,8 @@ export default function AssetsPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-3 w-full sm:w-auto">
-          <div className="relative flex-1 sm:flex-none sm:w-64">
+        <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+          <div className="relative w-full sm:w-64">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <input
               type="text"
@@ -189,10 +189,10 @@ export default function AssetsPage() {
           </div>
           <button
             onClick={() => setIsAddAssetOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-primary-foreground font-semibold text-xs shadow-md shadow-primary/20 hover:bg-primary/90 transition-colors shrink-0"
+            className="w-full sm:w-auto flex justify-center items-center gap-2 px-4 py-2.5 sm:py-2 rounded-xl bg-primary text-primary-foreground font-semibold text-sm sm:text-xs shadow-md shadow-primary/20 hover:bg-primary/90 transition-colors shrink-0"
           >
-            <Plus className="w-4 h-4" />
-            <span className="hidden sm:inline">Add Asset</span>
+            <Plus className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
+            <span>Add Asset</span>
           </button>
         </div>
       </div>
@@ -203,7 +203,7 @@ export default function AssetsPage() {
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
             Total Asset Portfolio Value
           </p>
-          <p className="text-2xl font-bold text-foreground mt-1">
+          <p className="text-xl sm:text-2xl font-bold text-foreground mt-1 truncate">
             {formatCurrency(totalValue)}
           </p>
           <p className="text-[11px] text-muted-foreground mt-1">

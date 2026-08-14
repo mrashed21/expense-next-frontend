@@ -105,7 +105,7 @@ export default function TransfersPage() {
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
             Total Transfers
           </p>
-          <p className="text-2xl font-black text-foreground">
+          <p className="text-xl sm:text-2xl font-black text-foreground truncate">
             {transfers.length}
           </p>
         </div>
@@ -113,7 +113,7 @@ export default function TransfersPage() {
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
             Total Transferred
           </p>
-          <p className="text-2xl font-black text-foreground">
+          <p className="text-xl sm:text-2xl font-black text-foreground truncate">
             {formatCurrency(totalTransferred)}
           </p>
         </div>
@@ -121,7 +121,7 @@ export default function TransfersPage() {
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
             Total Fees Paid
           </p>
-          <p className="text-2xl font-black text-rose-500">
+          <p className="text-xl sm:text-2xl font-black text-rose-500 truncate">
             {formatCurrency(totalFees)}
           </p>
         </div>

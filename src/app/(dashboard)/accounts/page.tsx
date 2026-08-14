@@ -223,7 +223,7 @@ export default function AccountsPage() {
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
             Total Net Balance Across All Accounts
           </p>
-          <p className="text-2xl font-bold text-foreground mt-1">
+          <p className="text-xl sm:text-2xl font-bold text-foreground mt-1 truncate">
             {formatCurrency(totalBalance)}
           </p>
           <p className="text-[11px] text-muted-foreground mt-1">

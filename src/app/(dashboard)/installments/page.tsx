@@ -219,8 +219,8 @@ export default function InstallmentsPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-3 w-full sm:w-auto">
-          <div className="relative flex-1 sm:flex-none sm:w-56">
+        <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+          <div className="relative w-full sm:w-56">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <input
               type="text"
@@ -231,16 +231,16 @@ export default function InstallmentsPage() {
             />
           </div>
 
-          <div className="flex rounded-xl overflow-hidden border border-border text-xs font-medium">
+          <div className="flex w-full sm:w-auto rounded-xl overflow-hidden border border-border text-xs font-medium">
             <button
               onClick={() => setStatusFilter("all")}
-              className={`px-3 py-2 transition-colors ${statusFilter === "all" ? "bg-primary text-primary-foreground" : "bg-card hover:bg-secondary text-muted-foreground"}`}
+              className={`flex-1 sm:flex-none px-3 py-2 transition-colors ${statusFilter === "all" ? "bg-primary text-primary-foreground" : "bg-card hover:bg-secondary text-muted-foreground"}`}
             >
               All
             </button>
             <button
               onClick={() => setStatusFilter("active")}
-              className={`px-3 py-2 transition-colors border-l border-border ${statusFilter === "active" ? "bg-primary text-primary-foreground" : "bg-card hover:bg-secondary text-muted-foreground"}`}
+              className={`flex-1 sm:flex-none px-3 py-2 transition-colors border-l border-border ${statusFilter === "active" ? "bg-primary text-primary-foreground" : "bg-card hover:bg-secondary text-muted-foreground"}`}
             >
               Active
             </button>
@@ -251,10 +251,10 @@ export default function InstallmentsPage() {
               reset();
               setIsAddOpen(true);
             }}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-primary-foreground font-semibold text-xs shadow-md shadow-primary/20 hover:bg-primary/90 transition-colors shrink-0"
+            className="w-full sm:w-auto flex justify-center items-center gap-2 px-4 py-2.5 sm:py-2 rounded-xl bg-primary text-primary-foreground font-semibold text-sm sm:text-xs shadow-md shadow-primary/20 hover:bg-primary/90 transition-colors shrink-0"
           >
-            <Plus className="w-4 h-4" />
-            <span className="hidden sm:inline">New EMI</span>
+            <Plus className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
+            <span>New EMI</span>
           </button>
         </div>
       </div>
@@ -265,7 +265,7 @@ export default function InstallmentsPage() {
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
             Total Monthly Burden
           </p>
-          <p className="text-2xl font-black text-foreground mt-1">
+          <p className="text-xl sm:text-2xl font-black text-foreground mt-1 truncate">
             {formatCurrency(metrics.totalMonthlyBurden)}
           </p>
         </div>
@@ -273,7 +273,7 @@ export default function InstallmentsPage() {
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
             Total Outstanding
           </p>
-          <p className="text-2xl font-black text-foreground mt-1">
+          <p className="text-xl sm:text-2xl font-black text-foreground mt-1 truncate">
             {formatCurrency(metrics.totalOutstanding)}
           </p>
         </div>
@@ -281,7 +281,7 @@ export default function InstallmentsPage() {
           <p className="text-xs font-semibold text-blue-500 uppercase tracking-wider">
             Active EMIs
           </p>
-          <p className="text-2xl font-black text-blue-500 mt-1">
+          <p className="text-xl sm:text-2xl font-black text-blue-500 mt-1 truncate">
             {metrics.activeCount}
           </p>
         </div>
@@ -289,7 +289,7 @@ export default function InstallmentsPage() {
           <p className="text-xs font-semibold text-emerald-500 uppercase tracking-wider">
             Completed EMIs
           </p>
-          <p className="text-2xl font-black text-emerald-500 mt-1">
+          <p className="text-xl sm:text-2xl font-black text-emerald-500 mt-1 truncate">
             {metrics.completedCount}
           </p>
         </div>

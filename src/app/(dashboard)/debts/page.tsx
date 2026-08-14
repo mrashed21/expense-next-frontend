@@ -243,7 +243,7 @@ export default function DebtsPage() {
           <p className="text-xs font-semibold text-emerald-600 uppercase tracking-wider">
             Money Lent (Owed to you)
           </p>
-          <p className="text-2xl font-black text-emerald-500 mt-1">
+          <p className="text-xl sm:text-2xl font-black text-emerald-500 mt-1 truncate">
             {formatCurrency(metrics.totalLent)}
           </p>
         </div>
@@ -251,7 +251,7 @@ export default function DebtsPage() {
           <p className="text-xs font-semibold text-destructive/80 uppercase tracking-wider">
             Money Borrowed (You owe)
           </p>
-          <p className="text-2xl font-black text-destructive mt-1">
+          <p className="text-xl sm:text-2xl font-black text-destructive mt-1 truncate">
             {formatCurrency(metrics.totalBorrowed)}
           </p>
         </div>
@@ -260,7 +260,7 @@ export default function DebtsPage() {
             Net Debt Status
           </p>
           <p
-            className={`text-2xl font-black mt-1 ${metrics.netDebt >= 0 ? "text-emerald-500" : "text-destructive"}`}
+            className={`text-xl sm:text-2xl font-black mt-1 truncate ${metrics.netDebt >= 0 ? "text-emerald-500" : "text-destructive"}`}
           >
             {metrics.netDebt > 0 ? "+" : ""}
             {formatCurrency(metrics.netDebt)}
