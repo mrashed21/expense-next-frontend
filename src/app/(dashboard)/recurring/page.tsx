@@ -72,13 +72,13 @@ export default function RecurringPage() {
             Set it and forget it. Manage your recurring transactions and bills.
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 w-full sm:w-auto mt-2 sm:mt-0">
           <button
             onClick={() => {
               setSelectedItem(null);
               setIsModalOpen(true);
             }}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white text-primary font-bold text-xs shadow-lg hover:bg-slate-100 transition-colors"
+            className="w-full sm:w-auto flex justify-center items-center gap-2 px-4 py-2.5 rounded-xl bg-white text-primary font-bold text-sm sm:text-xs shadow-lg hover:bg-slate-100 transition-colors shrink-0"
           >
             <Plus className="w-4 h-4" />
             <span>New Automation</span>
