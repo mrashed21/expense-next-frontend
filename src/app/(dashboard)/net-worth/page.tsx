@@ -66,8 +66,20 @@ export default function NetWorthPage() {
 
   if (currentLoading) {
     return (
-      <div className="flex h-[80vh] items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      <div className="space-y-6 pb-6 animate-pulse">
+        <div>
+          <div className="h-6 w-48 bg-secondary rounded-lg mb-2"></div>
+          <div className="h-4 w-64 md:w-96 bg-secondary rounded-lg"></div>
+        </div>
+
+        <div className="glass-card p-6 md:p-8 rounded-3xl h-48 border border-border bg-secondary/50"></div>
+
+        <div className="glass-card p-6 rounded-3xl h-80 border border-border bg-secondary/50"></div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="glass-card p-6 rounded-3xl h-64 border border-border bg-secondary/50"></div>
+          <div className="glass-card p-6 rounded-3xl h-64 border border-border bg-secondary/50"></div>
+        </div>
       </div>
     );
   }
@@ -94,7 +106,7 @@ export default function NetWorthPage() {
             <p className="text-sm font-semibold text-muted-foreground uppercase tracking-widest">
               Total Net Worth
             </p>
-            <h2 className="text-4xl md:text-5xl font-black text-foreground tracking-tighter">
+            <h2 className="text-3xl font-black text-foreground tracking-tighter break-words">
               {formatCurrency(current.net_worth)}
             </h2>
 
@@ -125,7 +137,7 @@ export default function NetWorthPage() {
                   Total Assets
                 </span>
               </div>
-              <p className="text-2xl font-bold text-foreground">
+              <p className="text-xl font-bold text-foreground break-words">
                 {formatCurrency(current.total_assets)}
               </p>
             </div>
@@ -137,7 +149,7 @@ export default function NetWorthPage() {
                   Total Liabilities
                 </span>
               </div>
-              <p className="text-2xl font-bold text-foreground">
+              <p className="text-xl font-bold text-foreground break-words">
                 {formatCurrency(current.total_liabilities)}
               </p>
             </div>
@@ -152,9 +164,7 @@ export default function NetWorthPage() {
         </h3>
 
         {historyLoading ? (
-          <div className="h-64 flex items-center justify-center">
-            <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-          </div>
+          <div className="h-72 w-full animate-pulse bg-secondary/50 rounded-xl"></div>
         ) : chartData.length < 2 ? (
           <div className="h-64 flex items-center justify-center">
             <p className="text-sm text-muted-foreground text-center max-w-sm">
@@ -235,67 +245,67 @@ export default function NetWorthPage() {
       {/* Breakdown Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Assets Breakdown */}
-        <div className="glass-card p-6 rounded-3xl border border-border space-y-5">
-          <div className="flex items-center justify-between">
+        <div className="glass-card p-4 sm:p-6 rounded-3xl border border-border space-y-5">
+          <div className="flex items-center justify-between gap-2">
             <h3 className="text-base font-bold text-foreground">
               Assets Breakdown
             </h3>
-            <span className="text-sm font-black text-emerald-500">
+            <span className="text-sm font-black text-emerald-500 shrink-0">
               {formatCurrency(current.total_assets)}
             </span>
           </div>
 
           <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 rounded-xl bg-secondary/50">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+            <div className="flex items-center justify-between p-3 rounded-xl bg-secondary/50 gap-2">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center shrink-0">
                   <Wallet className="w-4 h-4 text-emerald-500" />
                 </div>
-                <span className="text-sm font-medium">Cash Accounts</span>
+                <span className="text-xs sm:text-sm font-medium truncate">Cash Accounts</span>
               </div>
-              <span className="text-sm font-bold">
+              <span className="text-xs sm:text-sm font-bold shrink-0">
                 {formatCurrency(current.breakdown?.assets?.cash || 0)}
               </span>
             </div>
 
-            <div className="flex items-center justify-between p-3 rounded-xl bg-secondary/50">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
+            <div className="flex items-center justify-between p-3 rounded-xl bg-secondary/50 gap-2">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center shrink-0">
                   <TrendingUp className="w-4 h-4 text-blue-500" />
                 </div>
-                <span className="text-sm font-medium">
+                <span className="text-xs sm:text-sm font-medium truncate">
                   Investments (Stocks, Crypto)
                 </span>
               </div>
-              <span className="text-sm font-bold">
+              <span className="text-xs sm:text-sm font-bold shrink-0">
                 {formatCurrency(current.breakdown?.assets?.investments || 0)}
               </span>
             </div>
 
-            <div className="flex items-center justify-between p-3 rounded-xl bg-secondary/50">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center">
+            <div className="flex items-center justify-between p-3 rounded-xl bg-secondary/50 gap-2">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center shrink-0">
                   <Home className="w-4 h-4 text-purple-500" />
                 </div>
-                <span className="text-sm font-medium">Physical Assets</span>
+                <span className="text-xs sm:text-sm font-medium truncate">Physical Assets</span>
               </div>
-              <span className="text-sm font-bold">
+              <span className="text-xs sm:text-sm font-bold shrink-0">
                 {formatCurrency(
                   current.breakdown?.assets?.physical_assets || 0,
                 )}
               </span>
             </div>
 
-            <div className="flex items-center justify-between p-3 rounded-xl bg-secondary/50">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center">
+            <div className="flex items-center justify-between p-3 rounded-xl bg-secondary/50 gap-2">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center shrink-0">
                   <HandCoins className="w-4 h-4 text-amber-500" />
                 </div>
-                <span className="text-sm font-medium">
+                <span className="text-xs sm:text-sm font-medium truncate">
                   Money Lent to Others
                 </span>
               </div>
-              <span className="text-sm font-bold">
+              <span className="text-xs sm:text-sm font-bold shrink-0">
                 {formatCurrency(current.breakdown?.assets?.money_lent || 0)}
               </span>
             </div>
@@ -303,41 +313,41 @@ export default function NetWorthPage() {
         </div>
 
         {/* Liabilities Breakdown */}
-        <div className="glass-card p-6 rounded-3xl border border-border space-y-5">
-          <div className="flex items-center justify-between">
+        <div className="glass-card p-4 sm:p-6 rounded-3xl border border-border space-y-5">
+          <div className="flex items-center justify-between gap-2">
             <h3 className="text-base font-bold text-foreground">
               Liabilities Breakdown
             </h3>
-            <span className="text-sm font-black text-destructive">
+            <span className="text-sm font-black text-destructive shrink-0">
               {formatCurrency(current.total_liabilities)}
             </span>
           </div>
 
           <div className="space-y-3">
-            <div className="flex items-center justify-between p-3 rounded-xl bg-secondary/50">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-destructive/10 flex items-center justify-center">
+            <div className="flex items-center justify-between p-3 rounded-xl bg-secondary/50 gap-2">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-8 h-8 rounded-lg bg-destructive/10 flex items-center justify-center shrink-0">
                   <HandCoins className="w-4 h-4 text-destructive" />
                 </div>
-                <span className="text-sm font-medium">Money Borrowed</span>
+                <span className="text-xs sm:text-sm font-medium truncate">Money Borrowed</span>
               </div>
-              <span className="text-sm font-bold">
+              <span className="text-xs sm:text-sm font-bold shrink-0">
                 {formatCurrency(
                   current.breakdown?.liabilities?.money_borrowed || 0,
                 )}
               </span>
             </div>
 
-            <div className="flex items-center justify-between p-3 rounded-xl bg-secondary/50">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center">
+            <div className="flex items-center justify-between p-3 rounded-xl bg-secondary/50 gap-2">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center shrink-0">
                   <CreditCard className="w-4 h-4 text-orange-500" />
                 </div>
-                <span className="text-sm font-medium">
+                <span className="text-xs sm:text-sm font-medium truncate">
                   Outstanding EMIs (Loans)
                 </span>
               </div>
-              <span className="text-sm font-bold">
+              <span className="text-xs sm:text-sm font-bold shrink-0">
                 {formatCurrency(
                   current.breakdown?.liabilities?.emi_remaining || 0,
                 )}

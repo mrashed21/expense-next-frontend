@@ -270,7 +270,7 @@ export default function ReportsPage() {
         {/* BALANCE SHEET VIEW */}
         {activeReport === "balance-sheet" && (
           <div className="animate-in fade-in duration-300">
-            <div className="flex items-center justify-between p-6 border-b border-border bg-secondary/30">
+            <div className="flex flex-col xs:flex-row xs:items-center justify-between gap-4 p-4 sm:p-6 border-b border-border bg-secondary/30">
               <div>
                 <h2 className="text-lg font-black tracking-tight">
                   Balance Sheet
@@ -305,7 +305,7 @@ export default function ReportsPage() {
                         Assets
                       </h3>
                       <div className="space-y-2 text-sm">
-                        <div className="flex justify-between py-1">
+                        <div className="flex items-center justify-between gap-4 py-1">
                           <span className="text-muted-foreground">
                             Cash (Current)
                           </span>
@@ -315,7 +315,7 @@ export default function ReportsPage() {
                             )}
                           </span>
                         </div>
-                        <div className="flex justify-between py-1">
+                        <div className="flex items-center justify-between gap-4 py-1">
                           <span className="text-muted-foreground">
                             Investments
                           </span>
@@ -325,7 +325,7 @@ export default function ReportsPage() {
                             )}
                           </span>
                         </div>
-                        <div className="flex justify-between py-1">
+                        <div className="flex items-center justify-between gap-4 py-1">
                           <span className="text-muted-foreground">
                             Physical Assets
                           </span>
@@ -336,7 +336,7 @@ export default function ReportsPage() {
                             )}
                           </span>
                         </div>
-                        <div className="flex justify-between py-1">
+                        <div className="flex items-center justify-between gap-4 py-1">
                           <span className="text-muted-foreground">
                             Money Lent
                           </span>
@@ -346,7 +346,7 @@ export default function ReportsPage() {
                             )}
                           </span>
                         </div>
-                        <div className="flex justify-between py-3 border-t border-border font-bold text-foreground">
+                        <div className="flex items-center justify-between gap-4 py-3 border-t border-border font-bold text-foreground">
                           <span>Total Assets</span>
                           <span>
                             {formatCurrency(bsData.data.assets.totalAssets)}
@@ -361,7 +361,7 @@ export default function ReportsPage() {
                         Liabilities
                       </h3>
                       <div className="space-y-2 text-sm">
-                        <div className="flex justify-between py-1">
+                        <div className="flex items-center justify-between gap-4 py-1">
                           <span className="text-muted-foreground">
                             Money Borrowed
                           </span>
@@ -372,7 +372,7 @@ export default function ReportsPage() {
                             )}
                           </span>
                         </div>
-                        <div className="flex justify-between py-1">
+                        <div className="flex items-center justify-between gap-4 py-1">
                           <span className="text-muted-foreground">
                             EMIs Remaining
                           </span>
@@ -383,7 +383,7 @@ export default function ReportsPage() {
                             )}
                           </span>
                         </div>
-                        <div className="flex justify-between py-3 border-t border-border font-bold text-foreground">
+                        <div className="flex items-center justify-between gap-4 py-3 border-t border-border font-bold text-foreground">
                           <span>Total Liabilities</span>
                           <span>
                             {formatCurrency(
@@ -400,7 +400,7 @@ export default function ReportsPage() {
                         Equity
                       </h3>
                       <div className="space-y-2 text-sm">
-                        <div className="flex justify-between py-1">
+                        <div className="flex items-center justify-between gap-4 py-1">
                           <span className="text-muted-foreground">
                             Net Worth (Retained Earnings)
                           </span>
@@ -410,7 +410,7 @@ export default function ReportsPage() {
                             )}
                           </span>
                         </div>
-                        <div className="flex justify-between py-3 border-t-2 border-foreground font-black text-lg text-foreground">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-3 border-t-2 border-foreground font-black text-lg text-foreground">
                           <span>Total Liabilities & Equity</span>
                           <span>
                             {formatCurrency(
@@ -429,7 +429,7 @@ export default function ReportsPage() {
         {/* CASH FLOW VIEW */}
         {activeReport === "cash-flow" && (
           <div className="animate-in fade-in duration-300">
-            <div className="flex items-center justify-between p-6 border-b border-border bg-secondary/30">
+            <div className="flex flex-col xs:flex-row xs:items-center justify-between gap-4 p-4 sm:p-6 border-b border-border bg-secondary/30">
               <div>
                 <h2 className="text-lg font-black tracking-tight">
                   Cash Flow Statement
@@ -466,8 +466,8 @@ export default function ReportsPage() {
                       <div className="space-y-2 text-sm">
                         {cfData.data.cashFlow.operatingActivities.inflows.map(
                           (inf: any, i: number) => (
-                            <div key={i} className="flex justify-between py-1">
-                              <span className="text-muted-foreground">
+                            <div key={i} className="flex items-center justify-between gap-4 py-1">
+                              <span className="text-muted-foreground truncate">
                                 {inf.category}
                               </span>
                               <span className="font-medium text-emerald-500">
@@ -482,7 +482,7 @@ export default function ReportsPage() {
                             No inflows recorded.
                           </p>
                         )}
-                        <div className="flex justify-between py-3 border-t border-border font-bold text-foreground">
+                        <div className="flex items-center justify-between gap-4 py-3 border-t border-border font-bold text-foreground">
                           <span>Total Inflows</span>
                           <span className="text-emerald-500">
                             {formatCurrency(cfData.data.summary.totalInflows)}
@@ -499,8 +499,8 @@ export default function ReportsPage() {
                       <div className="space-y-2 text-sm">
                         {cfData.data.cashFlow.operatingActivities.outflows.map(
                           (out: any, i: number) => (
-                            <div key={i} className="flex justify-between py-1">
-                              <span className="text-muted-foreground">
+                            <div key={i} className="flex items-center justify-between gap-4 py-1">
+                              <span className="text-muted-foreground truncate">
                                 {out.category}
                               </span>
                               <span className="font-medium text-rose-500">
@@ -515,7 +515,7 @@ export default function ReportsPage() {
                             No outflows recorded.
                           </p>
                         )}
-                        <div className="flex justify-between py-3 border-t border-border font-bold text-foreground">
+                        <div className="flex items-center justify-between gap-4 py-3 border-t border-border font-bold text-foreground">
                           <span>Total Outflows</span>
                           <span className="text-rose-500">
                             -{formatCurrency(cfData.data.summary.totalOutflows)}
@@ -526,7 +526,7 @@ export default function ReportsPage() {
 
                     {/* Net */}
                     <div>
-                      <div className="flex justify-between py-4 border-t-2 border-foreground font-black text-lg text-foreground">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-4 border-t-2 border-foreground font-black text-lg text-foreground">
                         <span>Net Cash Flow</span>
                         <span
                           className={
@@ -547,7 +547,7 @@ export default function ReportsPage() {
         {/* TAX REPORT VIEW */}
         {activeReport === "tax" && (
           <div className="animate-in fade-in duration-300">
-            <div className="flex items-center justify-between p-6 border-b border-border bg-secondary/30">
+            <div className="flex flex-col xs:flex-row xs:items-center justify-between gap-4 p-4 sm:p-6 border-b border-border bg-secondary/30">
               <div>
                 <h2 className="text-lg font-black tracking-tight">
                   Tax Report (Estimate)
@@ -582,7 +582,7 @@ export default function ReportsPage() {
                         Gross Income
                       </h3>
                       <div className="space-y-2 text-sm">
-                        <div className="flex justify-between py-1">
+                        <div className="flex items-center justify-between gap-4 py-1">
                           <span className="text-muted-foreground">
                             Taxable Income
                           </span>
@@ -590,7 +590,7 @@ export default function ReportsPage() {
                             {formatCurrency(taxData.data.income.taxable)}
                           </span>
                         </div>
-                        <div className="flex justify-between py-1">
+                        <div className="flex items-center justify-between gap-4 py-1">
                           <span className="text-muted-foreground">
                             Non-Taxable Income
                           </span>
@@ -598,7 +598,7 @@ export default function ReportsPage() {
                             {formatCurrency(taxData.data.income.nonTaxable)}
                           </span>
                         </div>
-                        <div className="flex justify-between py-3 border-t border-border font-bold text-foreground">
+                        <div className="flex items-center justify-between gap-4 py-3 border-t border-border font-bold text-foreground">
                           <span>Total Income</span>
                           <span>
                             {formatCurrency(taxData.data.income.total)}
@@ -613,7 +613,7 @@ export default function ReportsPage() {
                         Deductions
                       </h3>
                       <div className="space-y-2 text-sm">
-                        <div className="flex justify-between py-1">
+                        <div className="flex items-center justify-between gap-4 py-1">
                           <span className="text-muted-foreground">
                             Eligible Deductions (Health, Edu, Tax)
                           </span>
@@ -624,7 +624,7 @@ export default function ReportsPage() {
                             )}
                           </span>
                         </div>
-                        <div className="flex justify-between py-3 border-t border-border font-bold text-foreground">
+                        <div className="flex items-center justify-between gap-4 py-3 border-t border-border font-bold text-foreground">
                           <span>Total Deductions</span>
                           <span className="text-rose-500">
                             -
@@ -638,7 +638,7 @@ export default function ReportsPage() {
 
                     {/* Net */}
                     <div>
-                      <div className="flex justify-between py-4 border-t-2 border-foreground font-black text-lg text-foreground">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 py-4 border-t-2 border-foreground font-black text-lg text-foreground">
                         <span>Estimated Taxable Amount</span>
                         <span>
                           {formatCurrency(taxData.data.estimatedTaxableAmount)}
