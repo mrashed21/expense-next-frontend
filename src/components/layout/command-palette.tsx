@@ -113,10 +113,11 @@ export function CommandPalette() {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border bg-secondary/50 text-muted-foreground hover:bg-secondary transition-colors"
+        className="flex items-center justify-center w-9 h-9 sm:w-auto sm:h-auto sm:px-3 sm:py-1.5 rounded-full sm:rounded-lg sm:border sm:border-border sm:bg-secondary/50 text-muted-foreground hover:bg-secondary transition-colors"
+        aria-label="Global Search"
       >
-        <Search className="w-4 h-4" />
-        <span className="text-sm">Search...</span>
+        <Search className="w-5 h-5 sm:w-4 sm:h-4" />
+        <span className="hidden sm:inline-block text-sm">Search...</span>
         <kbd className="hidden lg:inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-border bg-background text-[10px] font-medium font-mono text-muted-foreground ml-4">
           <span className="text-xs">⌘</span>K
         </kbd>

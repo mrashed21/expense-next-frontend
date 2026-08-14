@@ -91,7 +91,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-20 h-14 bg-card border-b border-border px-4 md:px-5 flex items-center justify-between gap-3">
-      {/* Left: Mobile Brand / Desktop Search */}
+      {/* Left: Mobile Brand */}
       <div className="flex items-center gap-3 min-w-0">
         {/* Mobile brand */}
         <div className="md:hidden flex items-center gap-2 shrink-0">
@@ -100,15 +100,10 @@ export function Header() {
           </div>
           <span className="font-semibold text-sm">Expense Tracker</span>
         </div>
-
-        {/* Desktop Search */}
-        <div className="hidden sm:flex items-center gap-2">
-          <CommandPalette />
-        </div>
       </div>
 
       {/* Right Controls */}
-      <div className="flex items-center gap-1.5">
+      <div className="flex items-center gap-1.5 sm:gap-3">
         {/* Quick Add */}
         <Button
           asChild
@@ -120,6 +115,11 @@ export function Header() {
             Add
           </Link>
         </Button>
+
+        {/* Global Search */}
+        <div className="flex items-center">
+          <CommandPalette />
+        </div>
 
         {/* Notifications Dropdown */}
         <NotificationDropdown />
