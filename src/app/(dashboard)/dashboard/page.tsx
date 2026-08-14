@@ -183,7 +183,7 @@ export default function DashboardPage() {
   return (
     <div className="space-y-5 pb-6">
       {/* Top Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-5 rounded-2xl bg-linear-to-r from-primary via-indigo-600 to-purple-600 text-white shadow-lg shadow-primary/20">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-3 p-5 rounded-2xl bg-linear-to-r from-primary via-indigo-600 to-purple-600 text-white shadow-lg shadow-primary/20">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold tracking-tight">
             Financial Dashboard
@@ -192,28 +192,28 @@ export default function DashboardPage() {
             Track your net worth, cash flow, and upcoming obligations.
           </p>
         </div>
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-2 w-full sm:w-auto shrink-0">
           <Link
             href="/transactions?action=add"
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white text-primary font-semibold text-xs shadow-md hover:bg-slate-100 transition-colors"
+            className="flex w-full sm:w-auto justify-center items-center gap-1.5 px-4 py-2.5 sm:px-3 sm:py-2 rounded-xl bg-white text-primary font-semibold text-sm sm:text-xs shadow-md hover:bg-slate-100 transition-colors"
           >
-            <Plus className="w-3.5 h-3.5" />
+            <Plus className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
             Add Transaction
           </Link>
         </div>
       </div>
 
       {/* Date Range Filter */}
-      <div className="flex items-center gap-2">
-        <span className="text-xs font-medium text-muted-foreground mr-1 shrink-0">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+        <span className="text-xs font-medium text-muted-foreground shrink-0 hidden sm:block">
           Period:
         </span>
-        <div className="flex items-center gap-1.5 flex-wrap">
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 w-full scrollbar-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           {DATE_RANGE_OPTIONS.map((opt) => (
             <button
               key={opt.value}
               onClick={() => setDateRange(opt.value)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all ${
+              className={`whitespace-nowrap shrink-0 px-4 py-2 sm:px-3 sm:py-1.5 rounded-xl text-xs font-medium transition-all ${
                 dateRange === opt.value
                   ? "bg-primary text-primary-foreground shadow-sm"
                   : "bg-secondary/60 text-muted-foreground hover:bg-secondary hover:text-foreground"
