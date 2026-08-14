@@ -199,19 +199,19 @@ export default function AccountsPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row w-full sm:w-auto items-center gap-2 sm:gap-3 shrink-0">
           <button
             onClick={() => setIsTransferOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-secondary border border-border text-foreground font-semibold text-xs hover:bg-secondary/80 transition-colors"
+            className="w-full sm:w-auto flex justify-center items-center gap-2 px-4 py-2.5 sm:py-2 rounded-xl bg-secondary border border-border text-foreground font-semibold text-sm sm:text-xs hover:bg-secondary/80 transition-colors shrink-0"
           >
-            <ArrowRightLeft className="w-4 h-4 text-primary" />
+            <ArrowRightLeft className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-primary" />
             <span>Transfer Money</span>
           </button>
           <button
             onClick={() => setIsAddAccountOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-primary-foreground font-semibold text-xs shadow-md shadow-primary/20 hover:bg-primary/90 transition-colors"
+            className="w-full sm:w-auto flex justify-center items-center gap-2 px-4 py-2.5 sm:py-2 rounded-xl bg-primary text-primary-foreground font-semibold text-sm sm:text-xs shadow-md shadow-primary/20 hover:bg-primary/90 transition-colors shrink-0"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
             <span>Add Account</span>
           </button>
         </div>
