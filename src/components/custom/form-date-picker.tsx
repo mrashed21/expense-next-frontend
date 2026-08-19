@@ -48,7 +48,7 @@ const FormDatePicker = <T extends FieldValues>({
 }: FormDatePickerProps<T>) => {
   return (
     <div className="flex flex-col w-full">
-      <label className="mb-1 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+      <label className="mb-1 text-xs font-semibold text-foreground leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
         {icon && <span className="mr-1">{icon}</span>} {label && label}{" "}
         {label && rules?.required && (
           <TooltipProvider>
@@ -73,7 +73,7 @@ const FormDatePicker = <T extends FieldValues>({
               <Button
                 variant={"outline"}
                 className={cn(
-                  "w-full justify-start text-left font-normal bg-secondary border-border text-xs text-foreground px-3 py-5 rounded-xl h-10",
+                  "w-full justify-start text-left font-normal bg-secondary border-border text-xs text-foreground px-3 py-2 rounded-xl h-auto",
                   !field.value && "text-muted-foreground",
                   error && "border-destructive",
                 )}
