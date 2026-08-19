@@ -349,9 +349,10 @@ export default function AssetsPage() {
                     Current Value
                   </label>
                   <input
-                    {...registerAsset("value", { valueAsNumber: true })}
+                    {...registerAsset("value", { setValueAs: (v) => v === "" ? undefined : Number(v) })}
                     type="number"
                     step="0.01"
+                    placeholder="e.g. 500000"
                     className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                   />
                   {assetErrors.value && (
@@ -366,10 +367,11 @@ export default function AssetsPage() {
                   </label>
                   <input
                     {...registerAsset("purchase_price", {
-                      valueAsNumber: true,
+                      setValueAs: (v) => v === "" ? undefined : Number(v),
                     })}
                     type="number"
                     step="0.01"
+                    placeholder="e.g. 450000"
                     className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                   />
                 </div>
@@ -463,9 +465,10 @@ export default function AssetsPage() {
                     Current Value
                   </label>
                   <input
-                    {...registerEdit("value", { valueAsNumber: true })}
+                    {...registerEdit("value", { setValueAs: (v) => v === "" ? undefined : Number(v) })}
                     type="number"
                     step="0.01"
+                    placeholder="e.g. 500000"
                     className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                   />
                   {editErrors.value && (
@@ -479,9 +482,10 @@ export default function AssetsPage() {
                     Purchase Price (Opt)
                   </label>
                   <input
-                    {...registerEdit("purchase_price", { valueAsNumber: true })}
+                    {...registerEdit("purchase_price", { setValueAs: (v) => v === "" ? undefined : Number(v) })}
                     type="number"
                     step="0.01"
+                    placeholder="e.g. 450000"
                     className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                   />
                 </div>

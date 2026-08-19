@@ -256,10 +256,10 @@ export default function GoalsPage() {
                   Target Amount
                 </label>
                 <input
-                  {...register("target_amount", { valueAsNumber: true })}
+                  {...register("target_amount", { setValueAs: (v) => v === "" ? undefined : Number(v) })}
                   type="number"
                   step="0.01"
-                  placeholder="2500.00"
+                  placeholder="e.g. 50000"
                   className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                 />
               </div>
@@ -306,7 +306,7 @@ export default function GoalsPage() {
                   step="0.01"
                   value={depositAmount}
                   onChange={(e) => setDepositAmount(e.target.value)}
-                  placeholder="100.00"
+                  placeholder="e.g. 1000"
                   className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                 />
               </div>

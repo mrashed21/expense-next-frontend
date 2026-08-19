@@ -294,10 +294,10 @@ export default function BillsPage() {
                     Amount
                   </label>
                   <input
-                    {...register("amount", { valueAsNumber: true })}
+                    {...register("amount", { setValueAs: (v) => v === "" ? undefined : Number(v) })}
                     type="number"
                     step="0.01"
-                    placeholder="50.00"
+                    placeholder="e.g. 500"
                     className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                   />
                 </div>

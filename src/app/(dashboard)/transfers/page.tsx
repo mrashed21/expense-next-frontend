@@ -277,10 +277,10 @@ export default function TransfersPage() {
                     Transfer Amount
                   </label>
                   <input
-                    {...register("amount", { valueAsNumber: true })}
+                    {...register("amount", { setValueAs: (v) => v === "" ? undefined : Number(v) })}
                     type="number"
                     step="0.01"
-                    placeholder="0.00"
+                    placeholder="e.g. 5000"
                     className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                   />
                   {errors.amount && (
@@ -294,10 +294,10 @@ export default function TransfersPage() {
                     Fee (Optional)
                   </label>
                   <input
-                    {...register("fee", { valueAsNumber: true })}
+                    {...register("fee", { setValueAs: (v) => v === "" ? undefined : Number(v) })}
                     type="number"
                     step="0.01"
-                    placeholder="0.00"
+                    placeholder="e.g. 10"
                     className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                   />
                 </div>

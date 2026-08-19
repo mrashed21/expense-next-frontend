@@ -523,9 +523,10 @@ export default function InstallmentsPage() {
                     Total Loan Amount
                   </label>
                   <input
-                    {...registerForm("total_amount", { valueAsNumber: true })}
+                    {...registerForm("total_amount", { setValueAs: (v) => v === "" ? undefined : Number(v) })}
                     type="number"
                     step="0.01"
+                    placeholder="e.g. 120000"
                     className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                   />
                   {errors.total_amount && (
@@ -539,9 +540,10 @@ export default function InstallmentsPage() {
                     Duration (Months)
                   </label>
                   <input
-                    {...registerForm("total_months", { valueAsNumber: true })}
+                    {...registerForm("total_months", { setValueAs: (v) => v === "" ? undefined : Number(v) })}
                     type="number"
                     step="1"
+                    placeholder="e.g. 24"
                     className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                   />
                   {errors.total_months && (
@@ -649,9 +651,10 @@ export default function InstallmentsPage() {
                   Payment Amount
                 </label>
                 <input
-                  {...registerPayment("amount", { valueAsNumber: true })}
+                  {...registerPayment("amount", { setValueAs: (v) => v === "" ? undefined : Number(v) })}
                   type="number"
                   step="0.01"
+                  placeholder="e.g. 5000"
                   max={paymentItem.remaining_amount}
                   className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                 />

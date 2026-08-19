@@ -420,10 +420,11 @@ export default function AccountsPage() {
                   </label>
                   <input
                     {...registerAccount("opening_balance", {
-                      valueAsNumber: true,
+                      setValueAs: (v) => v === "" ? undefined : Number(v),
                     })}
                     type="number"
                     step="0.01"
+                    placeholder="e.g. 10000"
                     className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                   />
                 </div>
@@ -520,10 +521,11 @@ export default function AccountsPage() {
                   </label>
                   <input
                     {...registerEdit("opening_balance", {
-                      valueAsNumber: true,
+                      setValueAs: (v) => v === "" ? undefined : Number(v),
                     })}
                     type="number"
                     step="0.01"
+                    placeholder="e.g. 10000"
                     className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                   />
                 </div>
@@ -621,9 +623,10 @@ export default function AccountsPage() {
                     Transfer Amount
                   </label>
                   <input
-                    {...registerTransfer("amount", { valueAsNumber: true })}
+                    {...registerTransfer("amount", { setValueAs: (v) => v === "" ? undefined : Number(v) })}
                     type="number"
                     step="0.01"
+                    placeholder="e.g. 5000"
                     className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                   />
                 </div>
@@ -632,9 +635,10 @@ export default function AccountsPage() {
                     Fee (Optional)
                   </label>
                   <input
-                    {...registerTransfer("fee", { valueAsNumber: true })}
+                    {...registerTransfer("fee", { setValueAs: (v) => v === "" ? undefined : Number(v) })}
                     type="number"
                     step="0.01"
+                    placeholder="e.g. 10"
                     className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                   />
                 </div>

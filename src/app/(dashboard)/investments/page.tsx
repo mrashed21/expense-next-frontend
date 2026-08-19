@@ -535,9 +535,10 @@ export default function InvestmentsPage() {
                     Quantity
                   </label>
                   <input
-                    {...registerForm("quantity", { valueAsNumber: true })}
+                    {...registerForm("quantity", { setValueAs: (v) => v === "" ? undefined : Number(v) })}
                     type="number"
                     step="0.00000001"
+                    placeholder="e.g. 10"
                     className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                   />
                   {errors.quantity && (
@@ -551,9 +552,10 @@ export default function InvestmentsPage() {
                     Avg Buy Price
                   </label>
                   <input
-                    {...registerForm("purchase_price", { valueAsNumber: true })}
+                    {...registerForm("purchase_price", { setValueAs: (v) => v === "" ? undefined : Number(v) })}
                     type="number"
                     step="0.01"
+                    placeholder="e.g. 450"
                     className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                   />
                   {errors.purchase_price && (
@@ -567,9 +569,10 @@ export default function InvestmentsPage() {
                     Market Price
                   </label>
                   <input
-                    {...registerForm("current_price", { valueAsNumber: true })}
+                    {...registerForm("current_price", { setValueAs: (v) => v === "" ? undefined : Number(v) })}
                     type="number"
                     step="0.01"
+                    placeholder="e.g. 500"
                     className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                   />
                   {errors.current_price && (

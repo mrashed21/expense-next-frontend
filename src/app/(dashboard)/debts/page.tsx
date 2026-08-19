@@ -519,9 +519,10 @@ export default function DebtsPage() {
                     Principal Amount
                   </label>
                   <input
-                    {...registerForm("amount", { valueAsNumber: true })}
+                    {...registerForm("amount", { setValueAs: (v) => v === "" ? undefined : Number(v) })}
                     type="number"
                     step="0.01"
+                    placeholder="e.g. 50000"
                     className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                   />
                   {errors.amount && (
@@ -535,10 +536,10 @@ export default function DebtsPage() {
                     Interest Rate (% APY)
                   </label>
                   <input
-                    {...registerForm("interest_rate", { valueAsNumber: true })}
+                    {...registerForm("interest_rate", { setValueAs: (v) => v === "" ? undefined : Number(v) })}
                     type="number"
                     step="0.01"
-                    placeholder="0"
+                    placeholder="e.g. 12"
                     className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                   />
                 </div>
@@ -620,9 +621,10 @@ export default function DebtsPage() {
                   Payment Amount
                 </label>
                 <input
-                  {...registerPayment("amount", { valueAsNumber: true })}
+                  {...registerPayment("amount", { setValueAs: (v) => v === "" ? undefined : Number(v) })}
                   type="number"
                   step="0.01"
+                  placeholder="e.g. 5000"
                   max={paymentItem.true_remaining_amount}
                   className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                 />
