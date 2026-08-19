@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { useGetMyFeedbacksQuery, useDeleteFeedbackMutation, useSubmitFeedbackMutation } from "@/services/feedback-api";
 import { useGetMyReviewsQuery, useDeleteReviewMutation, useSubmitReviewMutation } from "@/services/review-api";
 import { Loader2, MessageSquare, Star, Trash2 } from "lucide-react";
+import { CardSkeleton } from "@/components/custom/card-skeleton";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
@@ -63,14 +64,15 @@ export default function FeedbackPage() {
 
   return (
     <div className="space-y-6 pb-10 max-w-4xl mx-auto">
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight flex items-center gap-2">
-          <MessageSquare className="w-7 h-7 text-primary" />
-          Feedback & Reviews
-        </h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Share your experience with us or report an issue.
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-3xl bg-linear-to-r from-primary via-indigo-600 to-purple-600 text-white shadow-xl shadow-primary/20">
+        <div>
+          <h1 className="text-xl sm:text-xl font-bold tracking-tight flex items-center gap-2">
+            <MessageSquare className="w-8 h-8" /> Feedback & Reviews
+          </h1>
+          <p className="text-xs sm:text-sm text-indigo-100 mt-1">
+            Share your experience with us or report an issue.
+          </p>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -203,7 +205,9 @@ export default function FeedbackPage() {
           <div className="space-y-4">
             <h3 className="font-semibold text-lg">My Feedbacks</h3>
             {isLoadingFeedbacks ? (
-              <Loader2 className="w-6 h-6 animate-spin text-primary" />
+              <div className="space-y-4">
+                <CardSkeleton count={2} />
+              </div>
             ) : myFeedbacks.length === 0 ? (
               <p className="text-sm text-muted-foreground">No feedbacks submitted yet.</p>
             ) : (
@@ -248,7 +252,9 @@ export default function FeedbackPage() {
           <div className="space-y-4">
             <h3 className="font-semibold text-lg">My Reviews</h3>
             {isLoadingReviews ? (
-              <Loader2 className="w-6 h-6 animate-spin text-primary" />
+              <div className="space-y-4">
+                <CardSkeleton count={2} />
+              </div>
             ) : myReviews.length === 0 ? (
               <p className="text-sm text-muted-foreground">No reviews submitted yet.</p>
             ) : (

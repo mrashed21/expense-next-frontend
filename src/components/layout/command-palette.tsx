@@ -113,18 +113,19 @@ export function CommandPalette() {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border bg-secondary/50 text-muted-foreground hover:bg-secondary transition-colors"
+        className="flex items-center justify-center w-9 h-9 sm:w-auto sm:h-auto sm:px-3 sm:py-1.5 rounded-full sm:rounded-lg sm:border sm:border-border sm:bg-secondary/50 text-muted-foreground hover:bg-secondary transition-colors"
+        aria-label="Global Search"
       >
-        <Search className="w-4 h-4" />
-        <span className="text-sm">Search...</span>
+        <Search className="w-5 h-5 sm:w-4 sm:h-4" />
+        <span className="hidden sm:inline-block text-sm">Search...</span>
         <kbd className="hidden lg:inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-border bg-background text-[10px] font-medium font-mono text-muted-foreground ml-4">
           <span className="text-xs">⌘</span>K
         </kbd>
       </button>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="sm:max-w-137.5 p-0 overflow-hidden border border-border bg-card shadow-2xl rounded-2xl gap-0">
-          <div className="flex items-center border-b border-border px-4 py-3">
+        <DialogContent className="w-[calc(100%-2rem)] sm:w-full sm:max-w-137.5 p-0 overflow-hidden border border-border bg-card shadow-2xl rounded-2xl gap-0 [&>button.absolute]:hidden">
+          <div className="flex items-center border-b border-border px-3 sm:px-4 py-3 gap-2">
             <Search className="w-5 h-5 text-muted-foreground shrink-0" />
             <input
               ref={inputRef}
@@ -135,20 +136,26 @@ export function CommandPalette() {
                   ? "Search users and admins by name or email..."
                   : "Search transactions, accounts, bills..."
               }
-              className="flex-1 bg-transparent border-none outline-none ring-0 px-3 py-2 text-foreground placeholder:text-muted-foreground text-base"
+              className="flex-1 min-w-0 bg-transparent border-none outline-none ring-0 py-1 text-foreground placeholder:text-muted-foreground text-sm sm:text-base"
               autoFocus
             />
             {isFetching && (
-              <Loader2 className="w-5 h-5 animate-spin text-muted-foreground shrink-0" />
+              <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin text-muted-foreground shrink-0" />
             )}
             {query && (
               <button
                 onClick={() => setQuery("")}
-                className="p-1 rounded-full hover:bg-secondary text-muted-foreground"
+                className="p-1.5 rounded-full hover:bg-secondary text-muted-foreground shrink-0"
               >
                 <X className="w-4 h-4" />
               </button>
             )}
+            <button
+              onClick={() => setIsOpen(false)}
+              className="sm:hidden text-xs font-medium text-muted-foreground hover:text-foreground px-1 py-1.5 shrink-0"
+            >
+              Cancel
+            </button>
           </div>
 
           <div className="max-h-[60vh] overflow-y-auto p-2">

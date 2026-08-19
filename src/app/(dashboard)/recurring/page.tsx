@@ -1,6 +1,8 @@
 "use client";
 
+import { CardSkeleton } from "@/components/custom/card-skeleton";
 import { ConfirmDialog } from "@/components/custom/confirm-dialog";
+import { EmptyState } from "@/components/custom/empty-state";
 import { useCurrency } from "@/hooks/use-currency";
 import { formatDate } from "@/lib/utils";
 import {
@@ -70,13 +72,13 @@ export default function RecurringPage() {
             Set it and forget it. Manage your recurring transactions and bills.
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 w-full sm:w-auto mt-2 sm:mt-0">
           <button
             onClick={() => {
               setSelectedItem(null);
               setIsModalOpen(true);
             }}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white text-primary font-bold text-xs shadow-lg hover:bg-slate-100 transition-colors"
+            className="w-full sm:w-auto flex justify-center items-center gap-2 px-4 py-2.5 rounded-xl bg-white text-primary font-bold text-sm sm:text-xs shadow-lg hover:bg-slate-100 transition-colors shrink-0"
           >
             <Plus className="w-4 h-4" />
             <span>New Automation</span>
@@ -86,16 +88,17 @@ export default function RecurringPage() {
 
       <div className="glass-card p-6 rounded-3xl border border-border">
         {isLoading ? (
-          <div className="flex items-center justify-center h-48">
-            <Loader2 className="w-6 h-6 animate-spin text-primary" />
+          <div className="grid grid-cols-1 gap-4">
+            <CardSkeleton count={3} />
           </div>
         ) : items.length === 0 ? (
-          <div className="text-center py-12">
-            <CalendarClock className="w-12 h-12 text-muted-foreground mx-auto mb-4 opacity-50" />
-            <p className="text-sm text-muted-foreground">
-              No automations configured.
-            </p>
-          </div>
+          <EmptyState 
+            title="No Automations Found"
+            description="Set up recurring transactions to automate your finances."
+            actionLabel="New Automation"
+            icon={<CalendarClock className="w-8 h-8" />}
+            onAction={() => setIsModalOpen(true)}
+          />
         ) : (
           <div className="space-y-4">
             {items.map((item: any) => (

@@ -1,6 +1,8 @@
 "use client";
 
+import { EmptyState } from "@/components/custom/empty-state";
 import FormSelect from "@/components/custom/form-select";
+import { TableSkeleton } from "@/components/custom/table-skeleton";
 import {
   Table,
   TableBody,
@@ -90,9 +92,9 @@ export default function TransfersPage() {
 
         <button
           onClick={() => setIsOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-primary-foreground font-semibold text-xs shadow-md shadow-primary/20 hover:bg-primary/90 transition-colors"
+          className="w-full sm:w-auto flex justify-center items-center gap-2 px-4 py-2.5 sm:py-2 rounded-xl bg-primary text-primary-foreground font-semibold text-sm sm:text-xs shadow-md shadow-primary/20 hover:bg-primary/90 transition-colors shrink-0"
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
           <span>New Transfer</span>
         </button>
       </div>
@@ -103,7 +105,7 @@ export default function TransfersPage() {
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
             Total Transfers
           </p>
-          <p className="text-2xl font-black text-foreground">
+          <p className="text-xl sm:text-2xl font-black text-foreground truncate">
             {transfers.length}
           </p>
         </div>
@@ -111,7 +113,7 @@ export default function TransfersPage() {
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
             Total Transferred
           </p>
-          <p className="text-2xl font-black text-foreground">
+          <p className="text-xl sm:text-2xl font-black text-foreground truncate">
             {formatCurrency(totalTransferred)}
           </p>
         </div>
@@ -119,7 +121,7 @@ export default function TransfersPage() {
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
             Total Fees Paid
           </p>
-          <p className="text-2xl font-black text-rose-500">
+          <p className="text-xl sm:text-2xl font-black text-rose-500 truncate">
             {formatCurrency(totalFees)}
           </p>
         </div>
@@ -137,10 +139,17 @@ export default function TransfersPage() {
         </div>
         <div className="border-t border-border">
           {isLoading ? (
-            <div className="flex items-center justify-center py-10">
-              <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+            <TableSkeleton columns={6} rows={5} />
+          ) : transfers.length === 0 ? (
+            <div className="py-12">
+              <EmptyState 
+                title="No Transfers Found"
+                description="Move funds between your accounts to log transfers."
+                actionLabel="New Transfer"
+                onAction={() => setIsOpen(true)}
+              />
             </div>
-          ) : transfers.length > 0 ? (
+          ) : (
             <>
               {/* ── Mobile Card View (< md) ── */}
               <div className="md:hidden divide-y divide-border">
@@ -203,11 +212,6 @@ export default function TransfersPage() {
                 </Table>
               </div>
             </>
-          ) : (
-            <div className="text-center py-12 text-xs text-muted-foreground">
-              No transfers yet. Click &quot;New Transfer&quot; to move funds between
-              accounts.
-            </div>
           )}
         </div>
       </div>

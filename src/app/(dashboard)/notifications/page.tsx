@@ -1,6 +1,7 @@
 "use client";
 
 import { ConfirmDialog } from "@/components/custom/confirm-dialog";
+import { EmptyState } from "@/components/custom/empty-state";
 import {
   getNotificationIcon,
   getRelativeTime,
@@ -249,7 +250,7 @@ export default function NotificationsPage() {
             {filteredNotifications.map((n: any) => (
               <div
                 key={n._id}
-                className={`p-4 transition-colors flex items-start gap-3.5 group ${
+                className={`p-3 sm:p-4 transition-colors flex items-start gap-2.5 sm:gap-3.5 group ${
                   !n.is_read
                     ? "bg-primary/4 dark:bg-primary/8"
                     : "hover:bg-secondary/20"
@@ -258,7 +259,7 @@ export default function NotificationsPage() {
                 {/* Unread dot */}
                 <div className="relative shrink-0 mt-0.5">
                   <div
-                    className={`w-10 h-10 rounded-2xl flex items-center justify-center border transition-colors ${
+                    className={`w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl flex items-center justify-center border transition-colors [&>svg]:w-4 [&>svg]:h-4 sm:[&>svg]:w-5 sm:[&>svg]:h-5 ${
                       !n.is_read
                         ? "bg-background border-primary/20 shadow-sm"
                         : "bg-secondary/40 border-border"
@@ -271,100 +272,100 @@ export default function NotificationsPage() {
                   )}
                 </div>
 
-                {/* Content */}
-                <div className="flex-1 min-w-0 pt-0.5">
-                  <div className="flex items-start justify-between gap-2 flex-wrap">
-                    <div className="flex items-center gap-2 flex-wrap min-w-0">
-                      <p
-                        className={`text-sm ${
-                          !n.is_read
-                            ? "font-semibold text-foreground"
-                            : "font-medium text-muted-foreground"
-                        } truncate max-w-xs`}
-                      >
-                        {n.title}
-                      </p>
-                      {n.category && (
-                        <span className="px-1.5 py-0.5 rounded-md bg-secondary text-[10px] font-medium text-muted-foreground capitalize shrink-0">
-                          {n.category}
-                        </span>
+                {/* Content Container */}
+                <div className="flex-1 min-w-0 pt-0.5 flex flex-col">
+                  {/* Top Row: Title & Actions */}
+                  <div className="flex items-start justify-between gap-3">
+                    {/* Title */}
+                    <p
+                      className={`text-sm ${
+                        !n.is_read
+                          ? "font-semibold text-foreground"
+                          : "font-medium text-muted-foreground"
+                      } leading-snug flex-1`}
+                    >
+                      {n.title}
+                    </p>
+
+                    {/* Action buttons */}
+                    <div className="flex items-center gap-1 shrink-0 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex-col sm:flex-row">
+                      {!n.is_read && (
+                        <button
+                          onClick={() => handleMarkAsRead(n._id)}
+                          disabled={isMarkingOne}
+                          className="w-8 h-8 flex items-center justify-center rounded-xl bg-background border border-border text-muted-foreground hover:text-primary hover:border-primary/30 transition-colors disabled:opacity-50"
+                          title="Mark as read"
+                          aria-label="Mark as read"
+                        >
+                          <Check className="w-3.5 h-3.5" />
+                        </button>
                       )}
+                      <button
+                        onClick={() => setDeleteId(n._id)}
+                        disabled={isDeleting}
+                        className="w-8 h-8 flex items-center justify-center rounded-xl bg-background border border-border text-muted-foreground hover:text-destructive hover:border-destructive/30 hover:bg-destructive/5 transition-colors disabled:opacity-50"
+                        title="Delete notification"
+                        aria-label="Delete notification"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
                     </div>
-                    <span className="text-[10px] font-medium text-muted-foreground whitespace-nowrap shrink-0">
+                  </div>
+                  
+                  {/* Metadata Row */}
+                  <div className="flex items-center gap-1.5 mt-0.5 mb-1.5 flex-wrap">
+                    {n.category && (
+                      <span className="text-[10px] font-bold text-primary uppercase tracking-wider">
+                        {n.category}
+                      </span>
+                    )}
+                    {n.category && <span className="w-1 h-1 rounded-full bg-border" />}
+                    <span className="text-[10px] font-medium text-muted-foreground">
                       {getRelativeTime(n.createdAt)}
                     </span>
                   </div>
+
+                  {/* Message Row - Full Width */}
                   <p
-                    className={`text-xs mt-1 leading-relaxed ${
+                    className={`text-xs leading-relaxed ${
                       !n.is_read
                         ? "text-foreground/80"
-                        : "text-muted-foreground"
+                        : "text-muted-foreground/80"
                     }`}
                   >
                     {n.message}
                   </p>
                 </div>
-
-                {/* Action buttons */}
-                <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity sm:flex-row flex-col">
-                  {!n.is_read && (
-                    <button
-                      onClick={() => handleMarkAsRead(n._id)}
-                      disabled={isMarkingOne}
-                      className="w-8 h-8 flex items-center justify-center rounded-xl bg-background border border-border text-muted-foreground hover:text-primary hover:border-primary/30 transition-colors disabled:opacity-50"
-                      title="Mark as read"
-                      aria-label="Mark as read"
-                    >
-                      <Check className="w-3.5 h-3.5" />
-                    </button>
-                  )}
-                  <button
-                    onClick={() => setDeleteId(n._id)}
-                    disabled={isDeleting}
-                    className="w-8 h-8 flex items-center justify-center rounded-xl bg-background border border-border text-muted-foreground hover:text-destructive hover:border-destructive/30 hover:bg-destructive/5 transition-colors disabled:opacity-50"
-                    title="Delete notification"
-                    aria-label="Delete notification"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                </div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="p-12 flex flex-col items-center gap-4 text-center">
-            <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 flex items-center justify-center">
-              {activeFilter === "unread" ? (
-                <BellOff className="w-6 h-6 text-emerald-500" />
-              ) : (
-                <CheckCircle2 className="w-6 h-6 text-emerald-500" />
-              )}
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-foreground">
-                {activeFilter === "unread"
+          <div className="py-12">
+            <EmptyState 
+              title={
+                activeFilter === "unread"
                   ? "You're all caught up!"
                   : activeFilter === "all"
                     ? "No notifications yet"
-                    : `No ${activeFilter} notifications`}
-              </p>
-              <p className="text-xs text-muted-foreground mt-1 max-w-xs">
-                {activeFilter === "unread"
+                    : `No ${activeFilter} notifications`
+              }
+              description={
+                activeFilter === "unread"
                   ? "No unread notifications right now."
                   : activeFilter === "all"
                     ? "Alerts for budget breaches, bills, and account changes will appear here."
-                    : `No notifications in the ${activeFilter} category.`}
-              </p>
-            </div>
-            {activeFilter !== "all" && (
-              <button
-                onClick={() => setActiveFilter("all")}
-                className="flex items-center gap-1.5 text-xs text-primary font-medium hover:underline"
-              >
-                View all notifications
-                <ChevronRight className="w-3.5 h-3.5" />
-              </button>
-            )}
+                    : `No notifications in the ${activeFilter} category.`
+              }
+              icon={
+                activeFilter === "unread" ? (
+                  <BellOff className="w-8 h-8" />
+                ) : (
+                  <CheckCircle2 className="w-8 h-8" />
+                )
+              }
+              actionLabel={activeFilter !== "all" ? "View all notifications" : undefined}
+              onAction={activeFilter !== "all" ? () => setActiveFilter("all") : undefined}
+            />
           </div>
         )}
       </div>

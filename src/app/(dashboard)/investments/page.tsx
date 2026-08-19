@@ -1,8 +1,10 @@
 "use client";
 
 import { ConfirmDialog } from "@/components/custom/confirm-dialog";
+import { EmptyState } from "@/components/custom/empty-state";
 import FormDatePicker from "@/components/custom/form-date-picker";
 import FormSelect from "@/components/custom/form-select";
+import { TableSkeleton } from "@/components/custom/table-skeleton";
 import { useCurrency } from "@/hooks/use-currency";
 import {
   useCreateInvestmentMutation,
@@ -198,8 +200,8 @@ export default function InvestmentsPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-3 w-full sm:w-auto">
-          <div className="relative flex-1 sm:flex-none sm:w-64">
+        <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+          <div className="relative w-full sm:w-64">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <input
               type="text"
@@ -214,10 +216,10 @@ export default function InvestmentsPage() {
               reset();
               setIsAddOpen(true);
             }}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-primary-foreground font-semibold text-xs shadow-md shadow-primary/20 hover:bg-primary/90 transition-colors shrink-0"
+            className="w-full sm:w-auto flex justify-center items-center gap-2 px-4 py-2.5 sm:py-2 rounded-xl bg-primary text-primary-foreground font-semibold text-sm sm:text-xs shadow-md shadow-primary/20 hover:bg-primary/90 transition-colors shrink-0"
           >
-            <Plus className="w-4 h-4" />
-            <span className="hidden sm:inline">Add Holding</span>
+            <Plus className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
+            <span>Add Holding</span>
           </button>
         </div>
       </div>
@@ -228,7 +230,7 @@ export default function InvestmentsPage() {
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
             Total Invested
           </p>
-          <p className="text-2xl font-black text-foreground mt-1">
+          <p className="text-xl sm:text-2xl font-black text-foreground mt-1 truncate">
             {formatCurrency(metrics.totalInvested)}
           </p>
         </div>
@@ -236,7 +238,7 @@ export default function InvestmentsPage() {
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
             Current Value
           </p>
-          <p className="text-2xl font-black text-foreground mt-1">
+          <p className="text-xl sm:text-2xl font-black text-foreground mt-1 truncate">
             {formatCurrency(metrics.totalCurrentValue)}
           </p>
         </div>
@@ -249,7 +251,7 @@ export default function InvestmentsPage() {
                 Total Profit / Loss
               </p>
               <p
-                className={`text-2xl font-black mt-1 ${metrics.totalPnL >= 0 ? "text-emerald-500" : "text-destructive"}`}
+                className={`text-xl sm:text-2xl font-black mt-1 truncate ${metrics.totalPnL >= 0 ? "text-emerald-500" : "text-destructive"}`}
               >
                 {metrics.totalPnL > 0 ? "+" : ""}
                 {formatCurrency(metrics.totalPnL)}
@@ -324,22 +326,24 @@ export default function InvestmentsPage() {
       )}
 
       {/* Data Grid */}
-      <div className="glass-card rounded-3xl overflow-hidden border border-border">
-        {/* ── Mobile Card View (< md) ── */}
-        <div className="md:hidden divide-y divide-border">
-          {investmentsLoading ? (
-            <div className="p-8 text-center">
-              <Loader2 className="w-6 h-6 animate-spin text-muted-foreground mx-auto" />
-            </div>
-          ) : investments.length === 0 ? (
-            <div className="px-6 py-12 flex flex-col items-center space-y-3 text-center">
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                <Activity className="w-6 h-6 text-primary" />
-              </div>
-              <p className="text-sm font-semibold text-foreground">No Investments Found</p>
-              <p className="text-xs text-muted-foreground">Start building your portfolio by adding a new holding.</p>
-            </div>
-          ) : investments.filter((inv: any) => inv.name.toLowerCase().includes(searchTerm.toLowerCase()) || (inv.symbol || "").toLowerCase().includes(searchTerm.toLowerCase())).map((inv: any) => {
+      {investmentsLoading ? (
+        <TableSkeleton columns={6} rows={5} />
+      ) : investments.length === 0 ? (
+        <EmptyState 
+          title="No Investments Found"
+          description="Start building your portfolio by adding a new holding."
+          actionLabel="Add Investment"
+          icon={<Activity className="w-8 h-8" />}
+          onAction={() => {
+            reset();
+            setIsAddOpen(true);
+          }}
+        />
+      ) : (
+        <div className="glass-card rounded-3xl overflow-hidden border border-border">
+          {/* ── Mobile Card View (< md) ── */}
+          <div className="md:hidden divide-y divide-border">
+            {investments.filter((inv: any) => inv.name.toLowerCase().includes(searchTerm.toLowerCase()) || (inv.symbol || "").toLowerCase().includes(searchTerm.toLowerCase())).map((inv: any) => {
             const invested = inv.purchase_price * inv.quantity;
             const current = inv.current_price * inv.quantity;
             const pnl = current - invested;
@@ -399,26 +403,7 @@ export default function InvestmentsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {investmentsLoading ? (
-                <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center">
-                    <Loader2 className="w-6 h-6 animate-spin text-muted-foreground mx-auto" />
-                  </td>
-                </tr>
-              ) : investments.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center">
-                    <div className="flex flex-col items-center justify-center space-y-3">
-                      <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                        <Activity className="w-6 h-6 text-primary" />
-                      </div>
-                      <p className="text-sm font-semibold text-foreground">No Investments Found</p>
-                      <p className="text-xs text-muted-foreground max-w-xs">Start building your portfolio by adding a new holding.</p>
-                    </div>
-                  </td>
-                </tr>
-              ) : (
-                investments.map((inv: any) => {
+              {investments.map((inv: any) => {
                   const invested = inv.purchase_price * inv.quantity;
                   const current = inv.current_price * inv.quantity;
                   const pnl = current - invested;
@@ -470,12 +455,12 @@ export default function InvestmentsPage() {
                       </td>
                     </tr>
                   );
-                })
-              )}
+                })}
             </tbody>
           </table>
         </div>
-      </div>
+        </div>
+      )}
 
 
       {/* Form Modal (Shared Add/Edit) */}

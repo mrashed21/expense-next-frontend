@@ -1,8 +1,10 @@
 "use client";
 
 import { ConfirmDialog } from "@/components/custom/confirm-dialog";
+import { EmptyState } from "@/components/custom/empty-state";
 import FormDatePicker from "@/components/custom/form-date-picker";
 import FormSelect from "@/components/custom/form-select";
+import { TableSkeleton } from "@/components/custom/table-skeleton";
 import { useCurrency } from "@/hooks/use-currency";
 import { formatDate } from "@/lib/utils";
 import { useGetAccountsQuery } from "@/services/account-api";
@@ -217,8 +219,8 @@ export default function InstallmentsPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-3 w-full sm:w-auto">
-          <div className="relative flex-1 sm:flex-none sm:w-56">
+        <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+          <div className="relative w-full sm:w-56">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <input
               type="text"
@@ -229,16 +231,16 @@ export default function InstallmentsPage() {
             />
           </div>
 
-          <div className="flex rounded-xl overflow-hidden border border-border text-xs font-medium">
+          <div className="flex w-full sm:w-auto rounded-xl overflow-hidden border border-border text-xs font-medium">
             <button
               onClick={() => setStatusFilter("all")}
-              className={`px-3 py-2 transition-colors ${statusFilter === "all" ? "bg-primary text-primary-foreground" : "bg-card hover:bg-secondary text-muted-foreground"}`}
+              className={`flex-1 sm:flex-none px-3 py-2 transition-colors ${statusFilter === "all" ? "bg-primary text-primary-foreground" : "bg-card hover:bg-secondary text-muted-foreground"}`}
             >
               All
             </button>
             <button
               onClick={() => setStatusFilter("active")}
-              className={`px-3 py-2 transition-colors border-l border-border ${statusFilter === "active" ? "bg-primary text-primary-foreground" : "bg-card hover:bg-secondary text-muted-foreground"}`}
+              className={`flex-1 sm:flex-none px-3 py-2 transition-colors border-l border-border ${statusFilter === "active" ? "bg-primary text-primary-foreground" : "bg-card hover:bg-secondary text-muted-foreground"}`}
             >
               Active
             </button>
@@ -249,10 +251,10 @@ export default function InstallmentsPage() {
               reset();
               setIsAddOpen(true);
             }}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-primary-foreground font-semibold text-xs shadow-md shadow-primary/20 hover:bg-primary/90 transition-colors shrink-0"
+            className="w-full sm:w-auto flex justify-center items-center gap-2 px-4 py-2.5 sm:py-2 rounded-xl bg-primary text-primary-foreground font-semibold text-sm sm:text-xs shadow-md shadow-primary/20 hover:bg-primary/90 transition-colors shrink-0"
           >
-            <Plus className="w-4 h-4" />
-            <span className="hidden sm:inline">New EMI</span>
+            <Plus className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
+            <span>New EMI</span>
           </button>
         </div>
       </div>
@@ -263,7 +265,7 @@ export default function InstallmentsPage() {
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
             Total Monthly Burden
           </p>
-          <p className="text-2xl font-black text-foreground mt-1">
+          <p className="text-xl sm:text-2xl font-black text-foreground mt-1 truncate">
             {formatCurrency(metrics.totalMonthlyBurden)}
           </p>
         </div>
@@ -271,7 +273,7 @@ export default function InstallmentsPage() {
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
             Total Outstanding
           </p>
-          <p className="text-2xl font-black text-foreground mt-1">
+          <p className="text-xl sm:text-2xl font-black text-foreground mt-1 truncate">
             {formatCurrency(metrics.totalOutstanding)}
           </p>
         </div>
@@ -279,7 +281,7 @@ export default function InstallmentsPage() {
           <p className="text-xs font-semibold text-blue-500 uppercase tracking-wider">
             Active EMIs
           </p>
-          <p className="text-2xl font-black text-blue-500 mt-1">
+          <p className="text-xl sm:text-2xl font-black text-blue-500 mt-1 truncate">
             {metrics.activeCount}
           </p>
         </div>
@@ -287,29 +289,31 @@ export default function InstallmentsPage() {
           <p className="text-xs font-semibold text-emerald-500 uppercase tracking-wider">
             Completed EMIs
           </p>
-          <p className="text-2xl font-black text-emerald-500 mt-1">
+          <p className="text-xl sm:text-2xl font-black text-emerald-500 mt-1 truncate">
             {metrics.completedCount}
           </p>
         </div>
       </div>
 
       {/* Data Grid */}
-      <div className="glass-card rounded-3xl overflow-hidden border border-border">
-        {/* ── Mobile Card View (< md) ── */}
-        <div className="md:hidden divide-y divide-border">
-          {installmentsLoading ? (
-            <div className="p-8 text-center">
-              <Loader2 className="w-6 h-6 animate-spin text-muted-foreground mx-auto" />
-            </div>
-          ) : installments.length === 0 ? (
-            <div className="px-6 py-12 flex flex-col items-center space-y-3 text-center">
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                <Calendar className="w-6 h-6 text-primary" />
-              </div>
-              <p className="text-sm font-semibold text-foreground">No EMIs Found</p>
-              <p className="text-xs text-muted-foreground">Start tracking your car loan, mortgage, or device installments.</p>
-            </div>
-          ) : installments.filter((inst: any) =>
+      {installmentsLoading ? (
+        <TableSkeleton columns={7} rows={5} />
+      ) : installments.length === 0 ? (
+        <EmptyState 
+          title="No EMIs Found"
+          description="Start tracking your car loan, mortgage, or device installments."
+          actionLabel="Add EMI"
+          icon={<Calendar className="w-8 h-8" />}
+          onAction={() => {
+            reset();
+            setIsAddOpen(true);
+          }}
+        />
+      ) : (
+        <div className="glass-card rounded-3xl overflow-hidden border border-border">
+          {/* ── Mobile Card View (< md) ── */}
+          <div className="md:hidden divide-y divide-border">
+            {installments.filter((inst: any) =>
               statusFilter === "all" ? true : !inst.is_completed
             ).filter((inst: any) =>
               inst.title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -386,26 +390,7 @@ export default function InstallmentsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {installmentsLoading ? (
-                <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center">
-                    <Loader2 className="w-6 h-6 animate-spin text-muted-foreground mx-auto" />
-                  </td>
-                </tr>
-              ) : installments.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center">
-                    <div className="flex flex-col items-center justify-center space-y-3">
-                      <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                        <Calendar className="w-6 h-6 text-primary" />
-                      </div>
-                      <p className="text-sm font-semibold text-foreground">No EMIs Found</p>
-                      <p className="text-xs text-muted-foreground max-w-xs">Start tracking your car loan, mortgage, or device installments.</p>
-                    </div>
-                  </td>
-                </tr>
-              ) : (
-                installments.map((inst: any) => {
+              {installments.map((inst: any) => {
                   const progressPercent = Math.min(100, Math.max(0, (inst.months_paid / inst.total_months) * 100));
                   return (
                     <tr key={inst._id} className={`hover:bg-secondary/30 transition-colors ${inst.is_completed ? "opacity-60" : ""}`}>
@@ -470,12 +455,12 @@ export default function InstallmentsPage() {
                       </td>
                     </tr>
                   );
-                })
-              )}
+                })}
             </tbody>
           </table>
         </div>
-      </div>
+        </div>
+      )}
 
 
       {/* Form Modal (Shared Add/Edit) */}

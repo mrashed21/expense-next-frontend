@@ -1,6 +1,8 @@
 "use client";
 
+import { CardSkeleton } from "@/components/custom/card-skeleton";
 import { ConfirmDialog } from "@/components/custom/confirm-dialog";
+import { EmptyState } from "@/components/custom/empty-state";
 import FormSelect from "@/components/custom/form-select";
 import { useCurrency } from "@/hooks/use-currency";
 import {
@@ -34,7 +36,7 @@ type BudgetFormValues = z.infer<typeof budgetSchema>;
 export default function BudgetsPage() {
   const { formatCurrency } = useCurrency();
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const { data: budgetsData } = useGetBudgetsQuery(undefined);
+  const { data: budgetsData, isLoading } = useGetBudgetsQuery(undefined);
   const { data: categoriesData } = useGetCategoriesQuery({});
   const [createBudgetApi, { isLoading: isCreating }] =
     useCreateBudgetMutation();
@@ -85,7 +87,7 @@ export default function BudgetsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-bold tracking-tight">
             Monthly Category Budgets
@@ -97,16 +99,30 @@ export default function BudgetsPage() {
 
         <button
           onClick={() => setIsOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-primary-foreground font-semibold text-xs shadow-md shadow-primary/20 hover:bg-primary/90 transition-colors"
+          className="w-full sm:w-auto flex justify-center items-center gap-2 px-4 py-2.5 sm:py-2 rounded-xl bg-primary text-primary-foreground font-semibold text-sm sm:text-xs shadow-md shadow-primary/20 hover:bg-primary/90 transition-colors shrink-0"
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
           <span>Set Budget</span>
         </button>
       </div>
 
       {/* Budgets Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {budgets.map((b: any) => {
+        {isLoading ? (
+          <CardSkeleton count={4} />
+        ) : budgets.length === 0 ? (
+          <div className="col-span-full">
+            <EmptyState 
+              title="No Budgets Set" 
+              description="Set monthly category budgets to keep your expenditure in check."
+              actionLabel="Set Budget"
+              icon={<AlertTriangle className="w-8 h-8" />}
+              onAction={() => setIsOpen(true)}
+            />
+          </div>
+        ) : (
+          <>
+            {budgets.map((b: any) => {
           const isWarning = b.percentage >= b.warning_threshold;
           const isOver = b.percentage >= 100;
 
@@ -187,6 +203,8 @@ export default function BudgetsPage() {
             </div>
           );
         })}
+          </>
+        )}
       </div>
 
       {/* Modal */}

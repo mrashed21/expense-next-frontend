@@ -120,14 +120,16 @@ export default function SettingsPage() {
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
-      <div>
-        <h1 className="text-xl font-bold tracking-tight">
-          System Preferences & Settings
-        </h1>
-        <p className="text-xs text-muted-foreground">
-          Manage currency formats, app theme, data backups, and account
-          termination
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 rounded-3xl bg-linear-to-r from-primary via-indigo-600 to-purple-600 text-white shadow-xl shadow-primary/20">
+        <div>
+          <h1 className="text-xl sm:text-xl font-bold tracking-tight">
+            System Preferences & Settings
+          </h1>
+          <p className="text-xs sm:text-sm text-indigo-100 mt-1">
+            Manage currency formats, app theme, data backups, and account
+            termination
+          </p>
+        </div>
       </div>
 
       {/* General Preferences */}

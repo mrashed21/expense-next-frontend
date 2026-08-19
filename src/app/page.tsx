@@ -7,6 +7,14 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { RootState } from "@/redux/store";
 import { useGetReviewsQuery } from "@/services/review-api";
 import {
@@ -23,6 +31,7 @@ import {
   Linkedin,
   Lock,
   Mail,
+  Menu,
   MessageCircle,
   Paperclip,
   PieChart as PieIcon,
@@ -262,17 +271,19 @@ export default function HomePage() {
 
           {/* Actions */}
           <div className="flex items-center gap-3">
-            <ThemeToggle />
+            <div className="hidden md:block">
+              <ThemeToggle />
+            </div>
             {user ? (
               <Link
                 href="/dashboard"
-                className="px-4 py-2 rounded-xl bg-primary text-primary-foreground font-semibold text-xs shadow-md shadow-primary/20 hover:bg-primary/90 transition-all flex items-center gap-1.5"
+                className="hidden md:flex px-4 py-2 rounded-xl bg-primary text-primary-foreground font-semibold text-xs shadow-md shadow-primary/20 hover:bg-primary/90 transition-all items-center gap-1.5"
               >
                 Go to Dashboard
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             ) : (
-              <>
+              <div className="hidden md:flex items-center gap-3">
                 <Link
                   href="/login"
                   className="px-3.5 py-2 rounded-xl text-xs font-semibold text-foreground hover:bg-secondary transition-colors"
@@ -286,8 +297,59 @@ export default function HomePage() {
                   Get Started
                   <ChevronRight className="w-3.5 h-3.5" />
                 </Link>
-              </>
+              </div>
             )}
+
+            {/* Mobile Menu Toggle */}
+            <div className="md:hidden flex items-center gap-2">
+              <ThemeToggle />
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl border border-border/50">
+                    <Menu className="h-5 w-5" />
+                    <span className="sr-only">Toggle menu</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56 rounded-xl">
+                  <DropdownMenuItem asChild className="rounded-lg cursor-pointer">
+                    <a href="#features">Features</a>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild className="rounded-lg cursor-pointer">
+                    <a href="#preview">Preview</a>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild className="rounded-lg cursor-pointer">
+                    <a href="#why-us">Why Choose Us</a>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild className="rounded-lg cursor-pointer">
+                    <a href="#how-it-works">How It Works</a>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild className="rounded-lg cursor-pointer">
+                    <a href="#faq">FAQ</a>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  {user ? (
+                    <DropdownMenuItem asChild className="rounded-lg cursor-pointer bg-primary text-primary-foreground focus:bg-primary/90 focus:text-primary-foreground mt-2 justify-center">
+                      <Link href="/dashboard" className="font-semibold">
+                        Go to Dashboard
+                        <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
+                      </Link>
+                    </DropdownMenuItem>
+                  ) : (
+                    <div className="flex flex-col gap-2 mt-2">
+                      <DropdownMenuItem asChild className="rounded-lg cursor-pointer justify-center border border-border">
+                        <Link href="/login" className="font-semibold">Sign In</Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild className="rounded-lg cursor-pointer bg-primary text-primary-foreground focus:bg-primary/90 focus:text-primary-foreground justify-center">
+                        <Link href="/register" className="font-semibold">
+                          Get Started
+                          <ChevronRight className="w-3.5 h-3.5 ml-1.5" />
+                        </Link>
+                      </DropdownMenuItem>
+                    </div>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
         </div>
       </header>

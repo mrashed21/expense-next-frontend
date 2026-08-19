@@ -1,6 +1,8 @@
 "use client";
 
+import { CardSkeleton } from "@/components/custom/card-skeleton";
 import { ConfirmDialog } from "@/components/custom/confirm-dialog";
+import { EmptyState } from "@/components/custom/empty-state";
 import FormSelect from "@/components/custom/form-select";
 import { useCurrency } from "@/hooks/use-currency";
 import {
@@ -38,7 +40,7 @@ type GoalFormValues = z.infer<typeof goalSchema>;
 export default function GoalsPage() {
   const { formatCurrency } = useCurrency();
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const { data: goalsData } = useGetGoalsQuery({});
+  const { data: goalsData, isLoading } = useGetGoalsQuery({});
   const [createGoalApi, { isLoading: isCreating }] = useCreateGoalMutation();
   const [depositApi, { isLoading: isDepositing }] = useDepositToGoalMutation();
   const [deleteGoalApi] = useDeleteGoalMutation();
@@ -106,7 +108,7 @@ export default function GoalsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-bold tracking-tight">
             Savings & Target Goals
@@ -119,15 +121,28 @@ export default function GoalsPage() {
 
         <button
           onClick={() => setIsAddOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-primary-foreground font-semibold text-xs shadow-md shadow-primary/20 hover:bg-primary/90 transition-colors"
+          className="w-full sm:w-auto flex justify-center items-center gap-2 px-4 py-2.5 sm:py-2 rounded-xl bg-primary text-primary-foreground font-semibold text-sm sm:text-xs shadow-md shadow-primary/20 hover:bg-primary/90 transition-colors shrink-0"
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
           <span>New Goal</span>
         </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {goals.map((g: any) => (
+        {isLoading ? (
+          <CardSkeleton count={3} />
+        ) : goals.length === 0 ? (
+          <div className="col-span-full">
+            <EmptyState 
+              title="No Goals Set" 
+              description="Start saving for your future by setting financial goals."
+              actionLabel="New Goal"
+              icon={<Target className="w-8 h-8" />}
+              onAction={() => setIsAddOpen(true)}
+            />
+          </div>
+        ) : (
+          goals.map((g: any) => (
           <div
             key={g._id}
             className="glass-card p-5 rounded-3xl space-y-4 relative group"
@@ -183,8 +198,9 @@ export default function GoalsPage() {
               <Plus className="w-3.5 h-3.5" />
               <span>Add Funds / Deposit</span>
             </button>
-          </div>
-        ))}
+            </div>
+          ))
+        )}
       </div>
 
       {/* Add Goal Modal */}

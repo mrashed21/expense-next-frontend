@@ -1,6 +1,8 @@
 "use client";
 
+import { CardSkeleton } from "@/components/custom/card-skeleton";
 import { ConfirmDialog } from "@/components/custom/confirm-dialog";
+import { EmptyState } from "@/components/custom/empty-state";
 import FormDatePicker from "@/components/custom/form-date-picker";
 import FormSelect from "@/components/custom/form-select";
 import {
@@ -57,7 +59,7 @@ type BillFormValues = z.infer<typeof billSchema>;
 export default function BillsPage() {
   const { formatCurrency } = useCurrency();
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const { data: billsData } = useGetBillsQuery({});
+  const { data: billsData, isLoading } = useGetBillsQuery({});
   const { data: accountsData } = useGetAccountsQuery({});
   const [createBillApi, { isLoading: isCreating }] = useCreateBillMutation();
   const [payBillApi, { isLoading: isPaying }] = usePayBillMutation();
@@ -127,7 +129,7 @@ export default function BillsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl font-bold tracking-tight">
             Bills & Subscriptions Tracker
@@ -140,15 +142,28 @@ export default function BillsPage() {
 
         <button
           onClick={() => setIsAddOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-primary-foreground font-semibold text-xs shadow-md shadow-primary/20 hover:bg-primary/90 transition-colors"
+          className="w-full sm:w-auto flex justify-center items-center gap-2 px-4 py-2.5 sm:py-2 rounded-xl bg-primary text-primary-foreground font-semibold text-sm sm:text-xs shadow-md shadow-primary/20 hover:bg-primary/90 transition-colors shrink-0"
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
           <span>Add Bill</span>
         </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {bills.map((b: any) => {
+        {isLoading ? (
+          <CardSkeleton count={6} />
+        ) : bills.length === 0 ? (
+          <div className="col-span-full">
+            <EmptyState 
+              title="No Bills Found" 
+              description="Keep track of your utility bills, EMIs, and monthly recurring subscriptions."
+              actionLabel="Add Bill"
+              icon={<FileCheck className="w-8 h-8" />}
+              onAction={() => setIsAddOpen(true)}
+            />
+          </div>
+        ) : (
+          bills.map((b: any) => {
           const isPaid = b.status === "paid";
 
           return (
@@ -221,7 +236,8 @@ export default function BillsPage() {
               )}
             </div>
           );
-        })}
+          })
+        )}
       </div>
 
       {/* Add Bill Modal */}

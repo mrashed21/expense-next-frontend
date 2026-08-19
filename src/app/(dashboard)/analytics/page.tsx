@@ -1,5 +1,7 @@
 "use client";
 
+import { EmptyState } from "@/components/custom/empty-state";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useCurrency } from "@/hooks/use-currency";
 import { useGetAnalyticsSummaryQuery } from "@/services/analytics-api";
 import {
@@ -49,8 +51,25 @@ export default function AnalyticsPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-6 h-6 animate-spin text-primary" />
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row justify-between gap-4">
+          <Skeleton className="h-10 w-48 rounded-xl" />
+          <div className="flex gap-2">
+            <Skeleton className="h-10 w-24 rounded-xl" />
+            <Skeleton className="h-10 w-24 rounded-xl" />
+            <Skeleton className="h-10 w-24 rounded-xl" />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Skeleton className="h-32 rounded-3xl" />
+          <Skeleton className="h-32 rounded-3xl" />
+          <Skeleton className="h-32 rounded-3xl" />
+          <Skeleton className="h-32 rounded-3xl" />
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Skeleton className="h-[400px] rounded-3xl" />
+          <Skeleton className="h-[400px] rounded-3xl" />
+        </div>
       </div>
     );
   }
@@ -58,8 +77,12 @@ export default function AnalyticsPage() {
   const data = analyticsData?.data;
   if (!data) {
     return (
-      <div className="flex items-center justify-center h-64 text-sm text-muted-foreground">
-        No analytics data available.
+      <div className="mt-12">
+        <EmptyState 
+          title="No analytics data available"
+          description="We couldn't generate analytics. Make sure you have recorded some transactions."
+          icon={<BarChart3 className="w-8 h-8" />}
+        />
       </div>
     );
   }
@@ -91,41 +114,41 @@ export default function AnalyticsPage() {
       </div>
 
       {/* KPI Row */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="glass-card p-5 rounded-2xl space-y-1">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
-            <LayoutDashboard className="w-3.5 h-3.5" />
-            Net Worth
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div className="glass-card p-3 sm:p-5 rounded-2xl space-y-1 sm:space-y-1.5 overflow-hidden">
+          <p className="text-[10px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1 sm:gap-1.5 truncate">
+            <LayoutDashboard className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+            <span className="truncate">Net Worth</span>
           </p>
-          <p className="text-xl font-black text-foreground">
+          <p className="text-base sm:text-xl font-black text-foreground break-words">
             {formatCurrency(kpi.netWorth)}
           </p>
         </div>
-        <div className="glass-card p-5 rounded-2xl space-y-1">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
-            <ArrowDownCircle className="w-3.5 h-3.5 text-emerald-500" />
-            Income ({yearlyComparison.currentYear})
+        <div className="glass-card p-3 sm:p-5 rounded-2xl space-y-1 sm:space-y-1.5 overflow-hidden">
+          <p className="text-[10px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1 sm:gap-1.5 truncate">
+            <ArrowDownCircle className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-emerald-500 shrink-0" />
+            <span className="truncate">Income ({yearlyComparison.currentYear})</span>
           </p>
-          <p className="text-xl font-black text-emerald-500">
+          <p className="text-base sm:text-xl font-black text-emerald-500 break-words">
             {formatCurrency(kpi.totalIncomeYear)}
           </p>
         </div>
-        <div className="glass-card p-5 rounded-2xl space-y-1">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
-            <ArrowUpCircle className="w-3.5 h-3.5 text-rose-500" />
-            Expense ({yearlyComparison.currentYear})
+        <div className="glass-card p-3 sm:p-5 rounded-2xl space-y-1 sm:space-y-1.5 overflow-hidden">
+          <p className="text-[10px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1 sm:gap-1.5 truncate">
+            <ArrowUpCircle className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-rose-500 shrink-0" />
+            <span className="truncate">Expense ({yearlyComparison.currentYear})</span>
           </p>
-          <p className="text-xl font-black text-rose-500">
+          <p className="text-base sm:text-xl font-black text-rose-500 break-words">
             {formatCurrency(kpi.totalExpenseYear)}
           </p>
         </div>
-        <div className="glass-card p-5 rounded-2xl space-y-1">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
-            <TrendingUp className="w-3.5 h-3.5" />
-            Savings Rate
+        <div className="glass-card p-3 sm:p-5 rounded-2xl space-y-1 sm:space-y-1.5 overflow-hidden">
+          <p className="text-[10px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1 sm:gap-1.5 truncate">
+            <TrendingUp className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
+            <span className="truncate">Savings Rate</span>
           </p>
           <p
-            className={`text-xl font-black ${
+            className={`text-base sm:text-xl font-black break-words ${
               kpi.savingsRate >= 0 ? "text-emerald-500" : "text-rose-500"
             }`}
           >

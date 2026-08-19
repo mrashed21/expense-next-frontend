@@ -1,6 +1,8 @@
 "use client";
 
+import { CardSkeleton } from "@/components/custom/card-skeleton";
 import { ConfirmDialog } from "@/components/custom/confirm-dialog";
+import { EmptyState } from "@/components/custom/empty-state";
 import FormDatePicker from "@/components/custom/form-date-picker";
 import FormSelect from "@/components/custom/form-select";
 import { useCurrency } from "@/hooks/use-currency";
@@ -174,8 +176,8 @@ export default function AssetsPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-3 w-full sm:w-auto">
-          <div className="relative flex-1 sm:flex-none sm:w-64">
+        <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+          <div className="relative w-full sm:w-64">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
             <input
               type="text"
@@ -187,10 +189,10 @@ export default function AssetsPage() {
           </div>
           <button
             onClick={() => setIsAddAssetOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-primary-foreground font-semibold text-xs shadow-md shadow-primary/20 hover:bg-primary/90 transition-colors shrink-0"
+            className="w-full sm:w-auto flex justify-center items-center gap-2 px-4 py-2.5 sm:py-2 rounded-xl bg-primary text-primary-foreground font-semibold text-sm sm:text-xs shadow-md shadow-primary/20 hover:bg-primary/90 transition-colors shrink-0"
           >
-            <Plus className="w-4 h-4" />
-            <span className="hidden sm:inline">Add Asset</span>
+            <Plus className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
+            <span>Add Asset</span>
           </button>
         </div>
       </div>
@@ -201,7 +203,7 @@ export default function AssetsPage() {
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
             Total Asset Portfolio Value
           </p>
-          <p className="text-2xl font-bold text-foreground mt-1">
+          <p className="text-xl sm:text-2xl font-bold text-foreground mt-1 truncate">
             {formatCurrency(totalValue)}
           </p>
           <p className="text-[11px] text-muted-foreground mt-1">
@@ -213,24 +215,16 @@ export default function AssetsPage() {
       {/* Assets Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {assetsLoading ? (
-          <div className="col-span-full flex items-center justify-center py-12">
-            <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-          </div>
+          <CardSkeleton count={6} />
         ) : assets.length === 0 ? (
-          <div className="col-span-full glass-card p-12 rounded-3xl flex flex-col items-center justify-center text-center space-y-3">
-            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-              <Home className="w-6 h-6 text-primary" />
-            </div>
-            <div className="space-y-1">
-              <p className="text-sm font-semibold text-foreground">
-                No Assets Found
-              </p>
-              <p className="text-xs text-muted-foreground max-w-xs">
-                {searchTerm
-                  ? "No assets match your search criteria."
-                  : "Start tracking your physical assets and valuables here."}
-              </p>
-            </div>
+          <div className="col-span-full">
+            <EmptyState 
+              title="No Assets Found" 
+              description={searchTerm ? "No assets match your search criteria." : "Start tracking your physical assets and valuables here."}
+              actionLabel="Add Asset"
+              icon={<Home className="w-8 h-8" />}
+              onAction={() => setIsAddAssetOpen(true)}
+            />
           </div>
         ) : (
           assets.map((asset: any) => (

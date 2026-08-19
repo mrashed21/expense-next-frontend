@@ -300,9 +300,9 @@ export default function TransactionsPage() {
 
         <button
           onClick={() => setIsAddOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-primary-foreground font-semibold text-xs hover:bg-primary/90 transition-colors"
+          className="flex justify-center items-center gap-2 px-4 py-2.5 sm:py-2 rounded-xl bg-primary text-primary-foreground font-semibold text-sm sm:text-xs hover:bg-primary/90 transition-colors w-full sm:w-auto shrink-0"
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
           <span>Record Transaction</span>
         </button>
       </div>
@@ -310,21 +310,21 @@ export default function TransactionsPage() {
       {/* Filter Control Panel */}
       <div className="glass-card p-4 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-3">
         {/* Search Input */}
-        <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-secondary border border-border w-full md:w-80">
+        <div className="flex items-center gap-2 px-3 py-2.5 sm:py-2 rounded-xl bg-secondary border border-border w-full md:w-80 shrink-0">
           <Search className="w-4 h-4 text-muted-foreground" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search notes, tags, ref #..."
-            className="bg-transparent text-xs text-foreground outline-none w-full placeholder:text-muted-foreground"
+            className="bg-transparent text-sm sm:text-xs text-foreground outline-none w-full placeholder:text-muted-foreground"
           />
         </div>
 
         {/* Date & Type Filters */}
-        <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
+        <div className="flex items-center gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0 scrollbar-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           <Select value={dateRange} onValueChange={setDateRange}>
-            <SelectTrigger className="w-35 px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground font-medium outline-none">
+            <SelectTrigger className="w-35 px-3 py-2.5 sm:py-2 rounded-xl bg-secondary border border-border text-sm sm:text-xs text-foreground font-medium outline-none shrink-0">
               <SelectValue placeholder="Date Range" />
             </SelectTrigger>
             <SelectContent>
@@ -337,7 +337,7 @@ export default function TransactionsPage() {
           </Select>
 
           <Select value={typeFilter} onValueChange={setTypeFilter}>
-            <SelectTrigger className="w-35 px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground font-medium outline-none">
+            <SelectTrigger className="w-35 px-3 py-2.5 sm:py-2 rounded-xl bg-secondary border border-border text-sm sm:text-xs text-foreground font-medium outline-none shrink-0">
               <SelectValue placeholder="All Types" />
             </SelectTrigger>
             <SelectContent>
@@ -349,7 +349,7 @@ export default function TransactionsPage() {
 
           {/* Saved Filters Dropdown */}
           <Select value={activeFilterId} onValueChange={applySavedFilter}>
-            <SelectTrigger className="w-35 px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground font-medium outline-none">
+            <SelectTrigger className="w-35 px-3 py-2.5 sm:py-2 rounded-xl bg-secondary border border-border text-sm sm:text-xs text-foreground font-medium outline-none shrink-0">
               <Bookmark className="w-3.5 h-3.5 mr-2 inline-block text-primary" />
               <SelectValue placeholder="Saved Filters" />
             </SelectTrigger>
@@ -365,7 +365,7 @@ export default function TransactionsPage() {
 
           <button
             onClick={handleSaveFilter}
-            className="p-2 rounded-xl bg-secondary border border-border hover:bg-secondary/80 text-muted-foreground transition-colors"
+            className="p-2.5 sm:p-2 rounded-xl bg-secondary border border-border hover:bg-secondary/80 text-muted-foreground transition-colors shrink-0"
             title="Save current filters"
           >
             <Save className="w-4 h-4" />

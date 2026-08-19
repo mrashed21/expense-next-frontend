@@ -153,6 +153,7 @@ export const apiSlice = createApi({
     "AdminUsers",
     "AdminDashboard",
     "AdminActivity",
+    "Reviews",
   ],
   endpoints: () => ({}),
 });
