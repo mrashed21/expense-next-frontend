@@ -130,11 +130,22 @@ export default function TransactionsPage() {
     handleSubmit,
     reset,
     control,
+    watch,
+    setValue,
     clearErrors,
     formState: { errors },
   } = useForm<TransactionFormValues>({
     resolver: zodResolver(transactionSchema),
     defaultValues: { type: "expense", payment_method: "Cash" },
+  });
+
+  const selectedType = watch("type");
+
+  // Filter categories based on selected type (income/expense)
+  const filteredCategories = categories.filter((cat: any) => {
+    if (selectedType === "income") return cat.type === "income";
+    if (selectedType === "expense") return cat.type === "expense";
+    return true; // refund, adjustment etc. — show all
   });
 
   const onSubmit = async (data: TransactionFormValues) => {
@@ -147,6 +158,11 @@ export default function TransactionsPage() {
       toast.error(err?.data?.message || "Failed to record transaction");
     }
   };
+
+  // Clear category when type changes so stale category is not submitted
+  useEffect(() => {
+    setValue("category_id", undefined);
+  }, [selectedType, setValue]);
 
   const handleDelete = (id: string) => {
     setDeleteId(id);
@@ -627,6 +643,7 @@ export default function TransactionsPage() {
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
+              {/* Row 1: Type + Amount */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <FormSelect
@@ -644,19 +661,24 @@ export default function TransactionsPage() {
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-foreground">
+                  <label className="text-xs font-semibold text-foreground block">
                     Amount
                   </label>
                   <input
                     {...register("amount", { valueAsNumber: true })}
                     type="number"
                     step="0.01"
-                    placeholder="0.00"
+                    placeholder=""
+                    defaultValue=""
                     className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                   />
+                  {errors.amount && (
+                    <p className="text-[10px] text-destructive mt-0.5">{errors.amount.message}</p>
+                  )}
                 </div>
               </div>
 
+              {/* Row 2: Account */}
               <div className="space-y-1">
                 <FormSelect
                   label="Account"
@@ -672,13 +694,14 @@ export default function TransactionsPage() {
                 />
               </div>
 
+              {/* Row 3: Category — filtered by selected type */}
               <div className="space-y-1">
                 <FormSelect
                   label="Category"
                   name="category_id"
                   control={control}
-                  options={categories.map((cat: any) => ({
-                    label: `${cat.name} (${cat.type})`,
+                  options={filteredCategories.map((cat: any) => ({
+                    label: cat.name,
                     value: cat._id,
                   }))}
                   searchable={true}
@@ -687,8 +710,21 @@ export default function TransactionsPage() {
                 />
               </div>
 
+              {/* Row 4: Date */}
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">
+                <label className="text-xs font-semibold text-foreground block">
+                  Date
+                </label>
+                <input
+                  {...register("date")}
+                  type="date"
+                  className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
+                />
+              </div>
+
+              {/* Row 5: Notes */}
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-foreground block">
                   Notes / Description
                 </label>
                 <input
