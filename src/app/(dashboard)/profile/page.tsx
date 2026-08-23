@@ -44,6 +44,36 @@ import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 import { z } from "zod";
 
+function parseDeviceInfo(ua: string): string {
+  if (!ua) return "Unknown Device";
+
+  // Device type
+  const isMobile = /android|iphone|ipad|ipod|mobile|blackberry|windows phone/i.test(ua);
+  const isTablet = /ipad|tablet/i.test(ua);
+  const deviceType = isTablet ? "Tablet" : isMobile ? "Mobile" : "Desktop";
+
+  // OS
+  let os = "";
+  if (/windows phone/i.test(ua)) os = "Windows Phone";
+  else if (/android/i.test(ua)) os = "Android";
+  else if (/iphone|ipad|ipod/i.test(ua)) os = "iOS";
+  else if (/mac os x/i.test(ua)) os = "macOS";
+  else if (/windows/i.test(ua)) os = "Windows";
+  else if (/linux/i.test(ua)) os = "Linux";
+
+  // Browser
+  let browser = "";
+  if (/edg\//i.test(ua)) browser = "Edge";
+  else if (/chrome/i.test(ua) && !/chromium/i.test(ua)) browser = "Chrome";
+  else if (/firefox/i.test(ua)) browser = "Firefox";
+  else if (/safari/i.test(ua) && !/chrome/i.test(ua)) browser = "Safari";
+  else if (/opr|opera/i.test(ua)) browser = "Opera";
+
+  const parts = [deviceType, os, browser].filter(Boolean);
+  return parts.join(" · ");
+}
+
+
 const profileSchema = z.object({
   user_name: z.string().min(2, "Name must be at least 2 characters"),
   user_phone: z.string().optional(),
@@ -994,7 +1024,7 @@ export default function ProfilePage() {
                       {h.ip_address}
                     </td>
                     <td className="p-3 text-muted-foreground whitespace-nowrap">
-                      {h.device_info || h.user_agent || "Unknown"}
+                      {parseDeviceInfo(h.user_agent || h.device_info || "")}
                     </td>
                     <td className="p-3 text-right text-muted-foreground whitespace-nowrap">
                       {formatDate(h.timestamp)}

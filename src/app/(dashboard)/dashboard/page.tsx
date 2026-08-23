@@ -6,7 +6,7 @@ import { useGetAnalyticsSummaryQuery } from "@/services/analytics-api";
 import { useGetBillsQuery } from "@/services/bill-api";
 import { useGetGoalsQuery } from "@/services/goal-api";
 import { useGetInstallmentsQuery } from "@/services/installment-api";
-import { useGetLoansQuery } from "@/services/loan-api";
+import { useGetLoanSummaryQuery, useGetLoansQuery } from "@/services/loan-api";
 import { useGetCurrentNetWorthQuery } from "@/services/net-worth-api";
 import { useGetTransactionsQuery } from "@/services/transaction-api";
 
@@ -90,7 +90,9 @@ export default function DashboardPage() {
   const { data: goalsData, isLoading: isLoadingGoals } = useGetGoalsQuery({});
   const { data: loansData, isLoading: isLoadingLoans } = useGetLoansQuery({
     limit: 3,
+    status: "ACTIVE",
   });
+  const { data: loanSummaryData } = useGetLoanSummaryQuery({});
   const { data: analyticsData } = useGetAnalyticsSummaryQuery({});
 
   const netWorthInfo = netWorthData?.data || {
@@ -107,7 +109,7 @@ export default function DashboardPage() {
   const activeLoans = (loansData?.data || []).filter(
     (l: any) => l.outstanding_amount > 0 && l.status !== "CANCELLED",
   );
-  const loanSummary = loansData?.meta?.summary || { totalOutstanding: 0 };
+  const loanSummary = loanSummaryData?.data || loansData?.meta?.summary || { totalOutstanding: 0, totalLent: 0 };
   const analytics = analyticsData?.data;
 
   const monthlyIncome = useMemo(

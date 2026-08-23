@@ -1192,38 +1192,34 @@ export default function LendingPage() {
               </div>
 
               {borrowers.length > 0 ? (
-                <div className="space-y-2">
-                  <Controller
-                    control={createLoanForm.control}
-                    name="borrower_name"
-                    render={({ field }) => (
-                      <div className="space-y-1">
-                        <Input
-                          placeholder="Type or select borrower name..."
-                          list="borrower-datalist"
-                          {...field}
-                          onChange={(e) => {
-                            field.onChange(e.target.value);
-                            const matched = borrowers.find(
-                              (b: any) =>
-                                b.name.toLowerCase() ===
-                                e.target.value.trim().toLowerCase(),
-                            );
-                            createLoanForm.setValue(
-                              "borrower_id",
-                              matched ? matched._id : "",
-                            );
-                          }}
-                        />
-                        <datalist id="borrower-datalist">
-                          {borrowers.map((b: any) => (
-                            <option key={b._id} value={b.name} />
-                          ))}
-                        </datalist>
-                      </div>
-                    )}
-                  />
-                </div>
+                <Controller
+                  control={createLoanForm.control}
+                  name="borrower_name"
+                  render={({ field }) => (
+                    <SearchableSelect
+                      options={borrowers.map((b: any) => ({
+                        label: b.name,
+                        value: b._id,
+                      }))}
+                      value={
+                        borrowers.find((b: any) => b.name === field.value)?._id ||
+                        createLoanForm.watch("borrower_id") ||
+                        ""
+                      }
+                      onChange={(selectedId) => {
+                        const matched = borrowers.find(
+                          (b: any) => b._id === selectedId,
+                        );
+                        field.onChange(matched ? matched.name : "");
+                        createLoanForm.setValue(
+                          "borrower_id",
+                          matched ? matched._id : "",
+                        );
+                      }}
+                      placeholder="Select borrower..."
+                    />
+                  )}
+                />
               ) : (
                 <Input
                   placeholder="Enter borrower name (e.g. Rahim)"
