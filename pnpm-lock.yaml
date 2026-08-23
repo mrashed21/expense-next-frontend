@@ -47,6 +47,9 @@ importers:
       ably:
         specifier: ^2.26.0
         version: 2.26.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      bd-number-validator:
+        specifier: ^2.0.4
+        version: 2.0.4(react@19.2.8)
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -1133,6 +1136,15 @@ packages:
     resolution: {integrity: sha512-zAgkquC2WYF0PIc6XbNYkA2uuxxFavzgmX61R+dHDUa558V8Ejf8ozTZFR6QzM24RWu4kBcRkhJ5kpz77j9fnQ==}
     engines: {node: '>=6.0.0'}
     hasBin: true
+
+  bd-number-validator@2.0.4:
+    resolution: {integrity: sha512-5AQoOB9LfDsvchh72ecMrKR6DMBADoEuEt5WO9wMkL4M0wpYbWqTXUTROBlJ2EU/UccY52RRDLLb1YwbodbDiQ==}
+    engines: {node: '>=16'}
+    peerDependencies:
+      react: '>=18 <20'
+    peerDependenciesMeta:
+      react:
+        optional: true
 
   bidi-js@1.0.3:
     resolution: {integrity: sha512-RKshQI1R3YQ+n9YJz2QQ147P66ELpa1FQEg20Dk8oW9t2KgLbpDLLp9aGZ7y8WHSshDknG0bknqGw5/tyCs5tw==}
@@ -2833,6 +2845,10 @@ snapshots:
   base64-js@1.5.1: {}
 
   baseline-browser-mapping@2.11.8: {}
+
+  bd-number-validator@2.0.4(react@19.2.8):
+    optionalDependencies:
+      react: 19.2.8
 
   bidi-js@1.0.3:
     dependencies:

@@ -1,13 +1,14 @@
+"use client";
+
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import React, { useState } from "react";
+import { PhoneInputBd } from "bd-number-validator/react";
+import React from "react";
 import type { FieldError } from "react-hook-form";
-import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
-import "react-phone-number-input/style.css";
 
 interface PhoneInputProps {
   icon?: React.ReactNode;
@@ -23,21 +24,6 @@ interface PhoneInputProps {
   validate?: boolean;
 }
 
-const CustomInput = React.forwardRef<
-  HTMLInputElement,
-  React.InputHTMLAttributes<HTMLInputElement>
->(({ className, ...props }, ref) => {
-  return (
-    <input
-      ref={ref}
-      {...props}
-      className={`w-full bg-transparent outline-none text-sm text-foreground placeholder:text-muted-foreground rounded-lg ${className || ""}`}
-    />
-  );
-});
-
-CustomInput.displayName = "CustomInput";
-
 const PhonesInput = ({
   icon,
   label,
@@ -47,73 +33,86 @@ const PhonesInput = ({
   error,
   readOnly = false,
   disabled = false,
-  placeholder = "Enter phone number",
-  className = "",
-  validate = true,
+  placeholder = "e.g. 01700000000",
 }: PhoneInputProps) => {
-  const [validationError, setValidationError] = useState<string | null>(null);
-
-  const handleChange = (val: string | undefined) => {
-    const phoneValue = val || "";
-
-    if (validate && phoneValue && !isValidPhoneNumber(phoneValue)) {
-      setValidationError("Invalid phone number for selected country");
-    } else {
-      setValidationError(null);
-    }
-
-    onChange?.(phoneValue);
-  };
-
-  const displayError = error || validationError;
+  const displayError = error
+    ? typeof error === "string"
+      ? error
+      : (error as FieldError).message
+    : undefined;
 
   return (
     <div className="w-full">
-      <label className="mb-1 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-        {icon && <span className="">{icon}</span>} {label && label}{" "}
-        {label && required && (
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span className="ml-1 font-bold text-destructive">*</span>
-              </TooltipTrigger>
+      {label && (
+        <label className="mb-1 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex items-center gap-1">
+          {icon && <span>{icon}</span>}
+          {label}
+          {required && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="ml-0.5 font-bold text-destructive">*</span>
+                </TooltipTrigger>
+                <TooltipContent side="top">
+                  <p>Required Field</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
+        </label>
+      )}
 
-              <TooltipContent side="top">
-                <p>Required Field</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        )}
-      </label>
-      <div
-        className={`flex items-center rounded-lg border bg-input/30 px-3 py-2 transition-all duration-200 ${
-          displayError
-            ? "border-destructive focus-within:ring-2 focus-within:ring-destructive/20"
-            : "border-input focus-within:ring-2 focus-within:ring-ring/30 focus-within:border-ring"
-        } ${readOnly ? "bg-muted cursor-default" : ""} ${
-          disabled ? "opacity-60 cursor-not-allowed" : ""
-        } ${className}`}
-      >
-        <PhoneInput
-          international
-          countryCallingCodeEditable={false}
-          defaultCountry="BD"
-          value={value}
-          onChange={handleChange}
-          readOnly={readOnly}
-          disabled={disabled}
-          placeholder={placeholder}
-          className="w-full [&_.PhoneInputCountrySelectArrow]:text-muted-foreground [&_.PhoneInputCountrySelectArrow]:border-muted-foreground"
-          inputComponent={CustomInput}
-        />
-      </div>
+      <PhoneInputBd
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        disabled={disabled || readOnly}
+        styles={{
+          container: { width: "100%" },
+          inputWrapper: ({ hasError, isFocused }) => ({
+            display: "flex",
+            alignItems: "center",
+            borderRadius: "0.5rem",
+            border: `1px solid ${
+              hasError || displayError
+                ? "hsl(var(--destructive))"
+                : isFocused
+                  ? "hsl(var(--ring))"
+                  : "hsl(var(--input))"
+            }`,
+            background: "hsl(var(--input) / 0.3)",
+            padding: "0.375rem 0.75rem",
+            gap: "0.5rem",
+            transition: "border-color 0.2s, box-shadow 0.2s",
+            boxShadow: isFocused
+              ? hasError || displayError
+                ? "0 0 0 2px hsl(var(--destructive) / 0.2)"
+                : "0 0 0 2px hsl(var(--ring) / 0.3)"
+              : "none",
+            opacity: disabled || readOnly ? 0.6 : 1,
+            cursor: readOnly ? "default" : "text",
+          }),
+          prefix: {
+            color: "hsl(var(--muted-foreground))",
+            fontSize: "0.875rem",
+            fontWeight: 500,
+            userSelect: "none",
+          },
+          input: {
+            flex: 1,
+            background: "transparent",
+            outline: "none",
+            border: "none",
+            fontSize: "0.875rem",
+            color: "hsl(var(--foreground))",
+          },
+          error: { display: "none" },
+          label: { display: "none" },
+        }}
+      />
 
       {displayError && (
-        <p className="mt-1 text-sm text-destructive">
-          {typeof displayError === "string"
-            ? displayError
-            : (displayError as FieldError).message}
-        </p>
+        <p className="mt-1 text-sm text-destructive">{displayError}</p>
       )}
     </div>
   );

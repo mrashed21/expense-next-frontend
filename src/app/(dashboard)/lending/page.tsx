@@ -2,6 +2,7 @@
 
 import { ConfirmDialog } from "@/components/custom/confirm-dialog";
 import { EmptyState } from "@/components/custom/empty-state";
+import PhonesInput from "@/components/custom/phone-input";
 import DatePicker from "@/components/custom/date-picker";
 import { SearchableSelect } from "@/components/custom/searchable-select";
 import { TableSkeleton } from "@/components/custom/table-skeleton";
@@ -2109,9 +2110,17 @@ export default function LendingPage() {
 
             <div className="space-y-1.5">
               <Label className="text-xs font-semibold">Phone Number</Label>
-              <Input
-                placeholder="e.g. +8801700000000"
-                {...createBorrowerForm.register("phone")}
+              <Controller
+                name="phone"
+                control={createBorrowerForm.control}
+                render={({ field }) => (
+                  <PhonesInput
+                    value={field.value ?? ""}
+                    onChange={field.onChange}
+                    placeholder="e.g. 01700000000"
+                    error={createBorrowerForm.formState.errors.phone}
+                  />
+                )}
               />
             </div>
 

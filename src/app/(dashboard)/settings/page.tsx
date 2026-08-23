@@ -148,11 +148,7 @@ export default function SettingsPage() {
                 <SelectValue placeholder="Currency" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="USD">USD ($) - US Dollar</SelectItem>
                 <SelectItem value="BDT">BDT (৳) - Bangladeshi Taka</SelectItem>
-                <SelectItem value="EUR">EUR (€) - Euro</SelectItem>
-                <SelectItem value="GBP">GBP (£) - British Pound</SelectItem>
-                <SelectItem value="INR">INR (₹) - Indian Rupee</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -167,7 +163,6 @@ export default function SettingsPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="en">English (US)</SelectItem>
-                <SelectItem value="bn">Bengali (বাংলা)</SelectItem>
               </SelectContent>
             </Select>
           </div>
