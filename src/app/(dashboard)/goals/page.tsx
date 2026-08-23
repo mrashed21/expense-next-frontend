@@ -31,7 +31,7 @@ const goalCategories = [
 const goalSchema = z.object({
   title: z.string().min(1, "Goal title is required"),
   category: z.string(),
-  target_amount: z.number().positive("Target amount must be positive"),
+  target_amount: z.coerce.number().positive("Target amount must be positive"),
   target_date: z.string().optional(),
 });
 
@@ -60,7 +60,7 @@ export default function GoalsPage() {
     formState: { errors },
   } = useForm<GoalFormValues>({
     resolver: zodResolver(goalSchema),
-    defaultValues: { category: "Savings Goal" },
+    defaultValues: { category: "Savings Goal", target_amount: "" as any },
   });
 
   const onSubmit = async (data: GoalFormValues) => {
@@ -259,7 +259,7 @@ export default function GoalsPage() {
                   {...register("target_amount", { setValueAs: (v) => v === "" ? undefined : Number(v) })}
                   type="number"
                   step="0.01"
-                  placeholder="e.g. 50000"
+                  placeholder="0.00"
                   className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                 />
               </div>
@@ -306,7 +306,7 @@ export default function GoalsPage() {
                   step="0.01"
                   value={depositAmount}
                   onChange={(e) => setDepositAmount(e.target.value)}
-                  placeholder="e.g. 1000"
+                  placeholder="0.00"
                   className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                 />
               </div>

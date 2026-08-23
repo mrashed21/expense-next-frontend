@@ -99,8 +99,8 @@ export default function InstallmentsPage() {
   } = useForm<InstallmentFormValues>({
     resolver: zodResolver(installmentSchema),
     defaultValues: {
-      total_amount: 0,
-      total_months: 1,
+      total_amount: "" as any,
+      total_months: "" as any,
       title: "",
       account_id: "",
       start_date: "",
@@ -117,7 +117,7 @@ export default function InstallmentsPage() {
     formState: { errors: paymentErrors },
   } = useForm<PaymentFormValues>({
     resolver: zodResolver(paymentSchema),
-    defaultValues: { amount: 0, date: "", notes: "" },
+    defaultValues: { amount: "" as any, date: "", notes: "" },
   });
 
   const onAddSubmit = async (data: InstallmentFormValues) => {
@@ -526,7 +526,7 @@ export default function InstallmentsPage() {
                     {...registerForm("total_amount", { setValueAs: (v) => v === "" ? undefined : Number(v) })}
                     type="number"
                     step="0.01"
-                    placeholder="e.g. 120000"
+                    placeholder="0.00"
                     className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                   />
                   {errors.total_amount && (
@@ -654,7 +654,7 @@ export default function InstallmentsPage() {
                   {...registerPayment("amount", { setValueAs: (v) => v === "" ? undefined : Number(v) })}
                   type="number"
                   step="0.01"
-                  placeholder="e.g. 5000"
+                  placeholder="0.00"
                   max={paymentItem.remaining_amount}
                   className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                 />

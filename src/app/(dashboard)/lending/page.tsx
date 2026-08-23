@@ -214,7 +214,7 @@ export default function LendingPage() {
     defaultValues: {
       borrower_name: "",
       borrower_id: "",
-      principal_amount: 0,
+      principal_amount: "" as any,
       source_account_id: "",
       lent_date: new Date().toISOString().split("T")[0],
       expected_return_date: "",
@@ -225,7 +225,7 @@ export default function LendingPage() {
   const repaymentForm = useForm<AddRepaymentValues>({
     resolver: zodResolver(addRepaymentSchema),
     defaultValues: {
-      amount: 0,
+      amount: "" as any,
       account_id: "",
       payment_method: "Cash",
       payment_date: new Date().toISOString().split("T")[0],
@@ -261,13 +261,13 @@ export default function LendingPage() {
 
   // Watched form values for live preview calculation
   const watchedSourceAccountId = createLoanForm.watch("source_account_id");
-  const watchedPrincipalAmount = createLoanForm.watch("principal_amount") || 0;
+  const watchedPrincipalAmount = Number(createLoanForm.watch("principal_amount")) || 0;
   const selectedSourceAccount = accounts.find(
     (a: any) => a._id === watchedSourceAccountId,
   );
 
   const watchedRepaymentAccountId = repaymentForm.watch("account_id");
-  const watchedRepaymentAmount = repaymentForm.watch("amount") || 0;
+  const watchedRepaymentAmount = Number(repaymentForm.watch("amount")) || 0;
   const selectedRepaymentAccount = accounts.find(
     (a: any) => a._id === watchedRepaymentAccountId,
   );
@@ -537,7 +537,7 @@ export default function LendingPage() {
               createLoanForm.reset({
                 borrower_name: "",
                 borrower_id: "",
-                principal_amount: 0,
+                principal_amount: "" as any,
                 source_account_id: accounts[0]?._id || "",
                 lent_date: new Date().toISOString().split("T")[0],
                 expected_return_date: "",
@@ -749,7 +749,7 @@ export default function LendingPage() {
             createLoanForm.reset({
               borrower_name: "",
               borrower_id: "",
-              principal_amount: 0,
+              principal_amount: "" as any,
               source_account_id: accounts[0]?._id || "",
               lent_date: new Date().toISOString().split("T")[0],
               expected_return_date: "",

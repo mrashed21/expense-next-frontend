@@ -90,10 +90,10 @@ export default function DebtsPage() {
   } = useForm<DebtFormValues>({
     resolver: zodResolver(debtSchema),
     defaultValues: {
-      amount: 0,
+      amount: "" as any,
       person_name: "",
       type: "",
-      interest_rate: 0,
+      interest_rate: "" as any,
       due_date: "",
       notes: "",
     },
@@ -108,7 +108,7 @@ export default function DebtsPage() {
     formState: { errors: paymentErrors },
   } = useForm<PaymentFormValues>({
     resolver: zodResolver(paymentSchema),
-    defaultValues: { amount: 0, date: "", notes: "" },
+    defaultValues: { amount: "" as any, date: "", notes: "" },
   });
 
   const onAddSubmit = async (data: DebtFormValues) => {
@@ -522,7 +522,7 @@ export default function DebtsPage() {
                     {...registerForm("amount", { setValueAs: (v) => v === "" ? undefined : Number(v) })}
                     type="number"
                     step="0.01"
-                    placeholder="e.g. 50000"
+                    placeholder="0.00"
                     className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                   />
                   {errors.amount && (
@@ -536,10 +536,12 @@ export default function DebtsPage() {
                     Interest Rate (% APY)
                   </label>
                   <input
-                    {...registerForm("interest_rate", { setValueAs: (v) => v === "" ? undefined : Number(v) })}
+                    {...registerForm("interest_rate", {
+                      setValueAs: (v) => (v === "" || v === undefined ? 0 : Number(v)),
+                    })}
                     type="number"
                     step="0.01"
-                    placeholder="e.g. 12"
+                    placeholder="0.00"
                     className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                   />
                 </div>
@@ -624,7 +626,7 @@ export default function DebtsPage() {
                   {...registerPayment("amount", { setValueAs: (v) => v === "" ? undefined : Number(v) })}
                   type="number"
                   step="0.01"
-                  placeholder="e.g. 5000"
+                  placeholder="0.00"
                   max={paymentItem.true_remaining_amount}
                   className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                 />

@@ -27,7 +27,7 @@ import { z } from "zod";
 
 const budgetSchema = z.object({
   category_id: z.string().min(1, "Select a category"),
-  amount: z.number().positive("Amount must be positive"),
+  amount: z.coerce.number().positive("Amount must be positive"),
   warning_threshold: z.coerce.number(),
 });
 
@@ -55,7 +55,7 @@ export default function BudgetsPage() {
     formState: { errors },
   } = useForm<BudgetFormValues>({
     resolver: zodResolver(budgetSchema),
-    defaultValues: { warning_threshold: 80 },
+    defaultValues: { warning_threshold: 80, amount: "" as any },
   });
 
   const onSubmit = async (data: BudgetFormValues) => {
@@ -255,7 +255,7 @@ export default function BudgetsPage() {
                   {...register("amount", { setValueAs: (v) => v === "" ? undefined : Number(v) })}
                   type="number"
                   step="0.01"
-                  placeholder="e.g. 5000"
+                  placeholder="0.00"
                   className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                 />
               </div>

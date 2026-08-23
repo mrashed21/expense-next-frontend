@@ -88,7 +88,7 @@ export default function AccountsPage() {
     formState: { errors: accountErrors },
   } = useForm<AccountFormValues>({
     resolver: zodResolver(accountSchema),
-    defaultValues: { opening_balance: 0, color: "#4F46E5", name: "", type: "" },
+    defaultValues: { opening_balance: "" as any, color: "#4F46E5", name: "", type: "" },
   });
 
   const {
@@ -100,7 +100,7 @@ export default function AccountsPage() {
     formState: { errors: editErrors },
   } = useForm<AccountFormValues>({
     resolver: zodResolver(accountSchema),
-    defaultValues: { opening_balance: 0, color: "#4F46E5", name: "", type: "" },
+    defaultValues: { opening_balance: "" as any, color: "#4F46E5", name: "", type: "" },
   });
 
   const {
@@ -115,8 +115,8 @@ export default function AccountsPage() {
     defaultValues: {
       from_account_id: "",
       to_account_id: "",
-      amount: 0,
-      fee: 0,
+      amount: "" as any,
+      fee: "" as any,
       notes: "",
     },
   });
@@ -420,11 +420,11 @@ export default function AccountsPage() {
                   </label>
                   <input
                     {...registerAccount("opening_balance", {
-                      setValueAs: (v) => v === "" ? undefined : Number(v),
+                      setValueAs: (v) => (v === "" || v === undefined ? 0 : Number(v)),
                     })}
                     type="number"
                     step="0.01"
-                    placeholder="e.g. 10000"
+                    placeholder="0.00"
                     className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                   />
                 </div>
@@ -521,11 +521,11 @@ export default function AccountsPage() {
                   </label>
                   <input
                     {...registerEdit("opening_balance", {
-                      setValueAs: (v) => v === "" ? undefined : Number(v),
+                      setValueAs: (v) => (v === "" || v === undefined ? 0 : Number(v)),
                     })}
                     type="number"
                     step="0.01"
-                    placeholder="e.g. 10000"
+                    placeholder="0.00"
                     className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                   />
                 </div>
@@ -626,7 +626,7 @@ export default function AccountsPage() {
                     {...registerTransfer("amount", { setValueAs: (v) => v === "" ? undefined : Number(v) })}
                     type="number"
                     step="0.01"
-                    placeholder="e.g. 5000"
+                    placeholder="0.00"
                     className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                   />
                 </div>
@@ -635,10 +635,12 @@ export default function AccountsPage() {
                     Fee (Optional)
                   </label>
                   <input
-                    {...registerTransfer("fee", { setValueAs: (v) => v === "" ? undefined : Number(v) })}
+                    {...registerTransfer("fee", {
+                      setValueAs: (v) => (v === "" || v === undefined ? 0 : Number(v)),
+                    })}
                     type="number"
                     step="0.01"
-                    placeholder="e.g. 10"
+                    placeholder="0.00"
                     className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                   />
                 </div>

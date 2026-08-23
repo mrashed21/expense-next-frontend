@@ -67,10 +67,10 @@ export default function AssetsPage() {
   } = useForm<AssetFormValues>({
     resolver: zodResolver(assetSchema),
     defaultValues: {
-      value: 0,
+      value: "" as any,
       name: "",
       type: "",
-      purchase_price: 0,
+      purchase_price: "" as any,
       purchase_date: "",
       notes: "",
     },
@@ -86,10 +86,10 @@ export default function AssetsPage() {
   } = useForm<AssetFormValues>({
     resolver: zodResolver(assetSchema),
     defaultValues: {
-      value: 0,
+      value: "" as any,
       name: "",
       type: "",
-      purchase_price: 0,
+      purchase_price: "" as any,
       purchase_date: "",
       notes: "",
     },
@@ -352,7 +352,7 @@ export default function AssetsPage() {
                     {...registerAsset("value", { setValueAs: (v) => v === "" ? undefined : Number(v) })}
                     type="number"
                     step="0.01"
-                    placeholder="e.g. 500000"
+                    placeholder="0.00"
                     className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                   />
                   {assetErrors.value && (
@@ -367,11 +367,11 @@ export default function AssetsPage() {
                   </label>
                   <input
                     {...registerAsset("purchase_price", {
-                      setValueAs: (v) => v === "" ? undefined : Number(v),
+                      setValueAs: (v) => (v === "" || v === undefined ? 0 : Number(v)),
                     })}
                     type="number"
                     step="0.01"
-                    placeholder="e.g. 450000"
+                    placeholder="0.00"
                     className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                   />
                 </div>
@@ -468,7 +468,7 @@ export default function AssetsPage() {
                     {...registerEdit("value", { setValueAs: (v) => v === "" ? undefined : Number(v) })}
                     type="number"
                     step="0.01"
-                    placeholder="e.g. 500000"
+                    placeholder="0.00"
                     className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                   />
                   {editErrors.value && (
@@ -482,10 +482,12 @@ export default function AssetsPage() {
                     Purchase Price (Opt)
                   </label>
                   <input
-                    {...registerEdit("purchase_price", { setValueAs: (v) => v === "" ? undefined : Number(v) })}
+                    {...registerEdit("purchase_price", {
+                      setValueAs: (v) => (v === "" || v === undefined ? 0 : Number(v)),
+                    })}
                     type="number"
                     step="0.01"
-                    placeholder="e.g. 450000"
+                    placeholder="0.00"
                     className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                   />
                 </div>

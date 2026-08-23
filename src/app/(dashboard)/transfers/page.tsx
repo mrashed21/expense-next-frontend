@@ -28,8 +28,8 @@ import { z } from "zod";
 const transferSchema = z.object({
   from_account_id: z.string().min(1, "Select source account"),
   to_account_id: z.string().min(1, "Select destination account"),
-  amount: z.number().positive("Amount must be positive"),
-  fee: z.number().min(0).optional(),
+  amount: z.coerce.number().positive("Amount must be positive"),
+  fee: z.coerce.number().min(0).optional().or(z.literal(0)),
   notes: z.string().optional(),
 });
 
@@ -56,7 +56,13 @@ export default function TransfersPage() {
     formState: { errors },
   } = useForm<TransferFormValues>({
     resolver: zodResolver(transferSchema),
-    defaultValues: { fee: "" as any },
+    defaultValues: {
+      from_account_id: "",
+      to_account_id: "",
+      amount: "" as any,
+      fee: "" as any,
+      notes: "",
+    },
   });
 
   const onSubmit = async (data: TransferFormValues) => {
@@ -280,7 +286,7 @@ export default function TransfersPage() {
                     {...register("amount", { setValueAs: (v) => v === "" ? undefined : Number(v) })}
                     type="number"
                     step="0.01"
-                    placeholder="e.g. 5000"
+                    placeholder="0.00"
                     className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                   />
                   {errors.amount && (
@@ -294,10 +300,12 @@ export default function TransfersPage() {
                     Fee (Optional)
                   </label>
                   <input
-                    {...register("fee", { setValueAs: (v) => v === "" ? undefined : Number(v) })}
+                    {...register("fee", {
+                      setValueAs: (v) => (v === "" || v === undefined ? 0 : Number(v)),
+                    })}
                     type="number"
                     step="0.01"
-                    placeholder="e.g. 10"
+                    placeholder="0.00"
                     className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                   />
                 </div>

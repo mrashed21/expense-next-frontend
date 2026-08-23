@@ -109,9 +109,9 @@ export default function InvestmentsPage() {
   } = useForm<InvestmentFormValues>({
     resolver: zodResolver(investmentSchema),
     defaultValues: {
-      quantity: 0,
-      purchase_price: 0,
-      current_price: 0,
+      quantity: "" as any,
+      purchase_price: "" as any,
+      current_price: "" as any,
       name: "",
       symbol: "",
       type: "",
@@ -538,7 +538,7 @@ export default function InvestmentsPage() {
                     {...registerForm("quantity", { setValueAs: (v) => v === "" ? undefined : Number(v) })}
                     type="number"
                     step="0.00000001"
-                    placeholder="e.g. 10"
+                    placeholder="0"
                     className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                   />
                   {errors.quantity && (
@@ -555,7 +555,7 @@ export default function InvestmentsPage() {
                     {...registerForm("purchase_price", { setValueAs: (v) => v === "" ? undefined : Number(v) })}
                     type="number"
                     step="0.01"
-                    placeholder="e.g. 450"
+                    placeholder="0.00"
                     className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                   />
                   {errors.purchase_price && (
@@ -572,7 +572,7 @@ export default function InvestmentsPage() {
                     {...registerForm("current_price", { setValueAs: (v) => v === "" ? undefined : Number(v) })}
                     type="number"
                     step="0.01"
-                    placeholder="e.g. 500"
+                    placeholder="0.00"
                     className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                   />
                   {errors.current_price && (

@@ -210,7 +210,7 @@ export function RecurringModal({ isOpen, onClose, item }: Props) {
               onChange={(e) =>
                 setFormData({ ...formData, template_amount: e.target.value })
               }
-              placeholder="e.g. 1000"
+              placeholder="0.00"
               className="bg-secondary/50 border-border"
             />
           </div>
