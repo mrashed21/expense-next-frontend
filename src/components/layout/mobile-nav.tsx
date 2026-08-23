@@ -14,6 +14,7 @@ import {
   Grid,
   HandCoins,
   Home,
+  Landmark,
   LayoutDashboard,
   Megaphone,
   MoreHorizontal,
@@ -58,6 +59,7 @@ const adminMobileItems = [
 /* ─── "More" Drawer Items ──────────────────────────────── */
 const moreItems = [
   { name: "Transfers", href: "/transfers", icon: ArrowRightLeft },
+  { name: "Lending", href: "/lending", icon: Landmark },
   { name: "Categories", href: "/categories", icon: Grid },
   { name: "Budgets", href: "/budgets", icon: PiggyBank },
   { name: "Goals", href: "/goals", icon: Target },

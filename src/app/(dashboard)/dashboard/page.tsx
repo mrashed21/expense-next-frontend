@@ -6,6 +6,7 @@ import { useGetAnalyticsSummaryQuery } from "@/services/analytics-api";
 import { useGetBillsQuery } from "@/services/bill-api";
 import { useGetGoalsQuery } from "@/services/goal-api";
 import { useGetInstallmentsQuery } from "@/services/installment-api";
+import { useGetLoansQuery } from "@/services/loan-api";
 import { useGetCurrentNetWorthQuery } from "@/services/net-worth-api";
 import { useGetTransactionsQuery } from "@/services/transaction-api";
 
@@ -16,6 +17,8 @@ import {
   CircleDollarSign,
   CreditCard,
   FileCheck,
+  HandCoins,
+  Landmark,
   PieChart,
   Plus,
   Receipt,
@@ -85,6 +88,9 @@ export default function DashboardPage() {
   });
   const { data: billsData, isLoading: isLoadingBills } = useGetBillsQuery({});
   const { data: goalsData, isLoading: isLoadingGoals } = useGetGoalsQuery({});
+  const { data: loansData, isLoading: isLoadingLoans } = useGetLoansQuery({
+    limit: 3,
+  });
   const { data: analyticsData } = useGetAnalyticsSummaryQuery({});
 
   const netWorthInfo = netWorthData?.data || {
@@ -98,6 +104,10 @@ export default function DashboardPage() {
   const installments = installmentsData?.data || [];
   const bills = billsData?.data || [];
   const goals = goalsData?.data || [];
+  const activeLoans = (loansData?.data || []).filter(
+    (l: any) => l.outstanding_amount > 0 && l.status !== "CANCELLED",
+  );
+  const loanSummary = loansData?.meta?.summary || { totalOutstanding: 0 };
   const analytics = analyticsData?.data;
 
   const monthlyIncome = useMemo(
@@ -738,6 +748,52 @@ export default function DashboardPage() {
               </p>
             )}
           </div>
+
+          {/* Money Lent (Lending) */}
+          <div className="space-y-2">
+            <h3 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex justify-between items-center">
+              Money Lent
+              <Link
+                href="/lending"
+                className="text-primary hover:underline normal-case text-[10px] font-normal"
+              >
+                All →
+              </Link>
+            </h3>
+            {isLoadingLoans ? (
+              <div className="h-12 bg-secondary rounded-xl animate-pulse" />
+            ) : activeLoans.length > 0 ? (
+              activeLoans.slice(0, 2).map((loan: any) => (
+                <div
+                  key={loan._id}
+                  className="flex items-center justify-between p-2.5 rounded-xl bg-primary/5 border border-primary/10"
+                >
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                      <Landmark className="w-3.5 h-3.5 text-primary" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-xs font-medium text-foreground truncate">
+                        {loan.borrower_name}
+                      </p>
+                      <p className="text-[10px] text-muted-foreground">
+                        {loan.expected_return_date
+                          ? `Due ${formatDate(loan.expected_return_date)}`
+                          : `Lent ${formatDate(loan.lent_date)}`}
+                      </p>
+                    </div>
+                  </div>
+                  <span className="text-sm font-bold text-amber-600 dark:text-amber-400 shrink-0 ml-2">
+                    {formatCurrency(loan.outstanding_amount)}
+                  </span>
+                </div>
+              ))
+            ) : (
+              <p className="text-[11px] text-muted-foreground bg-secondary/30 p-2.5 rounded-xl border border-border text-center">
+                No active lent loans
+              </p>
+            )}
+          </div>
         </div>
       </div>
 
@@ -746,7 +802,7 @@ export default function DashboardPage() {
         <h2 className="text-sm font-semibold text-foreground mb-4">
           Portfolio Overview
         </h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
           <Link
             href="/accounts"
             className="p-4 rounded-xl bg-secondary/40 border border-border hover:border-emerald-500/50 hover:bg-emerald-500/5 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 group"
@@ -757,6 +813,22 @@ export default function DashboardPage() {
             </p>
             <p className="text-sm font-bold text-foreground mt-0.5">
               {formatCurrency(netWorthInfo.breakdown.assets?.cash || 0)}
+            </p>
+          </Link>
+          <Link
+            href="/lending"
+            className="p-4 rounded-xl bg-secondary/40 border border-border hover:border-amber-500/50 hover:bg-amber-500/5 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 group"
+          >
+            <Landmark className="w-4 h-4 text-amber-500 mb-2 group-hover:scale-110 transition-transform" />
+            <p className="text-[11px] text-muted-foreground font-medium">
+              Money Lent (Receivable)
+            </p>
+            <p className="text-sm font-bold text-foreground mt-0.5">
+              {formatCurrency(
+                netWorthInfo.breakdown.assets?.money_lent ??
+                  loanSummary.totalOutstanding ??
+                  0,
+              )}
             </p>
           </Link>
           <Link

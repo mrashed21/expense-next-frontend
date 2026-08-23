@@ -146,6 +146,8 @@ export const apiSlice = createApi({
     "Assets",
     "Investments",
     "Debts",
+    "Loans",
+    "Borrowers",
     "Installments",
     "NetWorth",
     "Recurring",
