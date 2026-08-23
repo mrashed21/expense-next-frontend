@@ -5,6 +5,7 @@ import { EmptyState } from "@/components/custom/empty-state";
 import PhonesInput from "@/components/custom/phone-input";
 import DatePicker from "@/components/custom/date-picker";
 import { SearchableSelect } from "@/components/custom/searchable-select";
+import { TablePagination } from "@/components/custom/table-pagination";
 import { TableSkeleton } from "@/components/custom/table-skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -138,6 +139,8 @@ export default function LendingPage() {
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [viewMode, setViewMode] = useState<"table" | "grid">("table");
   const [selectedBorrowerFilter, setSelectedBorrowerFilter] = useState<string>("");
+  const [loanPage, setLoanPage] = useState(1);
+  const loanPageSize = 10;
 
   // Modals state
   const [isCreateLoanOpen, setIsCreateLoanOpen] = useState(false);
@@ -199,6 +202,11 @@ export default function LendingPage() {
     [borrowersData],
   );
   const loans = loansData?.data || [];
+  const totalLoanPages = Math.ceil(loans.length / loanPageSize);
+  const paginatedLoans = loans.slice(
+    (loanPage - 1) * loanPageSize,
+    loanPage * loanPageSize,
+  );
   const summary = loansData?.meta?.summary || {
     totalLent: 0,
     totalRecovered: 0,
@@ -761,11 +769,12 @@ export default function LendingPage() {
         />
       ) : viewMode === "table" ? (
         /* Table View */
-        <div className="rounded-xl border border-border/80 bg-card overflow-hidden shadow-xs">
+        <div className="rounded-xl border border-border/80 bg-card overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm text-left">
               <thead className="text-xs uppercase bg-secondary/40 text-muted-foreground border-b border-border font-semibold">
                 <tr>
+                  <th className="py-3.5 px-3 w-12 text-center">#</th>
                   <th className="py-3.5 px-4">Borrower</th>
                   <th className="py-3.5 px-4">Principal</th>
                   <th className="py-3.5 px-4 min-w-40">Progress</th>
@@ -779,7 +788,7 @@ export default function LendingPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/60">
-                {loans.map((loan: any) => {
+                {paginatedLoans.map((loan: any, idx: number) => {
                   const progressPct =
                     loan.principal_amount > 0
                       ? Math.min(
@@ -801,6 +810,10 @@ export default function LendingPage() {
                       className="hover:bg-secondary/30 transition-colors group cursor-pointer"
                       onClick={() => openDetailsModal(loan._id)}
                     >
+                      {/* Serial Number */}
+                      <td className="py-3.5 px-3 text-center text-xs font-semibold text-muted-foreground w-12">
+                        {(loanPage - 1) * loanPageSize + idx + 1}
+                      </td>
                       {/* Borrower */}
                       <td className="py-3.5 px-4">
                         <div className="flex items-center gap-2.5">
@@ -1018,142 +1031,159 @@ export default function LendingPage() {
               </tbody>
             </table>
           </div>
+          <TablePagination
+            currentPage={loanPage}
+            totalPages={totalLoanPages}
+            totalItems={loans.length}
+            pageSize={loanPageSize}
+            onPageChange={(p) => setLoanPage(p)}
+          />
         </div>
       ) : (
         /* Grid Card View */
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {loans.map((loan: any) => {
-            const progressPct =
-              loan.principal_amount > 0
-                ? Math.min(
-                    100,
-                    Math.round(
-                      (loan.recovered_amount / loan.principal_amount) * 100,
-                    ),
-                  )
-                : 0;
+        <div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {paginatedLoans.map((loan: any) => {
+              const progressPct =
+                loan.principal_amount > 0
+                  ? Math.min(
+                      100,
+                      Math.round(
+                        (loan.recovered_amount / loan.principal_amount) * 100,
+                      ),
+                    )
+                  : 0;
 
-            const isOverdue =
-              loan.expected_return_date &&
-              new Date(loan.expected_return_date).getTime() < Date.now() &&
-              loan.outstanding_amount > 0;
+              const isOverdue =
+                loan.expected_return_date &&
+                new Date(loan.expected_return_date).getTime() < Date.now() &&
+                loan.outstanding_amount > 0;
 
-            return (
-              <Card
-                key={loan._id}
-                className="border-border/80 bg-card hover:border-primary/40 transition-all cursor-pointer shadow-xs group"
-                onClick={() => openDetailsModal(loan._id)}
-              >
-                <CardContent className="p-4 space-y-3.5">
-                  {/* Card Header */}
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="w-9 h-9 rounded-xl bg-primary/10 text-primary font-bold flex items-center justify-center text-sm shrink-0 border border-primary/20">
-                        {loan.borrower_name?.charAt(0)?.toUpperCase() || "B"}
+              return (
+                <Card
+                  key={loan._id}
+                  className="border-border/80 bg-card hover:border-primary/40 transition-all cursor-pointer group"
+                  onClick={() => openDetailsModal(loan._id)}
+                >
+                  <CardContent className="p-4 space-y-3.5">
+                    {/* Card Header */}
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="w-9 h-9 rounded-xl bg-primary/10 text-primary font-bold flex items-center justify-center text-sm shrink-0 border border-primary/20">
+                          {loan.borrower_name?.charAt(0)?.toUpperCase() || "B"}
+                        </div>
+                        <div className="min-w-0">
+                          <h4 className="font-semibold text-sm text-foreground truncate">
+                            {loan.borrower_name}
+                          </h4>
+                          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                            <span>{formatDate(loan.lent_date)}</span>
+                            <span>•</span>
+                            <span className="truncate">{loan.source_account_name}</span>
+                          </div>
+                        </div>
                       </div>
-                      <div className="min-w-0">
-                        <h4 className="font-semibold text-sm text-foreground truncate">
-                          {loan.borrower_name}
-                        </h4>
-                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                          <span>{formatDate(loan.lent_date)}</span>
-                          <span>•</span>
-                          <span className="truncate">{loan.source_account_name}</span>
+
+                      <div>{getStatusBadge(loan.display_status || loan.status)}</div>
+                    </div>
+
+                    {/* Amounts */}
+                    <div className="grid grid-cols-2 gap-2 p-2.5 rounded-lg bg-secondary/40 border border-border/40">
+                      <div>
+                        <div className="text-[11px] text-muted-foreground">
+                          Principal
+                        </div>
+                        <div className="text-sm font-semibold text-foreground">
+                          {formatCurrency(loan.principal_amount)}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="text-[11px] text-muted-foreground">
+                          Outstanding
+                        </div>
+                        <div
+                          className={`text-sm font-bold ${
+                            loan.outstanding_amount > 0
+                              ? isOverdue
+                                ? "text-rose-600 dark:text-rose-400"
+                                : "text-amber-600 dark:text-amber-400"
+                              : "text-muted-foreground"
+                          }`}
+                        >
+                          {formatCurrency(loan.outstanding_amount)}
                         </div>
                       </div>
                     </div>
 
-                    <div>{getStatusBadge(loan.display_status || loan.status)}</div>
-                  </div>
-
-                  {/* Amounts */}
-                  <div className="grid grid-cols-2 gap-2 p-2.5 rounded-lg bg-secondary/40 border border-border/40">
-                    <div>
-                      <div className="text-[11px] text-muted-foreground">
-                        Principal
-                      </div>
-                      <div className="text-sm font-semibold text-foreground">
-                        {formatCurrency(loan.principal_amount)}
-                      </div>
-                    </div>
-                    <div>
-                      <div className="text-[11px] text-muted-foreground">
-                        Outstanding
-                      </div>
-                      <div
-                        className={`text-sm font-bold ${
-                          loan.outstanding_amount > 0
-                            ? isOverdue
-                              ? "text-rose-600 dark:text-rose-400"
-                              : "text-amber-600 dark:text-amber-400"
-                            : "text-muted-foreground"
-                        }`}
-                      >
-                        {formatCurrency(loan.outstanding_amount)}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Progress Bar */}
-                  <div className="space-y-1">
-                    <div className="flex justify-between text-[11px] text-muted-foreground">
-                      <span>Recovered: {formatCurrency(loan.recovered_amount)}</span>
-                      <span className="font-medium text-foreground">
-                        {progressPct}%
-                      </span>
-                    </div>
-                    <div className="w-full h-1.5 rounded-full bg-secondary overflow-hidden">
-                      <div
-                        className={`h-full transition-all duration-300 ${
-                          progressPct === 100
-                            ? "bg-emerald-500"
-                            : progressPct > 0
-                            ? "bg-primary"
-                            : "bg-muted"
-                        }`}
-                        style={{ width: `${progressPct}%` }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Footer info & quick button */}
-                  <div
-                    className="flex items-center justify-between pt-2 border-t border-border/40"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <div className="text-xs text-muted-foreground">
-                      {loan.expected_return_date ? (
-                        <span
-                          className={
-                            isOverdue
-                              ? "text-rose-600 font-semibold"
-                              : "text-muted-foreground"
-                          }
-                        >
-                          Due: {formatDate(loan.expected_return_date)}
+                    {/* Progress Bar */}
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-[11px] text-muted-foreground">
+                        <span>Recovered: {formatCurrency(loan.recovered_amount)}</span>
+                        <span className="font-medium text-foreground">
+                          {progressPct}%
                         </span>
-                      ) : (
-                        <span>No due date</span>
-                      )}
+                      </div>
+                      <div className="w-full h-1.5 rounded-full bg-secondary overflow-hidden">
+                        <div
+                          className={`h-full transition-all duration-300 ${
+                            progressPct === 100
+                              ? "bg-emerald-500"
+                              : progressPct > 0
+                              ? "bg-primary"
+                              : "bg-muted"
+                          }`}
+                          style={{ width: `${progressPct}%` }}
+                        />
+                      </div>
                     </div>
 
-                    {loan.outstanding_amount > 0 &&
-                      loan.status !== "CANCELLED" &&
-                      loan.status !== "WRITTEN_OFF" && (
-                        <Button
-                          size="sm"
-                          className="h-7 text-xs gap-1 font-medium"
-                          onClick={() => openRepaymentModal(loan)}
-                        >
-                          <Plus className="w-3 h-3" />
-                          Repay
-                        </Button>
-                      )}
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
+                    {/* Footer info & quick button */}
+                    <div
+                      className="flex items-center justify-between pt-2 border-t border-border/40"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <div className="text-xs text-muted-foreground">
+                        {loan.expected_return_date ? (
+                          <span
+                            className={
+                              isOverdue
+                                ? "text-rose-600 font-semibold"
+                                : "text-muted-foreground"
+                            }
+                          >
+                            Due: {formatDate(loan.expected_return_date)}
+                          </span>
+                        ) : (
+                          <span>No due date</span>
+                        )}
+                      </div>
+
+                      {loan.outstanding_amount > 0 &&
+                        loan.status !== "CANCELLED" &&
+                        loan.status !== "WRITTEN_OFF" && (
+                          <Button
+                            size="sm"
+                            className="h-7 text-xs gap-1 font-medium"
+                            onClick={() => openRepaymentModal(loan)}
+                          >
+                            <Plus className="w-3 h-3" />
+                            Repay
+                          </Button>
+                        )}
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+          <TablePagination
+            currentPage={loanPage}
+            totalPages={totalLoanPages}
+            totalItems={loans.length}
+            pageSize={loanPageSize}
+            onPageChange={(p) => setLoanPage(p)}
+            className="mt-4"
+          />
         </div>
       )}
 
@@ -1760,59 +1790,63 @@ export default function LendingPage() {
                     No repayment received yet.
                   </div>
                 ) : (
-                  <div className="rounded-xl border border-border/80 bg-card overflow-hidden">
-                    <table className="w-full text-xs text-left">
-                      <thead className="bg-secondary/40 text-muted-foreground border-b border-border font-semibold">
-                        <tr>
-                          <th className="py-2.5 px-3">Date</th>
-                          <th className="py-2.5 px-3">Amount</th>
-                          <th className="py-2.5 px-3">Method & Account</th>
-                          <th className="py-2.5 px-3">Note</th>
-                          <th className="py-2.5 px-3 text-right">Action</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-border/60">
-                        {singleLoanData.data.repayments.map((rep: any) => (
-                          <tr key={rep._id} className="hover:bg-secondary/20">
-                            <td className="py-2.5 px-3 font-medium">
-                              {formatDate(rep.payment_date)}
-                            </td>
-                            <td className="py-2.5 px-3 font-bold text-emerald-600 dark:text-emerald-400">
-                              +{formatCurrency(rep.amount)}
-                            </td>
-                            <td className="py-2.5 px-3">
-                              <div className="font-medium text-foreground">
-                                {rep.payment_method}
-                              </div>
-                              <div className="text-[11px] text-muted-foreground">
-                                {rep.account_id?.name || "Account"}
-                              </div>
-                            </td>
-                            <td className="py-2.5 px-3 text-muted-foreground max-w-[150px] truncate">
-                              {rep.notes || "-"}
-                            </td>
-                            <td className="py-2.5 px-3 text-right">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-6 px-2 text-[11px] text-rose-600 hover:bg-rose-500/10"
-                                onClick={() =>
-                                  setReversalInfo({
-                                    loanId: singleLoanData.data._id,
-                                    repaymentId: rep._id,
-                                    amount: rep.amount,
-                                  })
-                                }
-                                title="Reverse this repayment"
-                              >
-                                Reverse
-                              </Button>
-                            </td>
+                    <div className="rounded-xl border border-border/80 bg-card overflow-hidden">
+                      <table className="w-full text-xs text-left">
+                        <thead className="bg-secondary/40 text-muted-foreground border-b border-border font-semibold">
+                          <tr>
+                            <th className="py-2.5 px-3 w-10 text-center">#</th>
+                            <th className="py-2.5 px-3">Date</th>
+                            <th className="py-2.5 px-3">Amount</th>
+                            <th className="py-2.5 px-3">Method & Account</th>
+                            <th className="py-2.5 px-3">Note</th>
+                            <th className="py-2.5 px-3 text-right">Action</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                        </thead>
+                        <tbody className="divide-y divide-border/60">
+                          {singleLoanData.data.repayments.map((rep: any, rIdx: number) => (
+                            <tr key={rep._id} className="hover:bg-secondary/20">
+                              <td className="py-2.5 px-3 text-center text-muted-foreground font-semibold">
+                                {rIdx + 1}
+                              </td>
+                              <td className="py-2.5 px-3 font-medium">
+                                {formatDate(rep.payment_date)}
+                              </td>
+                              <td className="py-2.5 px-3 font-bold text-emerald-600 dark:text-emerald-400">
+                                +{formatCurrency(rep.amount)}
+                              </td>
+                              <td className="py-2.5 px-3">
+                                <div className="font-medium text-foreground">
+                                  {rep.payment_method}
+                                </div>
+                                <div className="text-[11px] text-muted-foreground">
+                                  {rep.account_id?.name || "Account"}
+                                </div>
+                              </td>
+                              <td className="py-2.5 px-3 text-muted-foreground max-w-[150px] truncate">
+                                {rep.notes || "-"}
+                              </td>
+                              <td className="py-2.5 px-3 text-right">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-6 px-2 text-[11px] text-rose-600 hover:bg-rose-500/10"
+                                  onClick={() =>
+                                    setReversalInfo({
+                                      loanId: singleLoanData.data._id,
+                                      repaymentId: rep._id,
+                                      amount: rep.amount,
+                                    })
+                                  }
+                                  title="Reverse this repayment"
+                                >
+                                  Reverse
+                                </Button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                 )}
               </div>
             </div>

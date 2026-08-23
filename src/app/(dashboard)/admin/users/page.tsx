@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { TablePagination } from "@/components/custom/table-pagination";
 import {
   Dialog,
   DialogContent,
@@ -231,6 +232,7 @@ export default function AdminUsersPage() {
           <Table>
             <TableHeader className="bg-secondary/40">
               <TableRow>
+                <TableHead className="font-bold w-12 text-center">#</TableHead>
                 <TableHead className="font-bold">User Details</TableHead>
                 <TableHead className="font-bold">Status</TableHead>
                 <TableHead className="font-bold text-center">Txns</TableHead>
@@ -244,22 +246,25 @@ export default function AdminUsersPage() {
             <TableBody>
               {usersLoading ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="h-32 text-center">
+                  <TableCell colSpan={7} className="h-32 text-center">
                     <Loader2 className="w-6 h-6 animate-spin mx-auto text-primary" />
                   </TableCell>
                 </TableRow>
               ) : users.length === 0 ? (
                 <TableRow>
                   <TableCell
-                    colSpan={6}
+                    colSpan={7}
                     className="h-32 text-center text-muted-foreground"
                   >
                     No users found matching your search.
                   </TableCell>
                 </TableRow>
               ) : (
-                users.map((u: any) => (
+                users.map((u: any, idx: number) => (
                   <TableRow key={u._id} className="hover:bg-secondary/20">
+                    <TableCell className="text-center text-xs font-semibold text-muted-foreground w-12">
+                      {(page - 1) * (pagination.limit || 10) + idx + 1}
+                    </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm uppercase">
@@ -360,33 +365,14 @@ export default function AdminUsersPage() {
         </div>
 
         {/* Pagination */}
-        {pagination.totalPages > 1 && (
-          <div className="flex items-center justify-between pt-4">
-            <p className="text-sm text-muted-foreground">
-              Showing page {pagination.page} of {pagination.totalPages}
-            </p>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page === 1}
-              >
-                Previous
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() =>
-                  setPage((p) => Math.min(pagination.totalPages, p + 1))
-                }
-                disabled={page === pagination.totalPages}
-              >
-                Next
-              </Button>
-            </div>
-          </div>
-        )}
+        <TablePagination
+          currentPage={page}
+          totalPages={pagination.totalPages}
+          totalItems={pagination.total}
+          pageSize={pagination.limit || 10}
+          onPageChange={(p) => setPage(p)}
+          className="pt-3 border-t border-border"
+        />
       </Card>
 
       {/* Confirmation Dialog */}

@@ -5,6 +5,7 @@ import { EmptyState } from "@/components/custom/empty-state";
 import FormDatePicker from "@/components/custom/form-date-picker";
 import FormSelect from "@/components/custom/form-select";
 import { PromptDialog } from "@/components/custom/prompt-dialog";
+import { TablePagination } from "@/components/custom/table-pagination";
 import { TableSkeleton } from "@/components/custom/table-skeleton";
 import {
   Select,
@@ -31,9 +32,6 @@ import {
   useGetSavedFiltersQuery,
 } from "@/services/saved-filter-api";
 import {
-  useBulkDeleteTransactionsMutation,
-  useBulkEditTransactionsMutation,
-  useBulkRestoreTransactionsMutation,
   useCreateTransactionMutation,
   useDeleteTransactionMutation,
   useGetTransactionsQuery,
@@ -85,16 +83,12 @@ export default function TransactionsPage() {
   const [typeFilter, setTypeFilter] = useState("all");
   const [page, setPage] = useState(1);
   const [isAddOpen, setIsAddOpen] = useState(false);
-  const [isBulkEditOpen, setIsBulkEditOpen] = useState(false);
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [activeFilterId, setActiveFilterId] = useState<string>("none");
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [showBulkDeleteConfirm, setShowBulkDeleteConfirm] = useState(false);
   const [showSaveFilterPrompt, setShowSaveFilterPrompt] = useState(false);
 
   useEffect(() => {
     setPage(1);
-    setSelectedIds([]);
   }, [debouncedSearch, dateRange, typeFilter]);
 
   const { data: transactionsData, isLoading } = useGetTransactionsQuery({
@@ -102,7 +96,7 @@ export default function TransactionsPage() {
     dateRange,
     type: typeFilter,
     page,
-    limit: 20,
+    limit: 10,
   });
 
   const { data: accountsData } = useGetAccountsQuery({});
@@ -112,12 +106,7 @@ export default function TransactionsPage() {
   const [createTransactionApi, { isLoading: isCreating }] =
     useCreateTransactionMutation();
   const [deleteTransactionApi] = useDeleteTransactionMutation();
-  const [bulkDeleteApi, { isLoading: isBulkDeleting }] =
-    useBulkDeleteTransactionsMutation();
-  const [bulkEditApi, { isLoading: isBulkEditing }] =
-    useBulkEditTransactionsMutation();
   const [restoreApi] = useRestoreTransactionMutation();
-  const [bulkRestoreApi] = useBulkRestoreTransactionsMutation();
   const [createSavedFilterApi] = useCreateSavedFilterMutation();
 
   const transactions = transactionsData?.data || [];
@@ -196,62 +185,7 @@ export default function TransactionsPage() {
     }
   };
 
-  const handleBulkDelete = () => {
-    if (selectedIds.length === 0) return;
-    setShowBulkDeleteConfirm(true);
-  };
 
-  const confirmBulkDelete = async () => {
-    try {
-      await bulkDeleteApi(selectedIds).unwrap();
-      const idsToRestore = [...selectedIds];
-      setSelectedIds([]);
-
-      toast.success(`${idsToRestore.length} transactions deleted.`, {
-        action: {
-          label: "Undo All",
-          onClick: async () => {
-            try {
-              await bulkRestoreApi(idsToRestore).unwrap();
-              toast.success("Transactions restored.");
-            } catch (err: any) {
-              toast.error("Failed to restore some transactions");
-            }
-          },
-        },
-        duration: 6000,
-      });
-    } catch (err: any) {
-      toast.error(err?.data?.message || "Failed to bulk delete");
-    } finally {
-      setShowBulkDeleteConfirm(false);
-    }
-  };
-
-  const handleBulkEdit = async (data: any) => {
-    try {
-      await bulkEditApi({ ids: selectedIds, ...data }).unwrap();
-      toast.success(`${selectedIds.length} transactions updated.`);
-      setIsBulkEditOpen(false);
-      setSelectedIds([]);
-    } catch (err: any) {
-      toast.error(err?.data?.message || "Failed to bulk edit");
-    }
-  };
-
-  const toggleSelectAll = () => {
-    if (selectedIds.length === transactions.length) {
-      setSelectedIds([]);
-    } else {
-      setSelectedIds(transactions.map((t: any) => t._id));
-    }
-  };
-
-  const toggleSelect = (id: string) => {
-    setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
-    );
-  };
 
   const handleSaveFilter = () => {
     setShowSaveFilterPrompt(true);
@@ -382,23 +316,16 @@ export default function TransactionsPage() {
           <>
             {/* ── Mobile Card View (< md) ── */}
             <div className="md:hidden divide-y divide-border">
-              {transactions.map((tx: any) => (
+              {transactions.map((tx: any, idx: number) => (
                 <div
                   key={tx._id}
-                  className={`p-4 transition-colors ${
-                    selectedIds.includes(tx._id)
-                      ? "bg-primary/5"
-                      : "hover:bg-secondary/30"
-                  }`}
+                  className="p-4 hover:bg-secondary/30 transition-colors"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-3 min-w-0">
-                      <input
-                        type="checkbox"
-                        className="rounded border-border bg-background accent-primary shrink-0 mt-0.5"
-                        checked={selectedIds.includes(tx._id)}
-                        onChange={() => toggleSelect(tx._id)}
-                      />
+                      <span className="text-xs font-bold text-muted-foreground w-6 shrink-0">
+                        #{(page - 1) * 10 + idx + 1}
+                      </span>
                       <div className="min-w-0">
                         <p className="font-bold text-foreground text-sm truncate">
                           {tx.notes || tx.category_id?.name || "Transaction"}
@@ -458,17 +385,7 @@ export default function TransactionsPage() {
               <Table>
                 <TableHeader className="sticky top-0 z-10 bg-secondary/95 backdrop-blur-md">
                   <TableRow className="text-muted-foreground text-[11px] font-bold uppercase tracking-wider border-b border-border">
-                    <TableHead className="p-4 w-10">
-                      <input
-                        type="checkbox"
-                        className="rounded border-border bg-background accent-primary"
-                        checked={
-                          transactions.length > 0 &&
-                          selectedIds.length === transactions.length
-                        }
-                        onChange={toggleSelectAll}
-                      />
-                    </TableHead>
+                    <TableHead className="p-4 w-12 text-center">#</TableHead>
                     <TableHead className="p-4">Date</TableHead>
                     <TableHead className="p-4">Description / Notes</TableHead>
                     <TableHead className="p-4">Category</TableHead>
@@ -479,18 +396,13 @@ export default function TransactionsPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody className="divide-y divide-border text-xs font-medium">
-                  {transactions.map((tx: any) => (
+                  {transactions.map((tx: any, idx: number) => (
                     <TableRow
                       key={tx._id}
-                      className={`transition-colors ${selectedIds.includes(tx._id) ? "bg-primary/5 hover:bg-primary/10" : "hover:bg-secondary/30"}`}
+                      className="hover:bg-secondary/30 transition-colors"
                     >
-                      <TableCell className="p-4">
-                        <input
-                          type="checkbox"
-                          className="rounded border-border bg-background accent-primary"
-                          checked={selectedIds.includes(tx._id)}
-                          onChange={() => toggleSelect(tx._id)}
-                        />
+                      <TableCell className="p-4 text-center whitespace-nowrap text-muted-foreground font-semibold w-12">
+                        {(page - 1) * 10 + idx + 1}
                       </TableCell>
                       <TableCell className="p-4 whitespace-nowrap text-muted-foreground font-semibold">
                         {formatDate(tx.date)}
@@ -546,78 +458,30 @@ export default function TransactionsPage() {
                 </TableBody>
               </Table>
             </div>
+
+            {/* Pagination Controls */}
+            {meta && (
+              <TablePagination
+                currentPage={meta.page}
+                totalPages={meta.totalPage}
+                totalItems={meta.total}
+                pageSize={10}
+                onPageChange={(newPage) => setPage(newPage)}
+              />
+            )}
           </>
         ) : (
-          <EmptyState
-            title="No transactions found"
-            description="We couldn't find any transactions matching your current filters."
-            icon={<Receipt className="w-8 h-8" />}
-            actionLabel="Record Transaction"
-            onAction={() => setIsAddOpen(true)}
-          />
+          <div className="py-12">
+            <EmptyState
+              title="No Transactions Found"
+              description="Record income, expenses, or refunds to track your finances."
+              actionLabel="Record Transaction"
+              icon={<Receipt className="w-8 h-8" />}
+              onAction={() => setIsAddOpen(true)}
+            />
+          </div>
         )}
       </div>
-
-      {/* Pagination Controls */}
-      {meta && meta.totalPage > 1 && (
-        <div className="flex items-center justify-between p-4 bg-card rounded-2xl border border-border">
-          <div className="text-xs text-muted-foreground font-medium">
-            Showing page{" "}
-            <span className="text-foreground font-bold">{meta.page}</span> of{" "}
-            <span className="text-foreground font-bold">{meta.totalPage}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={meta.page <= 1}
-              className="p-1.5 rounded-lg border border-border text-foreground hover:bg-secondary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => setPage((p) => Math.min(meta.totalPage, p + 1))}
-              disabled={meta.page >= meta.totalPage}
-              className="p-1.5 rounded-lg border border-border text-foreground hover:bg-secondary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Floating Bulk Action Bar */}
-      {selectedIds.length > 0 && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-card border border-border rounded-full px-6 py-3 flex items-center gap-4 animate-in slide-in-from-bottom-10 fade-in duration-300">
-          <span className="text-sm font-bold bg-primary/10 text-primary px-2.5 py-0.5 rounded-full">
-            {selectedIds.length} selected
-          </span>
-          <div className="w-px h-6 bg-border mx-2"></div>
-          <button
-            onClick={() => setIsBulkEditOpen(true)}
-            className="flex items-center gap-2 text-sm font-medium text-foreground hover:bg-secondary px-3 py-1.5 rounded-xl transition-colors"
-          >
-            Edit All
-          </button>
-          <button
-            onClick={handleBulkDelete}
-            disabled={isBulkDeleting}
-            className="flex items-center gap-2 text-sm font-medium text-destructive hover:bg-destructive/10 px-3 py-1.5 rounded-xl transition-colors disabled:opacity-50"
-          >
-            {isBulkDeleting ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <Trash2 className="w-4 h-4" />
-            )}
-            Delete All
-          </button>
-          <button
-            onClick={() => setSelectedIds([])}
-            className="p-1.5 rounded-full hover:bg-secondary text-muted-foreground transition-colors ml-2"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-      )}
 
       {/* Add Transaction Modal */}
       {isAddOpen && (
@@ -751,78 +615,6 @@ export default function TransactionsPage() {
         </div>
       )}
 
-      {/* Bulk Edit Modal */}
-      {isBulkEditOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="bulk-modal-title"
-            className="w-full max-w-sm bg-card border border-border p-6 rounded-3xl space-y-4"
-          >
-            <div className="flex items-center justify-between border-b border-border pb-3">
-              <h3
-                id="bulk-modal-title"
-                className="text-base font-bold text-foreground"
-              >
-                Bulk Edit ({selectedIds.length} selected)
-              </h3>
-              <button
-                onClick={() => setIsBulkEditOpen(false)}
-                className="text-muted-foreground hover:text-foreground"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                const formData = new FormData(e.currentTarget);
-                const catId = formData.get("category_id") as string;
-                if (!catId || catId === "none") return;
-                handleBulkEdit({ category_id: catId });
-              }}
-              className="space-y-4"
-            >
-              <div className="space-y-1">
-                <label className="text-xs font-semibold text-foreground">
-                  Update Category
-                </label>
-                <select
-                  name="category_id"
-                  className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
-                  required
-                >
-                  <option value="">Select a new category...</option>
-                  {categories.map((c: any) => (
-                    <option key={c._id} value={c._id}>
-                      {c.name} ({c.type})
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <p className="text-[10px] text-muted-foreground italic">
-                Note: Only category updating is supported in MVP for bulk
-                operations.
-              </p>
-
-              <button
-                type="submit"
-                disabled={isBulkEditing}
-                className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground font-semibold text-xs hover:bg-primary/90 transition-colors flex justify-center"
-              >
-                {isBulkEditing ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  "Apply Changes"
-                )}
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
-
       {/* Delete Single Confirmation */}
       <ConfirmDialog
         isOpen={!!deleteId}
@@ -833,18 +625,6 @@ export default function TransactionsPage() {
         confirmText="Delete"
         variant="destructive"
       />
-
-      {/* Delete Bulk Confirmation */}
-      <ConfirmDialog
-        isOpen={showBulkDeleteConfirm}
-        onClose={() => setShowBulkDeleteConfirm(false)}
-        onConfirm={confirmBulkDelete}
-        title="Delete Multiple Transactions"
-        description={`Are you sure you want to delete ${selectedIds.length} selected transactions?`}
-        confirmText={`Delete ${selectedIds.length} Items`}
-        variant="destructive"
-      />
-
       {/* Save Filter Prompt */}
       <PromptDialog
         isOpen={showSaveFilterPrompt}

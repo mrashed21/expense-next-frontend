@@ -4,6 +4,7 @@ import AvatarCropper from "@/components/custom/avatar-cropper";
 import FormSelect from "@/components/custom/form-select";
 import PhonesInput from "@/components/custom/phone-input";
 import { SearchableSelect } from "@/components/custom/searchable-select";
+import { TablePagination } from "@/components/custom/table-pagination";
 import { bangladeshCities, cityAreas } from "@/lib/location-data";
 import { formatDate } from "@/lib/utils";
 import { logout, updateUser } from "@/redux/slices/auth-slice";
@@ -151,6 +152,13 @@ export default function ProfilePage() {
   }, [rawUser]);
 
   const history = historyData?.data || [];
+  const [historyPage, setHistoryPage] = useState(1);
+  const historyPageSize = 10;
+  const totalHistoryPages = Math.ceil(history.length / historyPageSize);
+  const paginatedHistory = history.slice(
+    (historyPage - 1) * historyPageSize,
+    historyPage * historyPageSize,
+  );
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isCropModalOpen, setIsCropModalOpen] = useState(false);
@@ -937,6 +945,9 @@ export default function ProfilePage() {
           <table className="w-full text-left text-xs border-collapse">
             <thead>
               <tr className="bg-secondary/60 text-muted-foreground uppercase text-[10px] font-bold border-b border-border">
+                <th scope="col" className="p-3 w-10 text-center whitespace-nowrap">
+                  #
+                </th>
                 <th scope="col" className="p-3 whitespace-nowrap">
                   Device Name
                 </th>
@@ -953,11 +964,14 @@ export default function ProfilePage() {
             </thead>
             <tbody className="divide-y divide-border font-medium">
               {devicesData?.data?.length > 0 ? (
-                devicesData.data.map((d: any) => (
+                devicesData.data.map((d: any, dIdx: number) => (
                   <tr
                     key={d._id}
                     className="hover:bg-secondary/30 transition-colors"
                   >
+                    <td className="p-3 text-center text-muted-foreground font-semibold w-10">
+                      {dIdx + 1}
+                    </td>
                     <td className="p-3 text-foreground font-bold flex items-center gap-2 whitespace-nowrap">
                       <Smartphone className="w-4 h-4 text-muted-foreground shrink-0" />
                       {d.device_name}
@@ -981,7 +995,7 @@ export default function ProfilePage() {
               ) : (
                 <tr>
                   <td
-                    colSpan={4}
+                    colSpan={5}
                     className="text-center py-6 text-muted-foreground whitespace-nowrap"
                   >
                     No trusted devices found.
@@ -1002,6 +1016,9 @@ export default function ProfilePage() {
           <table className="w-full text-left text-xs border-collapse">
             <thead>
               <tr className="bg-secondary/60 text-muted-foreground uppercase text-[10px] font-bold border-b border-border">
+                <th scope="col" className="p-3 w-10 text-center whitespace-nowrap">
+                  #
+                </th>
                 <th scope="col" className="p-3 whitespace-nowrap">
                   IP Address
                 </th>
@@ -1014,12 +1031,15 @@ export default function ProfilePage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border font-medium">
-              {history.length > 0 ? (
-                history.map((h: any) => (
+              {paginatedHistory.length > 0 ? (
+                paginatedHistory.map((h: any, hIdx: number) => (
                   <tr
                     key={h._id}
                     className="hover:bg-secondary/30 transition-colors"
                   >
+                    <td className="p-3 text-center text-muted-foreground font-semibold w-10">
+                      {(historyPage - 1) * historyPageSize + hIdx + 1}
+                    </td>
                     <td className="p-3 font-mono text-foreground font-bold whitespace-nowrap">
                       {h.ip_address}
                     </td>
@@ -1034,7 +1054,7 @@ export default function ProfilePage() {
               ) : (
                 <tr>
                   <td
-                    colSpan={3}
+                    colSpan={4}
                     className="text-center py-6 text-muted-foreground whitespace-nowrap"
                   >
                     No login history found.
@@ -1044,6 +1064,13 @@ export default function ProfilePage() {
             </tbody>
           </table>
         </div>
+        <TablePagination
+          currentPage={historyPage}
+          totalPages={totalHistoryPages}
+          totalItems={history.length}
+          pageSize={historyPageSize}
+          onPageChange={(p) => setHistoryPage(p)}
+        />
       </div>
 
       {/* Delete Account Confirmation Modal */}

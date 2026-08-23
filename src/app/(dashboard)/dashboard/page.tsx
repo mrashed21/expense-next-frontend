@@ -17,7 +17,6 @@ import {
   CircleDollarSign,
   CreditCard,
   FileCheck,
-  HandCoins,
   Landmark,
   PieChart,
   Plus,
@@ -25,7 +24,7 @@ import {
   Target,
   TrendingDown,
   TrendingUp,
-  Wallet,
+  Wallet
 } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
@@ -131,9 +130,9 @@ export default function DashboardPage() {
   const savingsRate =
     monthlyIncome > 0
       ? Math.max(
-          0,
-          Math.round(((monthlyIncome - monthlyExpense) / monthlyIncome) * 100),
-        )
+        0,
+        Math.round(((monthlyIncome - monthlyExpense) / monthlyIncome) * 100),
+      )
       : 0;
 
   const netSavings = Math.max(0, monthlyIncome - monthlyExpense);
@@ -225,11 +224,10 @@ export default function DashboardPage() {
             <button
               key={opt.value}
               onClick={() => setDateRange(opt.value)}
-              className={`whitespace-nowrap shrink-0 px-4 py-2 sm:px-3 sm:py-1.5 rounded-xl text-xs font-medium transition-all ${
-                dateRange === opt.value
+              className={`whitespace-nowrap shrink-0 px-4 py-2 sm:px-3 sm:py-1.5 rounded-xl text-xs font-medium transition-all ${dateRange === opt.value
                   ? "bg-primary text-primary-foreground shadow-sm"
                   : "bg-secondary/60 text-muted-foreground hover:bg-secondary hover:text-foreground"
-              }`}
+                }`}
             >
               {opt.label}
             </button>
@@ -566,11 +564,10 @@ export default function DashboardPage() {
                   className="flex items-center gap-3 py-2.5 first:pt-0 last:pb-0"
                 >
                   <div
-                    className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                      tx.type === "income"
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${tx.type === "income"
                         ? "bg-emerald-500/10"
                         : "bg-rose-500/10"
-                    }`}
+                      }`}
                   >
                     {tx.type === "income" ? (
                       <TrendingUp className="w-3.5 h-3.5 text-emerald-500" />
@@ -588,11 +585,10 @@ export default function DashboardPage() {
                     </p>
                   </div>
                   <span
-                    className={`text-sm font-semibold shrink-0 ${
-                      tx.type === "income"
+                    className={`text-sm font-semibold shrink-0 ${tx.type === "income"
                         ? "text-emerald-500"
                         : "text-foreground"
-                    }`}
+                      }`}
                   >
                     {tx.type === "income" ? "+" : "-"}
                     {formatCurrency(tx.amount)}
@@ -828,8 +824,8 @@ export default function DashboardPage() {
             <p className="text-sm font-bold text-foreground mt-0.5">
               {formatCurrency(
                 netWorthInfo.breakdown.assets?.money_lent ??
-                  loanSummary.totalOutstanding ??
-                  0,
+                loanSummary.totalOutstanding ??
+                0,
               )}
             </p>
           </Link>

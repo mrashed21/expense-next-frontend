@@ -2,6 +2,7 @@
 
 import { EmptyState } from "@/components/custom/empty-state";
 import FormSelect from "@/components/custom/form-select";
+import { TablePagination } from "@/components/custom/table-pagination";
 import { TableSkeleton } from "@/components/custom/table-skeleton";
 import {
   Table,
@@ -43,9 +44,16 @@ export default function TransfersPage() {
     useCreateTransferMutation();
 
   const [isOpen, setIsOpen] = useState(false);
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
 
   const transfers = transfersData?.data || [];
   const accounts = accountsData?.data || [];
+  const totalPages = Math.ceil(transfers.length / pageSize);
+  const paginatedTransfers = transfers.slice(
+    (page - 1) * pageSize,
+    page * pageSize,
+  );
 
   const {
     register,
@@ -159,9 +167,12 @@ export default function TransfersPage() {
             <>
               {/* ── Mobile Card View (< md) ── */}
               <div className="md:hidden divide-y divide-border">
-                {transfers.map((t: any) => (
+                {paginatedTransfers.map((t: any, idx: number) => (
                   <div key={t._id} className="p-4 hover:bg-secondary/20 transition-colors">
                     <div className="flex items-start justify-between gap-3">
+                      <span className="text-xs font-bold text-muted-foreground w-6 shrink-0 mt-0.5">
+                        #{(page - 1) * pageSize + idx + 1}
+                      </span>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="text-xs font-bold text-foreground truncate">{t.from_account_id?.name || "Account"}</span>
@@ -185,6 +196,7 @@ export default function TransfersPage() {
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      <TableHead className="w-12 text-center">#</TableHead>
                       <TableHead>Date</TableHead>
                       <TableHead>From Account</TableHead>
                       <TableHead>To Account</TableHead>
@@ -194,8 +206,11 @@ export default function TransfersPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {transfers.map((t: any) => (
+                    {paginatedTransfers.map((t: any, idx: number) => (
                       <TableRow key={t._id}>
+                        <TableCell className="text-center font-medium text-muted-foreground w-12">
+                          {(page - 1) * pageSize + idx + 1}
+                        </TableCell>
                         <TableCell className="font-medium">
                           {formatDate(t.date)}
                         </TableCell>
@@ -217,6 +232,14 @@ export default function TransfersPage() {
                   </TableBody>
                 </Table>
               </div>
+
+              <TablePagination
+                currentPage={page}
+                totalPages={totalPages}
+                totalItems={transfers.length}
+                pageSize={pageSize}
+                onPageChange={(p) => setPage(p)}
+              />
             </>
           )}
         </div>

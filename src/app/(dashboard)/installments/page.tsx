@@ -4,6 +4,7 @@ import { ConfirmDialog } from "@/components/custom/confirm-dialog";
 import { EmptyState } from "@/components/custom/empty-state";
 import FormDatePicker from "@/components/custom/form-date-picker";
 import FormSelect from "@/components/custom/form-select";
+import { TablePagination } from "@/components/custom/table-pagination";
 import { TableSkeleton } from "@/components/custom/table-skeleton";
 import { useCurrency } from "@/hooks/use-currency";
 import { formatDate } from "@/lib/utils";
@@ -75,8 +76,15 @@ export default function InstallmentsPage() {
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editItem, setEditItem] = useState<any>(null);
   const [paymentItem, setPaymentItem] = useState<any>(null);
+  const [instPage, setInstPage] = useState(1);
+  const instPageSize = 10;
 
   const installments = installmentsData?.data || [];
+  const totalInstPages = Math.ceil(installments.length / instPageSize);
+  const paginatedInstallments = installments.slice(
+    (instPage - 1) * instPageSize,
+    instPage * instPageSize,
+  );
   const metrics = installmentsData?.meta?.metrics || {
     totalMonthlyBurden: 0,
     totalOutstanding: 0,
@@ -376,11 +384,63 @@ export default function InstallmentsPage() {
           })}
         </div>
 
+        {/* ── Mobile Card View (< md) ── */}
+        <div className="md:hidden divide-y divide-border">
+          {paginatedInstallments.map((inst: any, idx: number) => {
+            const progressPercent = Math.min(100, Math.max(0, (inst.months_paid / inst.total_months) * 100));
+            return (
+              <div key={inst._id} className={`p-4 hover:bg-secondary/20 transition-colors ${inst.is_completed ? "opacity-60" : ""}`}>
+                <div className="flex items-start justify-between gap-3">
+                  <span className="text-xs font-bold text-muted-foreground w-6 shrink-0 mt-0.5">
+                    #{(instPage - 1) * instPageSize + idx + 1}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-bold text-foreground truncate">{inst.title}</p>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className="text-[10px] uppercase font-semibold text-muted-foreground">{inst.account_id?.name || "Unknown"}</span>
+                      <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
+                        <Calendar className="w-3 h-3" /> Ends {formatDate(inst.end_date)}
+                      </span>
+                    </div>
+                    <div className="mt-2 space-y-1">
+                      <div className="flex items-center justify-between text-[10px] font-bold">
+                        <span className="text-primary">{inst.months_paid}/{inst.total_months} months paid</span>
+                        <span className="text-muted-foreground">Remaining: {formatCurrency(inst.remaining_amount)}</span>
+                      </div>
+                      <div className="w-full h-1.5 bg-secondary rounded-full overflow-hidden">
+                        <div className={`h-full rounded-full ${inst.is_completed ? "bg-emerald-500" : "bg-primary"}`} style={{ width: `${progressPercent}%` }} />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className="text-sm font-bold text-foreground">{formatCurrency(inst.monthly_amount)}</p>
+                    <p className="text-[10px] text-muted-foreground">/mo</p>
+                    <div className="flex items-center justify-end gap-1 mt-2">
+                      {!inst.is_completed && (
+                        <button onClick={() => openPayment(inst)} className="p-1.5 rounded-lg text-muted-foreground hover:text-emerald-500 hover:bg-emerald-500/10 transition-colors">
+                          <CreditCard className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                      <button onClick={() => openEdit(inst)} className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors">
+                        <Pencil className="w-3.5 h-3.5" />
+                      </button>
+                      <button onClick={() => handleDelete(inst._id)} className="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors">
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
         {/* ── Desktop Table (md+) ── */}
         <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead className="sticky top-0 z-10 bg-secondary/95 backdrop-blur-md text-muted-foreground border-b border-border">
               <tr>
+                <th className="px-4 py-4 font-semibold text-xs uppercase tracking-wider text-center w-12">#</th>
                 <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider">EMI Details</th>
                 <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">Progress</th>
                 <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">Monthly EMI</th>
@@ -390,13 +450,16 @@ export default function InstallmentsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {installments.map((inst: any) => {
+              {paginatedInstallments.map((inst: any, idx: number) => {
                   const progressPercent = Math.min(100, Math.max(0, (inst.months_paid / inst.total_months) * 100));
                   return (
                     <tr key={inst._id} className={`hover:bg-secondary/30 transition-colors ${inst.is_completed ? "opacity-60" : ""}`}>
+                      <td className="px-4 py-4 text-center text-xs font-semibold text-muted-foreground w-12">
+                        {(instPage - 1) * instPageSize + idx + 1}
+                      </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold text-xs uppercase shadow-sm">
+                          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold text-xs uppercase">
                             {inst.title.substring(0, 2)}
                           </div>
                           <div>
@@ -459,6 +522,13 @@ export default function InstallmentsPage() {
             </tbody>
           </table>
         </div>
+        <TablePagination
+          currentPage={instPage}
+          totalPages={totalInstPages}
+          totalItems={installments.length}
+          pageSize={instPageSize}
+          onPageChange={(p) => setInstPage(p)}
+        />
         </div>
       )}
 

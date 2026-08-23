@@ -4,6 +4,7 @@ import { ConfirmDialog } from "@/components/custom/confirm-dialog";
 import { EmptyState } from "@/components/custom/empty-state";
 import FormDatePicker from "@/components/custom/form-date-picker";
 import FormSelect from "@/components/custom/form-select";
+import { TablePagination } from "@/components/custom/table-pagination";
 import { TableSkeleton } from "@/components/custom/table-skeleton";
 import { useCurrency } from "@/hooks/use-currency";
 import {
@@ -78,8 +79,15 @@ export default function InvestmentsPage() {
 
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editItem, setEditItem] = useState<any>(null);
+  const [invPage, setInvPage] = useState(1);
+  const invPageSize = 10;
 
   const investments = investmentsData?.data || [];
+  const totalInvPages = Math.ceil(investments.length / invPageSize);
+  const paginatedInvestments = investments.slice(
+    (invPage - 1) * invPageSize,
+    invPage * invPageSize,
+  );
   const metrics = investmentsData?.meta?.metrics || {
     totalInvested: 0,
     totalCurrentValue: 0,
@@ -216,7 +224,7 @@ export default function InvestmentsPage() {
               reset();
               setIsAddOpen(true);
             }}
-            className="w-full sm:w-auto flex justify-center items-center gap-2 px-4 py-2.5 sm:py-2 rounded-xl bg-primary text-primary-foreground font-semibold text-sm sm:text-xs shadow-md shadow-primary/20 hover:bg-primary/90 transition-colors shrink-0"
+            className="w-full sm:w-auto flex justify-center items-center gap-2 px-4 py-2.5 sm:py-2 rounded-xl bg-primary text-primary-foreground font-semibold text-sm sm:text-xs hover:bg-primary/90 transition-colors shrink-0"
           >
             <Plus className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
             <span>Add Holding</span>
@@ -273,7 +281,7 @@ export default function InvestmentsPage() {
 
       {/* Chart Section */}
       {investments.length > 0 && (
-        <div className="glass-card p-6 rounded-3xl space-y-4">
+        <div className="p-6 rounded-3xl border border-border space-y-4">
           <h2 className="text-base font-bold text-foreground">
             Top Holdings Value
           </h2>
@@ -340,70 +348,65 @@ export default function InvestmentsPage() {
           }}
         />
       ) : (
-        <div className="glass-card rounded-3xl overflow-hidden border border-border">
+        <div className="rounded-3xl overflow-hidden border border-border">
           {/* ── Mobile Card View (< md) ── */}
           <div className="md:hidden divide-y divide-border">
-            {investments.filter((inv: any) => inv.name.toLowerCase().includes(searchTerm.toLowerCase()) || (inv.symbol || "").toLowerCase().includes(searchTerm.toLowerCase())).map((inv: any) => {
-            const invested = inv.purchase_price * inv.quantity;
-            const current = inv.current_price * inv.quantity;
-            const pnl = current - invested;
-            const pnlPercent = invested > 0 ? (pnl / invested) * 100 : 0;
-            const isProfit = pnl >= 0;
-            return (
-              <div key={inv._id} className="p-4 hover:bg-secondary/20 transition-colors">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold text-xs uppercase shrink-0">
-                      {inv.symbol || inv.name.substring(0, 3)}
+            {paginatedInvestments.map((inv: any, idx: number) => {
+              const invested = inv.purchase_price * inv.quantity;
+              const current = inv.current_price * inv.quantity;
+              const pnl = current - invested;
+              const pnlPercent = invested > 0 ? (pnl / invested) * 100 : 0;
+              const isProfit = pnl >= 0;
+              return (
+                <div key={inv._id} className="p-4 hover:bg-secondary/20 transition-colors">
+                  <div className="flex items-start justify-between gap-3">
+                    <span className="text-xs font-bold text-muted-foreground w-6 shrink-0 mt-0.5">
+                      #{(invPage - 1) * invPageSize + idx + 1}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-bold text-foreground truncate">{inv.name}</p>
+                      <p className="text-[10px] text-muted-foreground uppercase mt-0.5">{inv.type.replace("_", " ")}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-xs font-semibold text-foreground">{inv.quantity.toLocaleString()} units</span>
+                        <span className="text-[10px] text-muted-foreground">@ {formatCurrency(inv.current_price)}</span>
+                      </div>
                     </div>
-                    <div className="min-w-0">
-                      <p className="font-bold text-foreground text-sm truncate">{inv.name}</p>
-                      <p className="text-[10px] text-muted-foreground uppercase">{inv.type.replace("_", " ")}</p>
-                      <div className="flex items-center gap-2 mt-1 flex-wrap">
-                        <span className="text-[10px] text-muted-foreground">Qty: {inv.quantity}</span>
-                        <span className="text-[10px] text-muted-foreground">Avg: {formatCurrency(inv.purchase_price)}</span>
-                        <span className="text-[10px] text-muted-foreground">Now: {formatCurrency(inv.current_price)}</span>
+                    <div className="text-right shrink-0">
+                      <p className="text-sm font-bold text-foreground">{formatCurrency(current)}</p>
+                      <p className={`text-[11px] font-bold mt-0.5 ${isProfit ? "text-emerald-500" : "text-destructive"}`}>
+                        {isProfit ? "+" : ""}{formatCurrency(pnl)} ({pnlPercent.toFixed(1)}%)
+                      </p>
+                      <div className="flex items-center justify-end gap-1 mt-2">
+                        <button onClick={() => openEdit(inv)} className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors">
+                          <Pencil className="w-3.5 h-3.5" />
+                        </button>
+                        <button onClick={() => handleDelete(inv._id)} className="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
                       </div>
                     </div>
                   </div>
-                  <div className="flex flex-col items-end gap-1.5 shrink-0">
-                    <span className={`font-bold text-sm ${isProfit ? "text-emerald-500" : "text-destructive"}`}>
-                      {isProfit ? "+" : ""}{formatCurrency(pnl)}
-                    </span>
-                    <span className={`text-[10px] font-semibold flex items-center gap-0.5 ${isProfit ? "text-emerald-500" : "text-destructive"}`}>
-                      {isProfit ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
-                      {pnlPercent.toFixed(2)}%
-                    </span>
-                    <div className="flex items-center gap-1 mt-1">
-                      <button onClick={() => openEdit(inv)} className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors">
-                        <Pencil className="w-3.5 h-3.5" />
-                      </button>
-                      <button onClick={() => handleDelete(inv._id)} className="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors">
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
 
-        {/* ── Desktop Table (md+) ── */}
-        <div className="hidden md:block overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="sticky top-0 z-10 bg-secondary/95 backdrop-blur-md text-muted-foreground border-b border-border">
-              <tr>
-                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider">Asset</th>
-                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">Holdings</th>
-                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">Avg Price</th>
-                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">Market Price</th>
-                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">Return</th>
-                <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {investments.map((inv: any) => {
+          {/* ── Desktop Table (md+) ── */}
+          <div className="hidden md:block overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead className="sticky top-0 z-10 bg-secondary/95 backdrop-blur-md text-muted-foreground border-b border-border">
+                <tr>
+                  <th className="px-4 py-4 font-semibold text-xs uppercase tracking-wider text-center w-12">#</th>
+                  <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider">Asset</th>
+                  <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">Holdings</th>
+                  <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">Avg Price</th>
+                  <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">Market Price</th>
+                  <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">Return</th>
+                  <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {paginatedInvestments.map((inv: any, idx: number) => {
                   const invested = inv.purchase_price * inv.quantity;
                   const current = inv.current_price * inv.quantity;
                   const pnl = current - invested;
@@ -411,9 +414,12 @@ export default function InvestmentsPage() {
                   const isProfit = pnl >= 0;
                   return (
                     <tr key={inv._id} className="hover:bg-secondary/30 transition-colors">
+                      <td className="px-4 py-4 text-center text-xs font-semibold text-muted-foreground w-12">
+                        {(invPage - 1) * invPageSize + idx + 1}
+                      </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold text-xs uppercase shadow-sm">
+                          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold text-xs uppercase">
                             {inv.symbol || inv.name.substring(0, 3)}
                           </div>
                           <div>
@@ -456,12 +462,18 @@ export default function InvestmentsPage() {
                     </tr>
                   );
                 })}
-            </tbody>
-          </table>
-        </div>
+              </tbody>
+            </table>
+          </div>
+          <TablePagination
+            currentPage={invPage}
+            totalPages={totalInvPages}
+            totalItems={investments.length}
+            pageSize={invPageSize}
+            onPageChange={(p) => setInvPage(p)}
+          />
         </div>
       )}
-
 
       {/* Form Modal (Shared Add/Edit) */}
       {(isAddOpen || editItem) && (
