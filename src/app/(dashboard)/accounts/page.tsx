@@ -88,7 +88,12 @@ export default function AccountsPage() {
     formState: { errors: accountErrors },
   } = useForm<AccountFormValues>({
     resolver: zodResolver(accountSchema),
-    defaultValues: { opening_balance: "" as any, color: "#4F46E5", name: "", type: "" },
+    defaultValues: {
+      opening_balance: "" as any,
+      color: "#4F46E5",
+      name: "",
+      type: "",
+    },
   });
 
   const {
@@ -100,7 +105,12 @@ export default function AccountsPage() {
     formState: { errors: editErrors },
   } = useForm<AccountFormValues>({
     resolver: zodResolver(accountSchema),
-    defaultValues: { opening_balance: "" as any, color: "#4F46E5", name: "", type: "" },
+    defaultValues: {
+      opening_balance: "" as any,
+      color: "#4F46E5",
+      name: "",
+      type: "",
+    },
   });
 
   const {
@@ -238,8 +248,8 @@ export default function AccountsPage() {
           <CardSkeleton count={6} />
         ) : accounts.length === 0 ? (
           <div className="col-span-full">
-            <EmptyState 
-              title="No accounts found" 
+            <EmptyState
+              title="No accounts found"
               description="You haven't created any accounts yet. Create one to start tracking your balances."
               actionLabel="Add Account"
               onAction={() => setIsAddAccountOpen(true)}
@@ -420,7 +430,8 @@ export default function AccountsPage() {
                   </label>
                   <input
                     {...registerAccount("opening_balance", {
-                      setValueAs: (v) => (v === "" || v === undefined ? 0 : Number(v)),
+                      setValueAs: (v) =>
+                        v === "" || v === undefined ? 0 : Number(v),
                     })}
                     type="number"
                     step="0.01"
@@ -521,7 +532,8 @@ export default function AccountsPage() {
                   </label>
                   <input
                     {...registerEdit("opening_balance", {
-                      setValueAs: (v) => (v === "" || v === undefined ? 0 : Number(v)),
+                      setValueAs: (v) =>
+                        v === "" || v === undefined ? 0 : Number(v),
                     })}
                     type="number"
                     step="0.01"
@@ -623,7 +635,9 @@ export default function AccountsPage() {
                     Transfer Amount
                   </label>
                   <input
-                    {...registerTransfer("amount", { setValueAs: (v) => v === "" ? undefined : Number(v) })}
+                    {...registerTransfer("amount", {
+                      setValueAs: (v) => (v === "" ? undefined : Number(v)),
+                    })}
                     type="number"
                     step="0.01"
                     placeholder="0.00"
@@ -636,7 +650,8 @@ export default function AccountsPage() {
                   </label>
                   <input
                     {...registerTransfer("fee", {
-                      setValueAs: (v) => (v === "" || v === undefined ? 0 : Number(v)),
+                      setValueAs: (v) =>
+                        v === "" || v === undefined ? 0 : Number(v),
                     })}
                     type="number"
                     step="0.01"

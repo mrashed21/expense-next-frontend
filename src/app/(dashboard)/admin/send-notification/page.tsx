@@ -1,6 +1,5 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -15,10 +14,10 @@ import {
 import { formatDate } from "@/lib/utils";
 import { RootState } from "@/redux/store";
 import {
+  useBroadcastNotificationMutation,
   useGetNotificationHistoryQuery,
   useGetUsersQuery,
   useSendUserNotificationMutation,
-  useBroadcastNotificationMutation,
 } from "@/services/admin-api";
 import {
   AlertTriangle,
@@ -158,7 +157,7 @@ export default function SendNotificationPage() {
 
   const [broadcastNotification, { isLoading: broadcasting }] =
     useBroadcastNotificationMutation();
-    
+
   const isActionLoading = sending || broadcasting;
 
   /* ── Derived ── */
@@ -205,7 +204,9 @@ export default function SendNotificationPage() {
           message: message.trim(),
           type,
         }).unwrap();
-        toast.success(`Notification sent to ${selectedUser.user_name} successfully!`);
+        toast.success(
+          `Notification sent to ${selectedUser.user_name} successfully!`,
+        );
       } else if (targetType === "all") {
         await broadcastNotification({
           title: title.trim(),
@@ -296,106 +297,111 @@ export default function SendNotificationPage() {
 
               {targetType === "specific" ? (
                 <div className="space-y-2" ref={searchRef}>
-                  <Label htmlFor="user-search" className="text-xs text-muted-foreground font-medium">
+                  <Label
+                    htmlFor="user-search"
+                    className="text-xs text-muted-foreground font-medium"
+                  >
                     Search by name or email
                   </Label>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-                <Input
-                  id="user-search"
-                  placeholder="Type name or email..."
-                  className="pl-9 pr-9 bg-background/50"
-                  value={searchQuery}
-                  onChange={(e) => {
-                    setSearchQuery(e.target.value);
-                    if (selectedUser) setSelectedUser(null);
-                    setShowDropdown(true);
-                  }}
-                  onFocus={() => {
-                    if (searchQuery.length >= 2) setShowDropdown(true);
-                  }}
-                  autoComplete="off"
-                />
-                {(searchFetching) && (
-                  <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin text-muted-foreground" />
-                )}
-                {selectedUser && !searchFetching && (
-                  <button
-                    onClick={handleClearUser}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                )}
-
-                {/* Dropdown */}
-                {showDropdown && searchQuery.length >= 2 && !selectedUser && (
-                  <div className="absolute top-full mt-1.5 left-0 right-0 z-50 bg-card border border-border rounded-xl shadow-xl overflow-hidden">
-                    {searchFetching ? (
-                      <div className="flex items-center justify-center py-6">
-                        <Loader2 className="w-5 h-5 animate-spin text-primary" />
-                      </div>
-                    ) : searchResults.length === 0 ? (
-                      <div className="py-6 text-center text-sm text-muted-foreground">
-                        No users found for &quot;{debouncedSearch}&quot;
-                      </div>
-                    ) : (
-                      <div className="max-h-64 overflow-y-auto py-1">
-                        {searchResults.map((u) => (
-                          <button
-                            key={u._id}
-                            onClick={() => handleSelectUser(u)}
-                            className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-secondary/60 transition-colors text-left"
-                          >
-                            <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm uppercase shrink-0">
-                              {u.user_name?.charAt(0) ?? "?"}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-semibold truncate">
-                                {u.user_name}
-                              </p>
-                              <p className="text-xs text-muted-foreground truncate">
-                                {u.user_email}
-                              </p>
-                            </div>
-                            <span
-                              className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full shrink-0 ${
-                                u.user_status === "active"
-                                  ? "bg-emerald-500/10 text-emerald-500"
-                                  : "bg-orange-500/10 text-orange-500"
-                              }`}
-                            >
-                              {u.user_status}
-                            </span>
-                          </button>
-                        ))}
-                      </div>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                    <Input
+                      id="user-search"
+                      placeholder="Type name or email..."
+                      className="pl-9 pr-9 bg-background/50"
+                      value={searchQuery}
+                      onChange={(e) => {
+                        setSearchQuery(e.target.value);
+                        if (selectedUser) setSelectedUser(null);
+                        setShowDropdown(true);
+                      }}
+                      onFocus={() => {
+                        if (searchQuery.length >= 2) setShowDropdown(true);
+                      }}
+                      autoComplete="off"
+                    />
+                    {searchFetching && (
+                      <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin text-muted-foreground" />
                     )}
-                  </div>
-                )}
-              </div>
+                    {selectedUser && !searchFetching && (
+                      <button
+                        onClick={handleClearUser}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    )}
 
-              {/* Selected user chip */}
-              {selectedUser && (
-                <div className="flex items-center gap-3 p-3 rounded-xl bg-primary/5 border border-primary/20 mt-2">
-                  <div className="w-9 h-9 rounded-full bg-primary/15 text-primary flex items-center justify-center font-bold text-sm uppercase shrink-0">
-                    {selectedUser.user_name?.charAt(0) ?? "?"}
+                    {/* Dropdown */}
+                    {showDropdown &&
+                      searchQuery.length >= 2 &&
+                      !selectedUser && (
+                        <div className="absolute top-full mt-1.5 left-0 right-0 z-50 bg-card border border-border rounded-xl shadow-xl overflow-hidden">
+                          {searchFetching ? (
+                            <div className="flex items-center justify-center py-6">
+                              <Loader2 className="w-5 h-5 animate-spin text-primary" />
+                            </div>
+                          ) : searchResults.length === 0 ? (
+                            <div className="py-6 text-center text-sm text-muted-foreground">
+                              No users found for &quot;{debouncedSearch}&quot;
+                            </div>
+                          ) : (
+                            <div className="max-h-64 overflow-y-auto py-1">
+                              {searchResults.map((u) => (
+                                <button
+                                  key={u._id}
+                                  onClick={() => handleSelectUser(u)}
+                                  className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-secondary/60 transition-colors text-left"
+                                >
+                                  <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm uppercase shrink-0">
+                                    {u.user_name?.charAt(0) ?? "?"}
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-semibold truncate">
+                                      {u.user_name}
+                                    </p>
+                                    <p className="text-xs text-muted-foreground truncate">
+                                      {u.user_email}
+                                    </p>
+                                  </div>
+                                  <span
+                                    className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full shrink-0 ${
+                                      u.user_status === "active"
+                                        ? "bg-emerald-500/10 text-emerald-500"
+                                        : "bg-orange-500/10 text-orange-500"
+                                    }`}
+                                  >
+                                    {u.user_status}
+                                  </span>
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold truncate">
-                      {selectedUser.user_name}
-                    </p>
-                    <p className="text-xs text-muted-foreground truncate">
-                      {selectedUser.user_email}
-                    </p>
-                  </div>
-                  <CheckCircle2 className="w-5 h-5 text-primary shrink-0" />
+
+                  {/* Selected user chip */}
+                  {selectedUser && (
+                    <div className="flex items-center gap-3 p-3 rounded-xl bg-primary/5 border border-primary/20 mt-2">
+                      <div className="w-9 h-9 rounded-full bg-primary/15 text-primary flex items-center justify-center font-bold text-sm uppercase shrink-0">
+                        {selectedUser.user_name?.charAt(0) ?? "?"}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-bold truncate">
+                          {selectedUser.user_name}
+                        </p>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {selectedUser.user_email}
+                        </p>
+                      </div>
+                      <CheckCircle2 className="w-5 h-5 text-primary shrink-0" />
+                    </div>
+                  )}
                 </div>
-              )}
+              ) : null}
             </div>
-          ) : null}
-          </div>
-        </Card>
+          </Card>
 
           {/* Step 2 — Compose */}
           <Card className="p-5 border border-border shadow-sm bg-card/60 space-y-4 overflow-visible">
@@ -409,7 +415,10 @@ export default function SendNotificationPage() {
             {/* Title */}
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <Label htmlFor="notif-title" className="text-xs text-muted-foreground font-medium">
+                <Label
+                  htmlFor="notif-title"
+                  className="text-xs text-muted-foreground font-medium"
+                >
                   Title <span className="text-destructive">*</span>
                 </Label>
                 <span
@@ -431,7 +440,10 @@ export default function SendNotificationPage() {
             {/* Message */}
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <Label htmlFor="notif-message" className="text-xs text-muted-foreground font-medium">
+                <Label
+                  htmlFor="notif-message"
+                  className="text-xs text-muted-foreground font-medium"
+                >
                   Message <span className="text-destructive">*</span>
                 </Label>
                 <span
@@ -464,19 +476,22 @@ export default function SendNotificationPage() {
                   <SelectValue placeholder="Select type" />
                 </SelectTrigger>
                 <SelectContent>
-                  {(Object.entries(TYPE_CONFIG) as [NotifType, typeof TYPE_CONFIG.info][]).map(
-                    ([key, cfg]) => {
-                      const Icon = cfg.icon;
-                      return (
-                        <SelectItem key={key} value={key}>
-                          <div className="flex items-center gap-2">
-                            <Icon className={`w-3.5 h-3.5 ${cfg.text}`} />
-                            <span>{cfg.label}</span>
-                          </div>
-                        </SelectItem>
-                      );
-                    },
-                  )}
+                  {(
+                    Object.entries(TYPE_CONFIG) as [
+                      NotifType,
+                      typeof TYPE_CONFIG.info,
+                    ][]
+                  ).map(([key, cfg]) => {
+                    const Icon = cfg.icon;
+                    return (
+                      <SelectItem key={key} value={key}>
+                        <div className="flex items-center gap-2">
+                          <Icon className={`w-3.5 h-3.5 ${cfg.text}`} />
+                          <span>{cfg.label}</span>
+                        </div>
+                      </SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
             </div>
@@ -485,7 +500,10 @@ export default function SendNotificationPage() {
             <div className="pt-2 border-t border-border">
               <Button
                 onClick={handleSend}
-                disabled={isActionLoading || (targetType === "specific" && !selectedUser)}
+                disabled={
+                  isActionLoading ||
+                  (targetType === "specific" && !selectedUser)
+                }
                 className="w-full flex items-center gap-2"
                 size="lg"
               >
@@ -497,7 +515,9 @@ export default function SendNotificationPage() {
                 ) : (
                   <>
                     <Send className="w-4 h-4" />
-                    {targetType === "all" ? "Broadcast to All Users" : "Send Notification"}
+                    {targetType === "all"
+                      ? "Broadcast to All Users"
+                      : "Send Notification"}
                   </>
                 )}
               </Button>

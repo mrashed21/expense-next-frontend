@@ -13,10 +13,16 @@ import { CheckCircle2, Loader2, Star, Trash2, XCircle } from "lucide-react";
 import toast from "react-hot-toast";
 
 export default function AdminReviewsPage() {
-  const { data: reviewsResponse, isLoading, refetch } = useGetAdminReviewsQuery({});
-  const [approveReview, { isLoading: isApproving }] = useApproveReviewMutation();
+  const {
+    data: reviewsResponse,
+    isLoading,
+    refetch,
+  } = useGetAdminReviewsQuery({});
+  const [approveReview, { isLoading: isApproving }] =
+    useApproveReviewMutation();
   const [rejectReview, { isLoading: isRejecting }] = useRejectReviewMutation();
-  const [adminDeleteReview, { isLoading: isDeleting }] = useAdminDeleteReviewMutation();
+  const [adminDeleteReview, { isLoading: isDeleting }] =
+    useAdminDeleteReviewMutation();
 
   const reviews = reviewsResponse?.data || [];
 
@@ -41,7 +47,8 @@ export default function AdminReviewsPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to permanently delete this review?")) return;
+    if (!confirm("Are you sure you want to permanently delete this review?"))
+      return;
     try {
       await adminDeleteReview(id).unwrap();
       toast.success("Review permanently deleted");
@@ -71,17 +78,21 @@ export default function AdminReviewsPage() {
           User Reviews Management
         </h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Approve or reject reviews. Only approved reviews appear on the landing page.
+          Approve or reject reviews. Only approved reviews appear on the landing
+          page.
         </p>
         <div className="flex gap-4 mt-3 text-sm">
           <span className="text-muted-foreground">
-            Total: <span className="font-bold text-foreground">{reviews.length}</span>
+            Total:{" "}
+            <span className="font-bold text-foreground">{reviews.length}</span>
           </span>
           <span className="text-muted-foreground">
-            Approved: <span className="font-bold text-green-500">{approved.length}</span>
+            Approved:{" "}
+            <span className="font-bold text-green-500">{approved.length}</span>
           </span>
           <span className="text-muted-foreground">
-            Hidden: <span className="font-bold text-red-500">{pending.length}</span>
+            Hidden:{" "}
+            <span className="font-bold text-red-500">{pending.length}</span>
           </span>
         </div>
       </div>
@@ -123,7 +134,9 @@ export default function AdminReviewsPage() {
                         {rev.user_id?.user_name || "Unknown"}
                       </span>
                       {rev.user_id?.user_email && (
-                        <span className="ml-1 truncate">· {rev.user_id.user_email}</span>
+                        <span className="ml-1 truncate">
+                          · {rev.user_id.user_email}
+                        </span>
                       )}
                     </div>
                     {/* Status badge */}

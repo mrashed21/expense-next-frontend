@@ -3,17 +3,34 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { useGetAdminFeedbacksQuery, useMarkFeedbackReviewedMutation, useReplyToFeedbackMutation } from "@/services/feedback-api";
+import {
+  useGetAdminFeedbacksQuery,
+  useMarkFeedbackReviewedMutation,
+  useReplyToFeedbackMutation,
+} from "@/services/feedback-api";
 import { CheckCircle2, Loader2, MessageSquare, Reply } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
 export default function AdminFeedbacksPage() {
-  const { data: feedbackResponse, isLoading, refetch } = useGetAdminFeedbacksQuery({});
-  const [markReviewed, { isLoading: isMarking }] = useMarkFeedbackReviewedMutation();
-  const [replyToFeedback, { isLoading: isReplying }] = useReplyToFeedbackMutation();
+  const {
+    data: feedbackResponse,
+    isLoading,
+    refetch,
+  } = useGetAdminFeedbacksQuery({});
+  const [markReviewed, { isLoading: isMarking }] =
+    useMarkFeedbackReviewedMutation();
+  const [replyToFeedback, { isLoading: isReplying }] =
+    useReplyToFeedbackMutation();
 
   const [replyMessage, setReplyMessage] = useState("");
   const [activeFeedbackId, setActiveFeedbackId] = useState<string | null>(null);
@@ -34,7 +51,10 @@ export default function AdminFeedbacksPage() {
   const handleReply = async () => {
     if (!activeFeedbackId || !replyMessage) return;
     try {
-      await replyToFeedback({ id: activeFeedbackId, admin_reply: replyMessage }).unwrap();
+      await replyToFeedback({
+        id: activeFeedbackId,
+        admin_reply: replyMessage,
+      }).unwrap();
       toast.success("Reply sent and feedback marked as reviewed");
       setReplyMessage("");
       setActiveFeedbackId(null);
@@ -72,7 +92,10 @@ export default function AdminFeedbacksPage() {
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {feedbacks.map((fb: any) => (
-            <Card key={fb._id} className="flex flex-col h-full border-border shadow-sm hover:shadow-md transition-shadow">
+            <Card
+              key={fb._id}
+              className="flex flex-col h-full border-border shadow-sm hover:shadow-md transition-shadow"
+            >
               <CardHeader className="pb-3 border-b border-border/50">
                 <div className="flex justify-between items-start gap-4">
                   <div className="flex flex-col gap-1">
@@ -80,10 +103,16 @@ export default function AdminFeedbacksPage() {
                       {fb.subject}
                     </CardTitle>
                     <div className="text-xs text-muted-foreground">
-                      By: <span className="font-semibold text-foreground">{fb.user_id?.user_name}</span>
+                      By:{" "}
+                      <span className="font-semibold text-foreground">
+                        {fb.user_id?.user_name}
+                      </span>
                     </div>
                   </div>
-                  <Badge variant={fb.status === "reviewed" ? "secondary" : "default"} className="capitalize shrink-0">
+                  <Badge
+                    variant={fb.status === "reviewed" ? "secondary" : "default"}
+                    className="capitalize shrink-0"
+                  >
                     {fb.status}
                   </Badge>
                 </div>
@@ -95,12 +124,16 @@ export default function AdminFeedbacksPage() {
                   </p>
                   {fb.admin_reply && (
                     <div className="p-3 bg-muted/50 rounded-md border border-border/50">
-                      <p className="text-xs font-semibold mb-1 text-primary">Your Reply:</p>
-                      <p className="text-sm text-muted-foreground">{fb.admin_reply}</p>
+                      <p className="text-xs font-semibold mb-1 text-primary">
+                        Your Reply:
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {fb.admin_reply}
+                      </p>
                     </div>
                   )}
                 </div>
-                
+
                 <div className="pt-4 border-t border-border/50 flex gap-2">
                   {fb.status === "pending" ? (
                     <>
@@ -160,11 +193,19 @@ export default function AdminFeedbacksPage() {
             rows={5}
           />
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsReplyModalOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setIsReplyModalOpen(false)}
+            >
               Cancel
             </Button>
-            <Button onClick={handleReply} disabled={isReplying || !replyMessage}>
-              {isReplying ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+            <Button
+              onClick={handleReply}
+              disabled={isReplying || !replyMessage}
+            >
+              {isReplying ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : null}
               Send Reply
             </Button>
           </DialogFooter>

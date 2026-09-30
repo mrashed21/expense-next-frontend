@@ -1,7 +1,7 @@
 "use client";
 
-import { Card } from "@/components/ui/card";
 import { TablePagination } from "@/components/custom/table-pagination";
+import { Card } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -155,7 +155,9 @@ export default function AdminLogsPage() {
                         </TableCell>
                         <TableCell className="px-6 py-4">
                           <div className="text-xs text-muted-foreground">
-                            {log.target_id && <div>Target: {log.target_id}</div>}
+                            {log.target_id && (
+                              <div>Target: {log.target_id}</div>
+                            )}
                             {log.details && (
                               <pre className="mt-1 bg-background p-2 rounded-md overflow-x-auto max-w-sm border border-border">
                                 {JSON.stringify(log.details, null, 2)}

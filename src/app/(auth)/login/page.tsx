@@ -7,18 +7,11 @@ import { Separator } from "@/components/ui/separator";
 import { setCredentials } from "@/redux/slices/auth-slice";
 import { RootState } from "@/redux/store";
 import {
-    useLoginMutation,
-    useVerifyLogin2FAMutation,
+  useLoginMutation,
+  useVerifyLogin2FAMutation,
 } from "@/services/auth-api";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-    ArrowRight,
-    Eye,
-    EyeOff,
-    Loader2,
-    Lock,
-    Mail
-} from "lucide-react";
+import { ArrowRight, Eye, EyeOff, Loader2, Lock, Mail } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
@@ -140,172 +133,167 @@ function LoginContent() {
 
       {!requires2FA ? (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                {/* Email */}
-                <div className="space-y-1.5">
-                  <Label
-                    htmlFor="email"
-                    className="text-xs font-medium text-foreground"
-                  >
-                    Email address
-                  </Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-                    <Input
-                      id="email"
-                      {...register("user_email")}
-                      type="email"
-                      placeholder="rashedjaman768@gmail.com"
-                      className="pl-9 h-9 text-sm bg-background border-input hover:border-primary/50 transition-colors focus-visible:ring-primary/20"
-                    />
-                  </div>
-                  {errors.user_email && (
-                    <p className="text-[11px] text-destructive">
-                      {errors.user_email.message}
-                    </p>
-                  )}
-                </div>
-
-                {/* Password */}
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <Label
-                      htmlFor="password"
-                      className="text-xs font-medium text-foreground"
-                    >
-                      Password
-                    </Label>
-                    <Link
-                      href="/forgot-password"
-                      className="text-[11px] text-muted-foreground hover:text-primary transition-colors"
-                    >
-                      Forgot password?
-                    </Link>
-                  </div>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-                    <Input
-                      id="password"
-                      {...register("user_password")}
-                      type={showPassword ? "text" : "password"}
-                      placeholder="••••••••"
-                      className="pl-9 pr-9 h-9 text-sm bg-background border-input hover:border-primary/50 transition-colors focus-visible:ring-primary/20"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      aria-label={
-                        showPassword ? "Hide password" : "Show password"
-                      }
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
-                    >
-                      {showPassword ? (
-                        <EyeOff className="w-4 h-4" />
-                      ) : (
-                        <Eye className="w-4 h-4" />
-                      )}
-                    </button>
-                  </div>
-                  {errors.user_password && (
-                    <p className="text-[11px] text-destructive">
-                      {errors.user_password.message}
-                    </p>
-                  )}
-                </div>
-
-                <Button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full h-10 text-sm font-medium mt-2"
-                >
-                  {isLoading ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <>
-                      <span>Sign in</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </>
-                  )}
-                </Button>
-              </form>
-            ) : (
-              <form
-                onSubmit={handleSubmit2FA(on2FASubmit)}
-                className="space-y-4"
-              >
-                <div className="space-y-1.5">
-                  <Label
-                    htmlFor="code"
-                    className="text-xs font-medium text-foreground"
-                  >
-                    Authentication Code
-                  </Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-                    <Input
-                      id="code"
-                      {...register2FA("code", {
-                        onChange: (e) => {
-                          e.target.value = e.target.value.replace(
-                            /[^0-9a-zA-Z-]/g,
-                            "",
-                          );
-                        },
-                      })}
-                      type="text"
-                      inputMode="text"
-                      placeholder="000000"
-                      maxLength={20}
-                      className="pl-9 h-9 text-sm bg-background border-input hover:border-primary/50 transition-colors focus-visible:ring-primary/20 text-center tracking-widest font-mono uppercase"
-                    />
-                  </div>
-                  {errors2FA.code && (
-                    <p className="text-[11px] text-destructive">
-                      {errors2FA.code.message}
-                    </p>
-                  )}
-                </div>
-
-                <Button
-                  type="submit"
-                  disabled={isVerifying2FA}
-                  className="w-full h-10 text-sm font-medium mt-2"
-                >
-                  {isVerifying2FA ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <>
-                      <span>Verify Code</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </>
-                  )}
-                </Button>
-
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() => {
-                    setRequires2FA(false);
-                    setTempToken(null);
-                  }}
-                  className="w-full h-10 text-xs"
-                >
-                  Cancel
-                </Button>
-              </form>
+          {/* Email */}
+          <div className="space-y-1.5">
+            <Label
+              htmlFor="email"
+              className="text-xs font-medium text-foreground"
+            >
+              Email address
+            </Label>
+            <div className="relative">
+              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+              <Input
+                id="email"
+                {...register("user_email")}
+                type="email"
+                placeholder="rashedjaman768@gmail.com"
+                className="pl-9 h-9 text-sm bg-background border-input hover:border-primary/50 transition-colors focus-visible:ring-primary/20"
+              />
+            </div>
+            {errors.user_email && (
+              <p className="text-[11px] text-destructive">
+                {errors.user_email.message}
+              </p>
             )}
-
-          <div className="flex-col gap-0 pt-6 p-0 mt-6">
-            <Separator className="mb-4 bg-border/50" />
-            <p className="text-xs text-muted-foreground text-center">
-              Don&apos;t have an account?{" "}
-              <Link
-                href="/register"
-                className="font-medium text-primary hover:underline underline-offset-4"
-              >
-                Create account
-              </Link>
-            </p>
           </div>
+
+          {/* Password */}
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <Label
+                htmlFor="password"
+                className="text-xs font-medium text-foreground"
+              >
+                Password
+              </Label>
+              <Link
+                href="/forgot-password"
+                className="text-[11px] text-muted-foreground hover:text-primary transition-colors"
+              >
+                Forgot password?
+              </Link>
+            </div>
+            <div className="relative">
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+              <Input
+                id="password"
+                {...register("user_password")}
+                type={showPassword ? "text" : "password"}
+                placeholder="••••••••"
+                className="pl-9 pr-9 h-9 text-sm bg-background border-input hover:border-primary/50 transition-colors focus-visible:ring-primary/20"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
+              >
+                {showPassword ? (
+                  <EyeOff className="w-4 h-4" />
+                ) : (
+                  <Eye className="w-4 h-4" />
+                )}
+              </button>
+            </div>
+            {errors.user_password && (
+              <p className="text-[11px] text-destructive">
+                {errors.user_password.message}
+              </p>
+            )}
+          </div>
+
+          <Button
+            type="submit"
+            disabled={isLoading}
+            className="w-full h-10 text-sm font-medium mt-2"
+          >
+            {isLoading ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <>
+                <span>Sign in</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </>
+            )}
+          </Button>
+        </form>
+      ) : (
+        <form onSubmit={handleSubmit2FA(on2FASubmit)} className="space-y-4">
+          <div className="space-y-1.5">
+            <Label
+              htmlFor="code"
+              className="text-xs font-medium text-foreground"
+            >
+              Authentication Code
+            </Label>
+            <div className="relative">
+              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+              <Input
+                id="code"
+                {...register2FA("code", {
+                  onChange: (e) => {
+                    e.target.value = e.target.value.replace(
+                      /[^0-9a-zA-Z-]/g,
+                      "",
+                    );
+                  },
+                })}
+                type="text"
+                inputMode="text"
+                placeholder="000000"
+                maxLength={20}
+                className="pl-9 h-9 text-sm bg-background border-input hover:border-primary/50 transition-colors focus-visible:ring-primary/20 text-center tracking-widest font-mono uppercase"
+              />
+            </div>
+            {errors2FA.code && (
+              <p className="text-[11px] text-destructive">
+                {errors2FA.code.message}
+              </p>
+            )}
+          </div>
+
+          <Button
+            type="submit"
+            disabled={isVerifying2FA}
+            className="w-full h-10 text-sm font-medium mt-2"
+          >
+            {isVerifying2FA ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <>
+                <span>Verify Code</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </>
+            )}
+          </Button>
+
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => {
+              setRequires2FA(false);
+              setTempToken(null);
+            }}
+            className="w-full h-10 text-xs"
+          >
+            Cancel
+          </Button>
+        </form>
+      )}
+
+      <div className="flex-col gap-0 pt-6 p-0 mt-6">
+        <Separator className="mb-4 bg-border/50" />
+        <p className="text-xs text-muted-foreground text-center">
+          Don&apos;t have an account?{" "}
+          <Link
+            href="/register"
+            className="font-medium text-primary hover:underline underline-offset-4"
+          >
+            Create account
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }

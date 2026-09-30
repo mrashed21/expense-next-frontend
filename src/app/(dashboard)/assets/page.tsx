@@ -218,9 +218,13 @@ export default function AssetsPage() {
           <CardSkeleton count={6} />
         ) : assets.length === 0 ? (
           <div className="col-span-full">
-            <EmptyState 
-              title="No Assets Found" 
-              description={searchTerm ? "No assets match your search criteria." : "Start tracking your physical assets and valuables here."}
+            <EmptyState
+              title="No Assets Found"
+              description={
+                searchTerm
+                  ? "No assets match your search criteria."
+                  : "Start tracking your physical assets and valuables here."
+              }
               actionLabel="Add Asset"
               icon={<Home className="w-8 h-8" />}
               onAction={() => setIsAddAssetOpen(true)}
@@ -349,7 +353,9 @@ export default function AssetsPage() {
                     Current Value
                   </label>
                   <input
-                    {...registerAsset("value", { setValueAs: (v) => v === "" ? undefined : Number(v) })}
+                    {...registerAsset("value", {
+                      setValueAs: (v) => (v === "" ? undefined : Number(v)),
+                    })}
                     type="number"
                     step="0.01"
                     placeholder="0.00"
@@ -367,7 +373,8 @@ export default function AssetsPage() {
                   </label>
                   <input
                     {...registerAsset("purchase_price", {
-                      setValueAs: (v) => (v === "" || v === undefined ? 0 : Number(v)),
+                      setValueAs: (v) =>
+                        v === "" || v === undefined ? 0 : Number(v),
                     })}
                     type="number"
                     step="0.01"
@@ -465,7 +472,9 @@ export default function AssetsPage() {
                     Current Value
                   </label>
                   <input
-                    {...registerEdit("value", { setValueAs: (v) => v === "" ? undefined : Number(v) })}
+                    {...registerEdit("value", {
+                      setValueAs: (v) => (v === "" ? undefined : Number(v)),
+                    })}
                     type="number"
                     step="0.01"
                     placeholder="0.00"
@@ -483,7 +492,8 @@ export default function AssetsPage() {
                   </label>
                   <input
                     {...registerEdit("purchase_price", {
-                      setValueAs: (v) => (v === "" || v === undefined ? 0 : Number(v)),
+                      setValueAs: (v) =>
+                        v === "" || v === undefined ? 0 : Number(v),
                     })}
                     type="number"
                     step="0.01"

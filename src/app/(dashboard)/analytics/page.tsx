@@ -16,7 +16,6 @@ import {
   HandCoins,
   Landmark,
   LayoutDashboard,
-  Loader2,
   PieChart as PieIcon,
   Target,
   TrendingUp,
@@ -73,8 +72,8 @@ export default function AnalyticsPage() {
           <Skeleton className="h-32 rounded-3xl" />
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Skeleton className="h-[400px] rounded-3xl" />
-          <Skeleton className="h-[400px] rounded-3xl" />
+          <Skeleton className="h-100 rounded-3xl" />
+          <Skeleton className="h-100 rounded-3xl" />
         </div>
       </div>
     );
@@ -84,7 +83,7 @@ export default function AnalyticsPage() {
   if (!data) {
     return (
       <div className="mt-12">
-        <EmptyState 
+        <EmptyState
           title="No analytics data available"
           description="We couldn't generate analytics. Make sure you have recorded some transactions."
           icon={<BarChart3 className="w-8 h-8" />}
@@ -126,25 +125,29 @@ export default function AnalyticsPage() {
             <LayoutDashboard className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0" />
             <span className="truncate">Net Worth</span>
           </p>
-          <p className="text-base sm:text-xl font-black text-foreground break-words">
+          <p className="text-base sm:text-xl font-black text-foreground wrap-break-word">
             {formatCurrency(kpi.netWorth)}
           </p>
         </div>
         <div className="glass-card p-3 sm:p-5 rounded-2xl space-y-1 sm:space-y-1.5 overflow-hidden">
           <p className="text-[10px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1 sm:gap-1.5 truncate">
             <ArrowDownCircle className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-emerald-500 shrink-0" />
-            <span className="truncate">Income ({yearlyComparison.currentYear})</span>
+            <span className="truncate">
+              Income ({yearlyComparison.currentYear})
+            </span>
           </p>
-          <p className="text-base sm:text-xl font-black text-emerald-500 break-words">
+          <p className="text-base sm:text-xl font-black text-emerald-500 wrap-break-word">
             {formatCurrency(kpi.totalIncomeYear)}
           </p>
         </div>
         <div className="glass-card p-3 sm:p-5 rounded-2xl space-y-1 sm:space-y-1.5 overflow-hidden">
           <p className="text-[10px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1 sm:gap-1.5 truncate">
             <ArrowUpCircle className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-rose-500 shrink-0" />
-            <span className="truncate">Expense ({yearlyComparison.currentYear})</span>
+            <span className="truncate">
+              Expense ({yearlyComparison.currentYear})
+            </span>
           </p>
-          <p className="text-base sm:text-xl font-black text-rose-500 break-words">
+          <p className="text-base sm:text-xl font-black text-rose-500 wrap-break-word">
             {formatCurrency(kpi.totalExpenseYear)}
           </p>
         </div>
@@ -154,7 +157,7 @@ export default function AnalyticsPage() {
             <span className="truncate">Savings Rate</span>
           </p>
           <p
-            className={`text-base sm:text-xl font-black break-words ${
+            className={`text-base sm:text-xl font-black wrap-break-word ${
               kpi.savingsRate >= 0 ? "text-emerald-500" : "text-rose-500"
             }`}
           >
@@ -742,126 +745,173 @@ export default function AnalyticsPage() {
       )}
 
       {/* Tab: Lending */}
-      {activeTab === "lending" && (() => {
-        const summary = loanSummaryData?.data;
-        return (
-          <div className="space-y-6 animate-in fade-in duration-300">
-            {/* KPI Row */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="glass-card p-5 rounded-2xl space-y-1.5 overflow-hidden">
-                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5 truncate">
-                  <HandCoins className="w-3.5 h-3.5 shrink-0 text-primary" />
-                  <span className="truncate">Total Lent</span>
-                </p>
-                <p className="text-xl font-black text-foreground break-words">
-                  {formatCurrency(summary?.totalLent ?? 0)}
-                </p>
-              </div>
-              <div className="glass-card p-5 rounded-2xl space-y-1.5 overflow-hidden">
-                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5 truncate">
-                  <TrendingUp className="w-3.5 h-3.5 shrink-0 text-emerald-500" />
-                  <span className="truncate">Total Repaid</span>
-                </p>
-                <p className="text-xl font-black text-emerald-500 break-words">
-                  {formatCurrency(summary?.totalRepaid ?? 0)}
-                </p>
-              </div>
-              <div className="glass-card p-5 rounded-2xl space-y-1.5 overflow-hidden">
-                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5 truncate">
-                  <CreditCard className="w-3.5 h-3.5 shrink-0 text-amber-500" />
-                  <span className="truncate">Outstanding</span>
-                </p>
-                <p className="text-xl font-black text-amber-500 break-words">
-                  {formatCurrency(summary?.totalOutstanding ?? 0)}
-                </p>
-              </div>
-              <div className="glass-card p-5 rounded-2xl space-y-1.5 overflow-hidden">
-                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5 truncate">
-                  <Users className="w-3.5 h-3.5 shrink-0 text-blue-500" />
-                  <span className="truncate">Active Loans</span>
-                </p>
-                <p className="text-xl font-black text-blue-500 break-words">
-                  {summary?.activeLoans ?? 0}
-                </p>
-              </div>
-            </div>
-
-            {/* Loan Status Breakdown */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="glass-card p-6 rounded-3xl space-y-4">
-                <div className="flex items-center gap-2 border-b border-border pb-3">
-                  <HandCoins className="w-5 h-5 text-primary" />
-                  <h2 className="text-base font-bold text-foreground">Loan Status Overview</h2>
+      {activeTab === "lending" &&
+        (() => {
+          const summary = loanSummaryData?.data;
+          return (
+            <div className="space-y-6 animate-in fade-in duration-300">
+              {/* KPI Row */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="glass-card p-5 rounded-2xl space-y-1.5 overflow-hidden">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5 truncate">
+                    <HandCoins className="w-3.5 h-3.5 shrink-0 text-primary" />
+                    <span className="truncate">Total Lent</span>
+                  </p>
+                  <p className="text-xl font-black text-foreground wrap-break-word">
+                    {formatCurrency(summary?.totalLent ?? 0)}
+                  </p>
                 </div>
-                <div className="space-y-4">
-                  {[
-                    { label: "Active Loans", count: summary?.activeLoans ?? 0, color: "bg-blue-500", total: summary?.totalLoans ?? 1 },
-                    { label: "Fully Repaid", count: summary?.repaidLoans ?? 0, color: "bg-emerald-500", total: summary?.totalLoans ?? 1 },
-                    { label: "Partially Repaid", count: summary?.partiallyRepaidLoans ?? 0, color: "bg-amber-500", total: summary?.totalLoans ?? 1 },
-                    { label: "Written Off", count: summary?.writtenOffLoans ?? 0, color: "bg-rose-500", total: summary?.totalLoans ?? 1 },
-                    { label: "Cancelled", count: summary?.cancelledLoans ?? 0, color: "bg-muted-foreground", total: summary?.totalLoans ?? 1 },
-                  ].map((item, idx) => (
-                    <div key={idx} className="space-y-1.5">
-                      <div className="flex justify-between items-center text-xs">
-                        <span className="font-semibold">{item.label}</span>
-                        <span className="text-muted-foreground font-medium">{item.count} loans</span>
+                <div className="glass-card p-5 rounded-2xl space-y-1.5 overflow-hidden">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5 truncate">
+                    <TrendingUp className="w-3.5 h-3.5 shrink-0 text-emerald-500" />
+                    <span className="truncate">Total Repaid</span>
+                  </p>
+                  <p className="text-xl font-black text-emerald-500 wrap-break-word">
+                    {formatCurrency(summary?.totalRepaid ?? 0)}
+                  </p>
+                </div>
+                <div className="glass-card p-5 rounded-2xl space-y-1.5 overflow-hidden">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5 truncate">
+                    <CreditCard className="w-3.5 h-3.5 shrink-0 text-amber-500" />
+                    <span className="truncate">Outstanding</span>
+                  </p>
+                  <p className="text-xl font-black text-amber-500 wrap-break-word">
+                    {formatCurrency(summary?.totalOutstanding ?? 0)}
+                  </p>
+                </div>
+                <div className="glass-card p-5 rounded-2xl space-y-1.5 overflow-hidden">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5 truncate">
+                    <Users className="w-3.5 h-3.5 shrink-0 text-blue-500" />
+                    <span className="truncate">Active Loans</span>
+                  </p>
+                  <p className="text-xl font-black text-blue-500 wrap-break-word">
+                    {summary?.activeLoans ?? 0}
+                  </p>
+                </div>
+              </div>
+
+              {/* Loan Status Breakdown */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="glass-card p-6 rounded-3xl space-y-4">
+                  <div className="flex items-center gap-2 border-b border-border pb-3">
+                    <HandCoins className="w-5 h-5 text-primary" />
+                    <h2 className="text-base font-bold text-foreground">
+                      Loan Status Overview
+                    </h2>
+                  </div>
+                  <div className="space-y-4">
+                    {[
+                      {
+                        label: "Active Loans",
+                        count: summary?.activeLoans ?? 0,
+                        color: "bg-blue-500",
+                        total: summary?.totalLoans ?? 1,
+                      },
+                      {
+                        label: "Fully Repaid",
+                        count: summary?.repaidLoans ?? 0,
+                        color: "bg-emerald-500",
+                        total: summary?.totalLoans ?? 1,
+                      },
+                      {
+                        label: "Partially Repaid",
+                        count: summary?.partiallyRepaidLoans ?? 0,
+                        color: "bg-amber-500",
+                        total: summary?.totalLoans ?? 1,
+                      },
+                      {
+                        label: "Written Off",
+                        count: summary?.writtenOffLoans ?? 0,
+                        color: "bg-rose-500",
+                        total: summary?.totalLoans ?? 1,
+                      },
+                      {
+                        label: "Cancelled",
+                        count: summary?.cancelledLoans ?? 0,
+                        color: "bg-muted-foreground",
+                        total: summary?.totalLoans ?? 1,
+                      },
+                    ].map((item, idx) => (
+                      <div key={idx} className="space-y-1.5">
+                        <div className="flex justify-between items-center text-xs">
+                          <span className="font-semibold">{item.label}</span>
+                          <span className="text-muted-foreground font-medium">
+                            {item.count} loans
+                          </span>
+                        </div>
+                        <div className="w-full h-2 rounded-full bg-secondary overflow-hidden">
+                          <div
+                            className={`h-full rounded-full transition-all ${item.color}`}
+                            style={{
+                              width: `${item.total > 0 ? Math.round((item.count / item.total) * 100) : 0}%`,
+                            }}
+                          />
+                        </div>
                       </div>
-                      <div className="w-full h-2 rounded-full bg-secondary overflow-hidden">
+                    ))}
+                  </div>
+                </div>
+
+                {/* Recovery Rate */}
+                <div className="glass-card p-6 rounded-3xl space-y-4">
+                  <div className="flex items-center gap-2 border-b border-border pb-3">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                    <h2 className="text-base font-bold text-foreground">
+                      Recovery Summary
+                    </h2>
+                  </div>
+                  {!summary || summary.totalLent === 0 ? (
+                    <div className="h-48 flex items-center justify-center text-xs text-muted-foreground">
+                      No lending activity yet.
+                    </div>
+                  ) : (
+                    <div className="space-y-5">
+                      <div className="flex flex-col items-center justify-center gap-2 pt-4">
+                        <p className="text-5xl font-black text-emerald-500">
+                          {summary.totalLent > 0
+                            ? Math.round(
+                                (summary.totalRepaid / summary.totalLent) * 100,
+                              )
+                            : 0}
+                          %
+                        </p>
+                        <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wide">
+                          Recovery Rate
+                        </p>
+                      </div>
+                      <div className="w-full h-3 rounded-full bg-secondary overflow-hidden">
                         <div
-                          className={`h-full rounded-full transition-all ${item.color}`}
-                          style={{ width: `${item.total > 0 ? Math.round((item.count / item.total) * 100) : 0}%` }}
+                          className="h-full rounded-full bg-emerald-500 transition-all"
+                          style={{
+                            width: `${summary.totalLent > 0 ? Math.min(100, Math.round((summary.totalRepaid / summary.totalLent) * 100)) : 0}%`,
+                          }}
                         />
                       </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Recovery Rate */}
-              <div className="glass-card p-6 rounded-3xl space-y-4">
-                <div className="flex items-center gap-2 border-b border-border pb-3">
-                  <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-                  <h2 className="text-base font-bold text-foreground">Recovery Summary</h2>
-                </div>
-                {!summary || summary.totalLent === 0 ? (
-                  <div className="h-48 flex items-center justify-center text-xs text-muted-foreground">
-                    No lending activity yet.
-                  </div>
-                ) : (
-                  <div className="space-y-5">
-                    <div className="flex flex-col items-center justify-center gap-2 pt-4">
-                      <p className="text-5xl font-black text-emerald-500">
-                        {summary.totalLent > 0
-                          ? Math.round((summary.totalRepaid / summary.totalLent) * 100)
-                          : 0}%
-                      </p>
-                      <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wide">Recovery Rate</p>
-                    </div>
-                    <div className="w-full h-3 rounded-full bg-secondary overflow-hidden">
-                      <div
-                        className="h-full rounded-full bg-emerald-500 transition-all"
-                        style={{
-                          width: `${summary.totalLent > 0 ? Math.min(100, Math.round((summary.totalRepaid / summary.totalLent) * 100)) : 0}%`
-                        }}
-                      />
-                    </div>
-                    <div className="grid grid-cols-2 gap-3 pt-2">
-                      <div className="bg-secondary/50 rounded-xl p-3 space-y-0.5">
-                        <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Total Loans</p>
-                        <p className="text-sm font-bold">{summary.totalLoans ?? 0}</p>
-                      </div>
-                      <div className="bg-secondary/50 rounded-xl p-3 space-y-0.5">
-                        <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Written Off</p>
-                        <p className="text-sm font-bold text-rose-500">{formatCurrency(summary.totalWrittenOff ?? 0)}</p>
+                      <div className="grid grid-cols-2 gap-3 pt-2">
+                        <div className="bg-secondary/50 rounded-xl p-3 space-y-0.5">
+                          <p className="text-[10px] text-muted-foreground uppercase tracking-wide">
+                            Total Loans
+                          </p>
+                          <p className="text-sm font-bold">
+                            {summary.totalLoans ?? 0}
+                          </p>
+                        </div>
+                        <div className="bg-secondary/50 rounded-xl p-3 space-y-0.5">
+                          <p className="text-[10px] text-muted-foreground uppercase tracking-wide">
+                            Written Off
+                          </p>
+                          <p className="text-sm font-bold text-rose-500">
+                            {formatCurrency(summary.totalWrittenOff ?? 0)}
+                          </p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        );
-      })()}
+          );
+        })()}
     </div>
   );
 }

@@ -3,33 +3,33 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { RootState } from "@/redux/store";
 import {
-    useCreateAdminMutation,
-    useGetAdminsQuery,
-    useUpdateAdminStatusMutation,
+  useCreateAdminMutation,
+  useGetAdminsQuery,
+  useUpdateAdminStatusMutation,
 } from "@/services/admin-api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-    Ban,
-    CheckCircle,
-    Loader2,
-    MoreVertical,
-    Plus,
-    ShieldAlert,
-    UserCog,
+  Ban,
+  CheckCircle,
+  Loader2,
+  MoreVertical,
+  Plus,
+  ShieldAlert,
+  UserCog,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";

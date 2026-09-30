@@ -1,8 +1,8 @@
 "use client";
 
+import { TablePagination } from "@/components/custom/table-pagination";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { TablePagination } from "@/components/custom/table-pagination";
 import {
   Dialog,
   DialogContent,
