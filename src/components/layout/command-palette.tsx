@@ -29,25 +29,27 @@ export function CommandPalette() {
   const router = useRouter();
   const user = useSelector((state: RootState) => state.auth.user);
 
-  const { data: userData, isFetching: isUserFetching } =
-    useGlobalSearchQuery(debouncedQuery, {
+  const { data: userData, isFetching: isUserFetching } = useGlobalSearchQuery(
+    debouncedQuery,
+    {
       skip: !debouncedQuery || debouncedQuery.length < 2 || !!user?.isAdmin,
-    });
+    },
+  );
   const { data: adminData, isFetching: isAdminFetching } =
     useGlobalAdminSearchQuery(debouncedQuery, {
       skip: !debouncedQuery || debouncedQuery.length < 2 || !user?.isAdmin,
     });
 
   const isFetching = isUserFetching || isAdminFetching;
-  
+
   // Get frontend routes
   const routeResults = useMemo(() => {
     if (!debouncedQuery || debouncedQuery.length < 2) return [];
-    
+
     const allGroups = getNavGroups(user);
     const searchLower = debouncedQuery.toLowerCase();
     const matches: any[] = [];
-    
+
     allGroups.forEach((group) => {
       group.items.forEach((item) => {
         if (item.name.toLowerCase().includes(searchLower)) {
@@ -61,7 +63,7 @@ export function CommandPalette() {
         }
       });
     });
-    
+
     return matches;
   }, [debouncedQuery, user]);
 
@@ -80,7 +82,6 @@ export function CommandPalette() {
     document.addEventListener("keydown", down);
     return () => document.removeEventListener("keydown", down);
   }, []);
-
 
   const handleSelect = (url: string) => {
     setIsOpen(false);

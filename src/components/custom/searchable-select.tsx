@@ -1,6 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { Check, Search } from "lucide-react";
 import * as React from "react";
@@ -22,14 +26,17 @@ export function SearchableSelect({
   const [search, setSearch] = React.useState("");
 
   const filteredOptions = options.filter((option) =>
-    option.label.toLowerCase().includes(search.toLowerCase())
+    option.label.toLowerCase().includes(search.toLowerCase()),
   );
 
   return (
-    <Popover open={open} onOpenChange={(open) => {
-      setOpen(open);
-      if (!open) setSearch(""); // Reset search on close
-    }}>
+    <Popover
+      open={open}
+      onOpenChange={(open) => {
+        setOpen(open);
+        if (!open) setSearch(""); // Reset search on close
+      }}
+    >
       <PopoverTrigger asChild>
         <Button
           variant="outline"
@@ -37,7 +44,7 @@ export function SearchableSelect({
           aria-expanded={open}
           className={cn(
             "w-full justify-between h-9 text-sm bg-background border-input hover:border-primary/50 transition-colors focus-visible:ring-primary/20",
-            !value && "text-muted-foreground font-normal"
+            !value && "text-muted-foreground font-normal",
           )}
           disabled={disabled}
         >
@@ -46,9 +53,9 @@ export function SearchableSelect({
             : placeholder}
         </Button>
       </PopoverTrigger>
-      <PopoverContent 
-        className="p-0 shadow-lg" 
-        align="start" 
+      <PopoverContent
+        className="p-0 shadow-lg"
+        align="start"
         style={{ width: "var(--radix-popover-trigger-width)" }}
       >
         <div className="flex items-center border-b px-3">
@@ -60,16 +67,19 @@ export function SearchableSelect({
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <div className="overflow-y-auto max-h-[200px] p-1">
+        <div className="overflow-y-auto max-h-50 p-1">
           {filteredOptions.length === 0 ? (
-            <p className="p-4 text-sm text-center text-muted-foreground">No results found.</p>
+            <p className="p-4 text-sm text-center text-muted-foreground">
+              No results found.
+            </p>
           ) : (
             filteredOptions.map((option) => (
               <div
                 key={option.value}
                 className={cn(
-                  "relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-                  value === option.value && "bg-accent/50 text-accent-foreground"
+                  "relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50",
+                  value === option.value &&
+                    "bg-accent/50 text-accent-foreground",
                 )}
                 onClick={() => {
                   onChange(option.value);
@@ -80,7 +90,7 @@ export function SearchableSelect({
                 <Check
                   className={cn(
                     "mr-2 h-4 w-4",
-                    value === option.value ? "opacity-100" : "opacity-0"
+                    value === option.value ? "opacity-100" : "opacity-0",
                   )}
                 />
                 {option.label}

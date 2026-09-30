@@ -16,7 +16,7 @@ import {
   Home,
   Landmark,
   LayoutDashboard,
-  Megaphone,
+  MessageSquare,
   MoreHorizontal,
   PiggyBank,
   Receipt,
@@ -25,13 +25,12 @@ import {
   SendHorizonal,
   Settings,
   ShieldAlert,
+  Star,
   Target,
   TrendingUp,
   User,
   Users,
   Wallet,
-  MessageSquare,
-  Star,
   X,
 } from "lucide-react";
 import Link from "next/link";
@@ -78,7 +77,11 @@ const moreItems = [
 ];
 
 const adminMoreItems = [
-  { name: "Send Notification", href: "/admin/send-notification", icon: SendHorizonal },
+  {
+    name: "Send Notification",
+    href: "/admin/send-notification",
+    icon: SendHorizonal,
+  },
   { name: "Activity", href: "/admin/activity", icon: Activity },
   { name: "Feedbacks", href: "/admin/feedbacks", icon: MessageSquare },
   { name: "Reviews", href: "/admin/reviews", icon: Star },
@@ -94,22 +97,24 @@ export function MobileNav() {
 
   const isAdmin = user?.isAdmin;
   const tabItems = isAdmin ? adminMobileItems : mobileItems;
-  const drawerItems = isAdmin
-    ? adminMoreItems
-    : moreItems;
+  const drawerItems = isAdmin ? adminMoreItems : moreItems;
 
-  const isMoreActive = drawerItems.some(
-    (item) =>
-      item.href === "/admin" || item.href === "/dashboard"
-        ? pathname === item.href
-        : pathname === item.href || pathname.startsWith(`${item.href}/`),
+  const isMoreActive = drawerItems.some((item) =>
+    item.href === "/admin" || item.href === "/dashboard"
+      ? pathname === item.href
+      : pathname === item.href || pathname.startsWith(`${item.href}/`),
   );
 
   return (
     <>
       {/* ── Bottom Tab Bar ── */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-card border-t border-border shadow-[0_-4px_24px_rgba(0,0,0,0.08)] flex items-stretch"
-        style={{ paddingBottom: "env(safe-area-inset-bottom)", height: "calc(60px + env(safe-area-inset-bottom))" }}>
+      <nav
+        className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-card border-t border-border shadow-[0_-4px_24px_rgba(0,0,0,0.08)] flex items-stretch"
+        style={{
+          paddingBottom: "env(safe-area-inset-bottom)",
+          height: "calc(60px + env(safe-area-inset-bottom))",
+        }}
+      >
         {tabItems.map((item) => {
           const isActive =
             item.href === "/admin" || item.href === "/dashboard"
@@ -135,7 +140,7 @@ export function MobileNav() {
               >
                 <Icon
                   className={cn(
-                    "w-[18px] h-[18px] transition-transform duration-150",
+                    "w-4.5 h-4.5 transition-transform duration-150",
                     isActive && "scale-110",
                   )}
                 />
@@ -168,7 +173,7 @@ export function MobileNav() {
               isMoreActive ? "bg-primary/12" : "",
             )}
           >
-            <MoreHorizontal className="w-[18px] h-[18px]" />
+            <MoreHorizontal className="w-4.5 h-4.5" />
           </div>
           <span
             className={cn(
@@ -185,14 +190,15 @@ export function MobileNav() {
       <DialogPrimitive.Root open={moreOpen} onOpenChange={setMoreOpen}>
         <DialogPrimitive.Portal>
           {/* Backdrop */}
-          <DialogPrimitive.Overlay
-            className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 md:hidden"
-          />
+          <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 md:hidden" />
 
           {/* Sheet Panel */}
           <DialogPrimitive.Content
             className="fixed bottom-0 left-0 right-0 z-50 bg-card rounded-t-2xl shadow-2xl data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom duration-300 md:hidden focus:outline-none"
-            style={{ paddingBottom: "env(safe-area-inset-bottom)", maxHeight: "80dvh" }}
+            style={{
+              paddingBottom: "env(safe-area-inset-bottom)",
+              maxHeight: "80dvh",
+            }}
           >
             {/* Handle bar */}
             <div className="flex justify-center pt-3 pb-1">
@@ -210,13 +216,17 @@ export function MobileNav() {
             </div>
 
             {/* Grid of routes */}
-            <div className="overflow-y-auto" style={{ maxHeight: "calc(80dvh - 100px)" }}>
+            <div
+              className="overflow-y-auto"
+              style={{ maxHeight: "calc(80dvh - 100px)" }}
+            >
               <div className="grid grid-cols-3 gap-2.5 p-4">
                 {drawerItems.map((item) => {
                   const isActive =
                     item.href === "/admin" || item.href === "/dashboard"
                       ? pathname === item.href
-                      : pathname === item.href || pathname.startsWith(`${item.href}/`);
+                      : pathname === item.href ||
+                        pathname.startsWith(`${item.href}/`);
                   const Icon = item.icon;
                   return (
                     <Link
@@ -233,9 +243,7 @@ export function MobileNav() {
                       <div
                         className={cn(
                           "w-9 h-9 rounded-xl flex items-center justify-center",
-                          isActive
-                            ? "bg-primary/15"
-                            : "bg-background/80",
+                          isActive ? "bg-primary/15" : "bg-background/80",
                         )}
                       >
                         <Icon className="w-4.5 h-4.5 shrink-0" />

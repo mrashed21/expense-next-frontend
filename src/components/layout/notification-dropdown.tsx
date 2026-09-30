@@ -8,13 +8,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { RootState } from "@/redux/store";
 import { useGetAdminFeedbacksQuery } from "@/services/feedback-api";
-import { useGetAdminReviewsQuery } from "@/services/review-api";
 import {
   useDeleteNotificationMutation,
   useGetNotificationsQuery,
   useMarkAllAsReadMutation,
   useMarkAsReadMutation,
 } from "@/services/notification-api";
+import { useGetAdminReviewsQuery } from "@/services/review-api";
 import { formatDistanceToNow, parseISO } from "date-fns";
 import {
   AlertTriangle,
@@ -24,14 +24,14 @@ import {
   CheckCircle2,
   Clock,
   Info,
+  MessageSquare,
   Shield,
+  Star,
   Trash2,
   TrendingDown,
   TrendingUp,
   User,
   Wallet,
-  MessageSquare,
-  Star,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -99,30 +99,36 @@ export function NotificationDropdown() {
 
   const adminNotifications = useMemo(() => {
     if (!user?.isAdmin) return [];
-    
-    const feedbacks = (adminFeedbackData?.data || []).filter((f: any) => f.status === "pending").map((f: any) => ({
-      _id: f._id,
-      type: "feedback",
-      title: "New Feedback",
-      message: `${f.user_id?.user_name || "Someone"} sent a feedback`,
-      createdAt: f.createdAt,
-      is_read: false,
-      url: "/admin/feedbacks"
-    }));
 
-    const reviews = (adminReviewData?.data || []).filter((r: any) => r.status === "pending").map((r: any) => ({
-      _id: r._id,
-      type: "review",
-      title: "New Review",
-      message: `${r.user_id?.user_name || "Someone"} submitted a review`,
-      createdAt: r.createdAt,
-      is_read: false,
-      url: "/admin/reviews"
-    }));
+    const feedbacks = (adminFeedbackData?.data || [])
+      .filter((f: any) => f.status === "pending")
+      .map((f: any) => ({
+        _id: f._id,
+        type: "feedback",
+        title: "New Feedback",
+        message: `${f.user_id?.user_name || "Someone"} sent a feedback`,
+        createdAt: f.createdAt,
+        is_read: false,
+        url: "/admin/feedbacks",
+      }));
 
-    return [...feedbacks, ...reviews].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    const reviews = (adminReviewData?.data || [])
+      .filter((r: any) => r.status === "pending")
+      .map((r: any) => ({
+        _id: r._id,
+        type: "review",
+        title: "New Review",
+        message: `${r.user_id?.user_name || "Someone"} submitted a review`,
+        createdAt: r.createdAt,
+        is_read: false,
+        url: "/admin/reviews",
+      }));
+
+    return [...feedbacks, ...reviews].sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
   }, [adminFeedbackData, adminReviewData, user?.isAdmin]);
-
 
   const {
     data: notificationsData,
@@ -143,7 +149,7 @@ export function NotificationDropdown() {
   const isError = user?.isAdmin ? false : isNotificationsError;
 
   const notifications = useMemo(
-    () => user?.isAdmin ? adminNotifications : (notificationsData?.data || []),
+    () => (user?.isAdmin ? adminNotifications : notificationsData?.data || []),
     [user?.isAdmin, adminNotifications, notificationsData],
   );
 
@@ -291,7 +297,11 @@ export function NotificationDropdown() {
                 className="h-7 text-xs font-semibold text-primary hover:text-primary hover:bg-primary/10 gap-1"
                 onClick={() => setIsOpen(false)}
               >
-                <Link href={user?.isAdmin ? "/admin/notifications" : "/notifications"}>
+                <Link
+                  href={
+                    user?.isAdmin ? "/admin/notifications" : "/notifications"
+                  }
+                >
                   View All Notifications
                   <ArrowRight className="w-3 h-3" />
                 </Link>
@@ -384,7 +394,9 @@ export function NotificationDropdown() {
             className="w-full h-8 text-xs font-semibold text-primary hover:text-primary hover:bg-primary/10 justify-center gap-1"
             onClick={() => setIsOpen(false)}
           >
-            <Link href={user?.isAdmin ? "/admin/notifications" : "/notifications"}>
+            <Link
+              href={user?.isAdmin ? "/admin/notifications" : "/notifications"}
+            >
               View All Notifications
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
