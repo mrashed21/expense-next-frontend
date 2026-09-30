@@ -9,24 +9,24 @@ import { TableSkeleton } from "@/components/custom/table-skeleton";
 import { useCurrency } from "@/hooks/use-currency";
 import { formatDate } from "@/lib/utils";
 import {
-    useAddPaymentMutation,
-    useCreateDebtMutation,
-    useDeleteDebtMutation,
-    useGetDebtsQuery,
-    useUpdateDebtMutation,
+  useAddPaymentMutation,
+  useCreateDebtMutation,
+  useDeleteDebtMutation,
+  useGetDebtsQuery,
+  useUpdateDebtMutation,
 } from "@/services/debt-api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-    CheckCircle2,
-    Clock,
-    CreditCard,
-    HandCoins,
-    Loader2,
-    Pencil,
-    Plus,
-    Search,
-    Trash2,
-    X,
+  CheckCircle2,
+  Clock,
+  CreditCard,
+  HandCoins,
+  Loader2,
+  Pencil,
+  Plus,
+  Search,
+  Trash2,
+  X,
 } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -288,7 +288,7 @@ export default function DebtsPage() {
       {debtsLoading ? (
         <TableSkeleton columns={6} rows={5} />
       ) : debts.length === 0 ? (
-        <EmptyState 
+        <EmptyState
           title="No Debts Found"
           description="Record who owes you money or your outstanding loans."
           actionLabel="Add Debt"
@@ -306,33 +306,51 @@ export default function DebtsPage() {
               const isPaid = debt.derived_status === "paid";
               const isLent = debt.type === "lent";
               return (
-                <div key={debt._id} className="p-4 hover:bg-secondary/20 transition-colors">
+                <div
+                  key={debt._id}
+                  className="p-4 hover:bg-secondary/20 transition-colors"
+                >
                   <div className="flex items-start justify-between gap-3">
                     <span className="text-xs font-bold text-muted-foreground w-6 shrink-0 mt-0.5">
                       #{(debtPage - 1) * debtPageSize + idx + 1}
                     </span>
                     <div className="min-w-0 flex-1">
-                      <p className="font-bold text-foreground truncate">{debt.person_name}</p>
+                      <p className="font-bold text-foreground truncate">
+                        {debt.person_name}
+                      </p>
                       <div className="flex items-center gap-2 mt-1">
-                        <span className={`text-[10px] uppercase font-semibold ${isLent ? "text-emerald-500" : "text-destructive"}`}>{debt.type}</span>
+                        <span
+                          className={`text-[10px] uppercase font-semibold ${isLent ? "text-emerald-500" : "text-destructive"}`}
+                        >
+                          {debt.type}
+                        </span>
                         {debt.due_date && (
                           <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
-                            <Clock className="w-3 h-3" />{formatDate(debt.due_date)}
+                            <Clock className="w-3 h-3" />
+                            {formatDate(debt.due_date)}
                           </span>
                         )}
                       </div>
                     </div>
                     <div className="text-right shrink-0">
-                      <p className={`font-bold ${isPaid ? "text-muted-foreground line-through" : "text-foreground"}`}>
+                      <p
+                        className={`font-bold ${isPaid ? "text-muted-foreground line-through" : "text-foreground"}`}
+                      >
                         {formatCurrency(debt.true_remaining_amount)}
                       </p>
                       <div className="flex items-center justify-end gap-1 mt-2">
                         {!isPaid && (
-                          <button onClick={() => openPayment(debt)} className="p-1.5 rounded-lg text-muted-foreground hover:text-emerald-500 hover:bg-emerald-500/10 transition-colors">
+                          <button
+                            onClick={() => openPayment(debt)}
+                            className="p-1.5 rounded-lg text-muted-foreground hover:text-emerald-500 hover:bg-emerald-500/10 transition-colors"
+                          >
                             <CreditCard className="w-3.5 h-3.5" />
                           </button>
                         )}
-                        <button onClick={() => openEdit(debt)} className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors">
+                        <button
+                          onClick={() => openEdit(debt)}
+                          className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                        >
                           <Pencil className="w-3.5 h-3.5" />
                         </button>
                         <button
@@ -354,13 +372,27 @@ export default function DebtsPage() {
             <table className="w-full text-left text-sm">
               <thead className="bg-secondary/50 text-muted-foreground border-b border-border">
                 <tr>
-                  <th className="px-4 py-4 font-semibold text-xs uppercase tracking-wider text-center w-12">#</th>
-                  <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider">Details</th>
-                  <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">Principal</th>
-                  <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">Interest</th>
-                  <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">Owed/Remaining</th>
-                  <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-center">Status</th>
-                  <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">Actions</th>
+                  <th className="px-4 py-4 font-semibold text-xs uppercase tracking-wider text-center w-12">
+                    #
+                  </th>
+                  <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider">
+                    Details
+                  </th>
+                  <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">
+                    Principal
+                  </th>
+                  <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">
+                    Interest
+                  </th>
+                  <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">
+                    Owed/Remaining
+                  </th>
+                  <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-center">
+                    Status
+                  </th>
+                  <th className="px-6 py-4 font-semibold text-xs uppercase tracking-wider text-right">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -368,22 +400,34 @@ export default function DebtsPage() {
                   const isPaid = debt.derived_status === "paid";
                   const isLent = debt.type === "lent";
                   return (
-                    <tr key={debt._id} className="hover:bg-secondary/30 transition-colors">
+                    <tr
+                      key={debt._id}
+                      className="hover:bg-secondary/30 transition-colors"
+                    >
                       <td className="px-4 py-4 text-center text-xs font-semibold text-muted-foreground w-12">
                         {(debtPage - 1) * debtPageSize + idx + 1}
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-xs uppercase ${isLent ? "bg-emerald-500/10 text-emerald-500" : "bg-destructive/10 text-destructive"}`}>
+                          <div
+                            className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-xs uppercase ${isLent ? "bg-emerald-500/10 text-emerald-500" : "bg-destructive/10 text-destructive"}`}
+                          >
                             {debt.person_name.substring(0, 2)}
                           </div>
                           <div>
-                            <p className="font-bold text-foreground line-clamp-1">{debt.person_name}</p>
+                            <p className="font-bold text-foreground line-clamp-1">
+                              {debt.person_name}
+                            </p>
                             <div className="flex items-center gap-2">
-                              <span className={`text-[10px] uppercase font-semibold ${isLent ? "text-emerald-500" : "text-destructive"}`}>{debt.type}</span>
+                              <span
+                                className={`text-[10px] uppercase font-semibold ${isLent ? "text-emerald-500" : "text-destructive"}`}
+                              >
+                                {debt.type}
+                              </span>
                               {debt.due_date && (
                                 <span className="text-[10px] text-muted-foreground flex items-center gap-0.5">
-                                  <Clock className="w-3 h-3" />{formatDate(debt.due_date)}
+                                  <Clock className="w-3 h-3" />
+                                  {formatDate(debt.due_date)}
                                 </span>
                               )}
                             </div>
@@ -391,16 +435,26 @@ export default function DebtsPage() {
                         </div>
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <p className="font-semibold text-foreground">{formatCurrency(debt.amount)}</p>
+                        <p className="font-semibold text-foreground">
+                          {formatCurrency(debt.amount)}
+                        </p>
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <p className="font-semibold text-foreground">{debt.interest_rate > 0 ? `${debt.interest_rate}%` : "-"}</p>
+                        <p className="font-semibold text-foreground">
+                          {debt.interest_rate > 0
+                            ? `${debt.interest_rate}%`
+                            : "-"}
+                        </p>
                         {debt.accrued_interest > 0 && (
-                          <p className="text-[10px] text-muted-foreground">+{formatCurrency(debt.accrued_interest)}</p>
+                          <p className="text-[10px] text-muted-foreground">
+                            +{formatCurrency(debt.accrued_interest)}
+                          </p>
                         )}
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <p className={`font-bold ${isPaid ? "text-muted-foreground line-through" : "text-foreground"}`}>
+                        <p
+                          className={`font-bold ${isPaid ? "text-muted-foreground line-through" : "text-foreground"}`}
+                        >
                           {formatCurrency(debt.true_remaining_amount)}
                         </p>
                       </td>
@@ -410,22 +464,38 @@ export default function DebtsPage() {
                             <CheckCircle2 className="w-3 h-3" /> Paid
                           </span>
                         ) : debt.derived_status === "partial" ? (
-                          <span className="inline-flex px-2 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-500 text-[10px] font-bold uppercase">Partial</span>
+                          <span className="inline-flex px-2 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-500 text-[10px] font-bold uppercase">
+                            Partial
+                          </span>
                         ) : (
-                          <span className="inline-flex px-2 py-1 rounded-full bg-secondary border border-border text-muted-foreground text-[10px] font-bold uppercase">Pending</span>
+                          <span className="inline-flex px-2 py-1 rounded-full bg-secondary border border-border text-muted-foreground text-[10px] font-bold uppercase">
+                            Pending
+                          </span>
                         )}
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center justify-end gap-1">
                           {!isPaid && (
-                            <button onClick={() => openPayment(debt)} className="p-1.5 rounded-lg text-muted-foreground hover:text-emerald-500 hover:bg-emerald-500/10 transition-colors" title="Log Payment">
+                            <button
+                              onClick={() => openPayment(debt)}
+                              className="p-1.5 rounded-lg text-muted-foreground hover:text-emerald-500 hover:bg-emerald-500/10 transition-colors"
+                              title="Log Payment"
+                            >
                               <CreditCard className="w-4 h-4" />
                             </button>
                           )}
-                          <button onClick={() => openEdit(debt)} className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors" title="Edit Debt">
+                          <button
+                            onClick={() => openEdit(debt)}
+                            className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+                            title="Edit Debt"
+                          >
                             <Pencil className="w-4 h-4" />
                           </button>
-                          <button onClick={() => handleDelete(debt._id)} className="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors" title="Delete Debt">
+                          <button
+                            onClick={() => handleDelete(debt._id)}
+                            className="p-1.5 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+                            title="Delete Debt"
+                          >
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
@@ -506,7 +576,9 @@ export default function DebtsPage() {
                     Principal Amount
                   </label>
                   <input
-                    {...registerForm("amount", { setValueAs: (v) => v === "" ? undefined : Number(v) })}
+                    {...registerForm("amount", {
+                      setValueAs: (v) => (v === "" ? undefined : Number(v)),
+                    })}
                     type="number"
                     step="0.01"
                     placeholder="0.00"
@@ -524,7 +596,8 @@ export default function DebtsPage() {
                   </label>
                   <input
                     {...registerForm("interest_rate", {
-                      setValueAs: (v) => (v === "" || v === undefined ? 0 : Number(v)),
+                      setValueAs: (v) =>
+                        v === "" || v === undefined ? 0 : Number(v),
                     })}
                     type="number"
                     step="0.01"
@@ -610,7 +683,9 @@ export default function DebtsPage() {
                   Payment Amount
                 </label>
                 <input
-                  {...registerPayment("amount", { setValueAs: (v) => v === "" ? undefined : Number(v) })}
+                  {...registerPayment("amount", {
+                    setValueAs: (v) => (v === "" ? undefined : Number(v)),
+                  })}
                   type="number"
                   step="0.01"
                   placeholder="0.00"

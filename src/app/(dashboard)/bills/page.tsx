@@ -154,8 +154,8 @@ export default function BillsPage() {
           <CardSkeleton count={6} />
         ) : bills.length === 0 ? (
           <div className="col-span-full">
-            <EmptyState 
-              title="No Bills Found" 
+            <EmptyState
+              title="No Bills Found"
               description="Keep track of your utility bills, EMIs, and monthly recurring subscriptions."
               actionLabel="Add Bill"
               icon={<FileCheck className="w-8 h-8" />}
@@ -164,78 +164,78 @@ export default function BillsPage() {
           </div>
         ) : (
           bills.map((b: any) => {
-          const isPaid = b.status === "paid";
+            const isPaid = b.status === "paid";
 
-          return (
-            <div
-              key={b._id}
-              className="glass-card p-5 rounded-3xl space-y-3 relative group"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div
-                    className={`w-10 h-10 rounded-2xl flex items-center justify-center font-bold text-sm ${
-                      isPaid
-                        ? "bg-emerald-500/10 text-emerald-500"
-                        : "bg-amber-500/10 text-amber-500"
-                    }`}
+            return (
+              <div
+                key={b._id}
+                className="glass-card p-5 rounded-3xl space-y-3 relative group"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={`w-10 h-10 rounded-2xl flex items-center justify-center font-bold text-sm ${
+                        isPaid
+                          ? "bg-emerald-500/10 text-emerald-500"
+                          : "bg-amber-500/10 text-amber-500"
+                      }`}
+                    >
+                      <FileCheck className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-foreground">
+                        {b.title}
+                      </h3>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-secondary border border-border text-muted-foreground font-semibold">
+                        {b.type}
+                      </span>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => handleDelete(b._id)}
+                    className="p-1 rounded-lg text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
                   >
-                    <FileCheck className="w-5 h-5" />
-                  </div>
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <div className="flex items-end justify-between pt-2 border-t border-border">
                   <div>
-                    <h3 className="text-sm font-bold text-foreground">
-                      {b.title}
-                    </h3>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-secondary border border-border text-muted-foreground font-semibold">
-                      {b.type}
+                    <span className="text-[10px] font-semibold text-muted-foreground uppercase">
+                      Due Date
                     </span>
+                    <p className="text-xs font-bold text-foreground">
+                      {formatDate(b.due_date)}
+                    </p>
+                  </div>
+
+                  <div className="text-right">
+                    <span className="text-[10px] font-semibold text-muted-foreground uppercase">
+                      Amount
+                    </span>
+                    <p className="text-base font-black text-foreground">
+                      {formatCurrency(b.amount)}
+                    </p>
                   </div>
                 </div>
 
-                <button
-                  onClick={() => handleDelete(b._id)}
-                  className="p-1 rounded-lg text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
+                {isPaid ? (
+                  <div className="w-full py-2 rounded-xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 text-xs font-bold flex items-center justify-center gap-1.5">
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span>Paid & Settled</span>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setPayBillId(b._id)}
+                    className="w-full py-2 rounded-xl bg-primary text-primary-foreground font-bold text-xs shadow-md hover:bg-primary/90 transition-colors flex items-center justify-center gap-1.5"
+                  >
+                    <CreditCard className="w-3.5 h-3.5" />
+                    <span>Pay Now</span>
+                  </button>
+                )}
               </div>
-
-              <div className="flex items-end justify-between pt-2 border-t border-border">
-                <div>
-                  <span className="text-[10px] font-semibold text-muted-foreground uppercase">
-                    Due Date
-                  </span>
-                  <p className="text-xs font-bold text-foreground">
-                    {formatDate(b.due_date)}
-                  </p>
-                </div>
-
-                <div className="text-right">
-                  <span className="text-[10px] font-semibold text-muted-foreground uppercase">
-                    Amount
-                  </span>
-                  <p className="text-base font-black text-foreground">
-                    {formatCurrency(b.amount)}
-                  </p>
-                </div>
-              </div>
-
-              {isPaid ? (
-                <div className="w-full py-2 rounded-xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 text-xs font-bold flex items-center justify-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span>Paid & Settled</span>
-                </div>
-              ) : (
-                <button
-                  onClick={() => setPayBillId(b._id)}
-                  className="w-full py-2 rounded-xl bg-primary text-primary-foreground font-bold text-xs shadow-md hover:bg-primary/90 transition-colors flex items-center justify-center gap-1.5"
-                >
-                  <CreditCard className="w-3.5 h-3.5" />
-                  <span>Pay Now</span>
-                </button>
-              )}
-            </div>
-          );
+            );
           })
         )}
       </div>
@@ -294,7 +294,9 @@ export default function BillsPage() {
                     Amount
                   </label>
                   <input
-                    {...register("amount", { setValueAs: (v) => v === "" ? undefined : Number(v) })}
+                    {...register("amount", {
+                      setValueAs: (v) => (v === "" ? undefined : Number(v)),
+                    })}
                     type="number"
                     step="0.01"
                     placeholder="0.00"

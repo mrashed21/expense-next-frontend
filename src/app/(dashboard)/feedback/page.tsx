@@ -1,27 +1,41 @@
 "use client";
 
+import { CardSkeleton } from "@/components/custom/card-skeleton";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import { useGetMyFeedbacksQuery, useDeleteFeedbackMutation, useSubmitFeedbackMutation } from "@/services/feedback-api";
-import { useGetMyReviewsQuery, useDeleteReviewMutation, useSubmitReviewMutation } from "@/services/review-api";
+import {
+  useDeleteFeedbackMutation,
+  useGetMyFeedbacksQuery,
+  useSubmitFeedbackMutation,
+} from "@/services/feedback-api";
+import {
+  useDeleteReviewMutation,
+  useGetMyReviewsQuery,
+  useSubmitReviewMutation,
+} from "@/services/review-api";
 import { Loader2, MessageSquare, Star, Trash2 } from "lucide-react";
-import { CardSkeleton } from "@/components/custom/card-skeleton";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
 export default function FeedbackPage() {
-  const [submitFeedback, { isLoading: isSubmittingFeedback }] = useSubmitFeedbackMutation();
-  const [submitReview, { isLoading: isSubmittingReview }] = useSubmitReviewMutation();
+  const [submitFeedback, { isLoading: isSubmittingFeedback }] =
+    useSubmitFeedbackMutation();
+  const [submitReview, { isLoading: isSubmittingReview }] =
+    useSubmitReviewMutation();
 
-  const { data: feedbackData, isLoading: isLoadingFeedbacks } = useGetMyFeedbacksQuery({});
-  const { data: reviewData, isLoading: isLoadingReviews } = useGetMyReviewsQuery({});
+  const { data: feedbackData, isLoading: isLoadingFeedbacks } =
+    useGetMyFeedbacksQuery({});
+  const { data: reviewData, isLoading: isLoadingReviews } =
+    useGetMyReviewsQuery({});
 
-  const [deleteFeedback, { isLoading: isDeletingFeedback }] = useDeleteFeedbackMutation();
-  const [deleteReview, { isLoading: isDeletingReview }] = useDeleteReviewMutation();
+  const [deleteFeedback, { isLoading: isDeletingFeedback }] =
+    useDeleteFeedbackMutation();
+  const [deleteReview, { isLoading: isDeletingReview }] =
+    useDeleteReviewMutation();
 
   const myFeedbacks = feedbackData?.data || [];
   const myReviews = reviewData?.data || [];
@@ -172,7 +186,9 @@ export default function FeedbackPage() {
             </div>
             <Button
               type="submit"
-              disabled={isSubmittingFeedback || !feedbackSubject || !feedbackMessage}
+              disabled={
+                isSubmittingFeedback || !feedbackSubject || !feedbackMessage
+              }
               className="w-full"
               variant="outline"
             >
@@ -209,14 +225,24 @@ export default function FeedbackPage() {
                 <CardSkeleton count={2} />
               </div>
             ) : myFeedbacks.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No feedbacks submitted yet.</p>
+              <p className="text-sm text-muted-foreground">
+                No feedbacks submitted yet.
+              </p>
             ) : (
               myFeedbacks.map((fb: any) => (
-                <Card key={fb._id} className="p-4 border border-border shadow-sm">
+                <Card
+                  key={fb._id}
+                  className="p-4 border border-border shadow-sm"
+                >
                   <div className="flex justify-between items-start mb-2">
                     <h4 className="font-bold">{fb.subject}</h4>
                     <div className="flex items-center gap-2">
-                      <Badge variant={fb.status === "reviewed" ? "secondary" : "outline"} className="capitalize">
+                      <Badge
+                        variant={
+                          fb.status === "reviewed" ? "secondary" : "outline"
+                        }
+                        className="capitalize"
+                      >
                         {fb.status}
                       </Badge>
                       <Button
@@ -236,11 +262,17 @@ export default function FeedbackPage() {
                       </Button>
                     </div>
                   </div>
-                  <p className="text-sm text-muted-foreground whitespace-pre-wrap">{fb.message}</p>
+                  <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                    {fb.message}
+                  </p>
                   {fb.admin_reply && (
                     <div className="mt-3 p-3 bg-muted/50 rounded-md border border-border/50">
-                      <p className="text-xs font-semibold mb-1 text-primary">Admin Reply:</p>
-                      <p className="text-sm text-muted-foreground">{fb.admin_reply}</p>
+                      <p className="text-xs font-semibold mb-1 text-primary">
+                        Admin Reply:
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {fb.admin_reply}
+                      </p>
                     </div>
                   )}
                 </Card>
@@ -256,17 +288,24 @@ export default function FeedbackPage() {
                 <CardSkeleton count={2} />
               </div>
             ) : myReviews.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No reviews submitted yet.</p>
+              <p className="text-sm text-muted-foreground">
+                No reviews submitted yet.
+              </p>
             ) : (
               myReviews.map((rev: any) => (
-                <Card key={rev._id} className="p-4 border border-border shadow-sm">
+                <Card
+                  key={rev._id}
+                  className="p-4 border border-border shadow-sm"
+                >
                   <div className="flex justify-between items-start mb-2">
                     <div className="flex items-center gap-1">
                       {[1, 2, 3, 4, 5].map((star) => (
                         <Star
                           key={star}
                           className={`w-4 h-4 ${
-                            star <= rev.rating ? "fill-yellow-500 text-yellow-500" : "text-muted-foreground"
+                            star <= rev.rating
+                              ? "fill-yellow-500 text-yellow-500"
+                              : "text-muted-foreground"
                           }`}
                         />
                       ))}
@@ -287,7 +326,9 @@ export default function FeedbackPage() {
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   </div>
-                  <p className="text-sm text-muted-foreground whitespace-pre-wrap mt-2">{rev.comment}</p>
+                  <p className="text-sm text-muted-foreground whitespace-pre-wrap mt-2">
+                    {rev.comment}
+                  </p>
                 </Card>
               ))
             )}

@@ -112,8 +112,8 @@ export default function BudgetsPage() {
           <CardSkeleton count={4} />
         ) : budgets.length === 0 ? (
           <div className="col-span-full">
-            <EmptyState 
-              title="No Budgets Set" 
+            <EmptyState
+              title="No Budgets Set"
               description="Set monthly category budgets to keep your expenditure in check."
               actionLabel="Set Budget"
               icon={<AlertTriangle className="w-8 h-8" />}
@@ -123,86 +123,86 @@ export default function BudgetsPage() {
         ) : (
           <>
             {budgets.map((b: any) => {
-          const isWarning = b.percentage >= b.warning_threshold;
-          const isOver = b.percentage >= 100;
+              const isWarning = b.percentage >= b.warning_threshold;
+              const isOver = b.percentage >= 100;
 
-          return (
-            <div
-              key={b._id}
-              className="glass-card p-5 rounded-3xl space-y-3 relative group"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div
-                    className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm"
-                    style={{
-                      backgroundColor: b.category_id?.color || "#4F46E5",
-                    }}
-                  >
-                    {b.category_id?.name?.charAt(0) || "B"}
+              return (
+                <div
+                  key={b._id}
+                  className="glass-card p-5 rounded-3xl space-y-3 relative group"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm"
+                        style={{
+                          backgroundColor: b.category_id?.color || "#4F46E5",
+                        }}
+                      >
+                        {b.category_id?.name?.charAt(0) || "B"}
+                      </div>
+                      <div>
+                        <h3 className="text-sm font-bold text-foreground">
+                          {b.category_id?.name || "Category"}
+                        </h3>
+                        <span className="text-[10px] text-muted-foreground font-semibold">
+                          Limit: {formatCurrency(b.amount)}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      {isOver ? (
+                        <span className="px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-500 text-[10px] font-bold border border-rose-500/20 flex items-center gap-1">
+                          <AlertTriangle className="w-3 h-3" /> Exceeded (100%)
+                        </span>
+                      ) : isWarning ? (
+                        <span className="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-500 text-[10px] font-bold border border-amber-amber/20 flex items-center gap-1">
+                          <AlertTriangle className="w-3 h-3" /> Warning (
+                          {b.percentage}%)
+                        </span>
+                      ) : (
+                        <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] font-bold border border-emerald-500/20 flex items-center gap-1">
+                          <CheckCircle className="w-3 h-3" /> On Track
+                        </span>
+                      )}
+
+                      <button
+                        onClick={() => handleDelete(b._id)}
+                        className="p-1 rounded-lg text-muted-foreground hover:text-destructive transition-colors opacity-0 group-hover:opacity-100"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-sm font-bold text-foreground">
-                      {b.category_id?.name || "Category"}
-                    </h3>
-                    <span className="text-[10px] text-muted-foreground font-semibold">
-                      Limit: {formatCurrency(b.amount)}
-                    </span>
+
+                  {/* Progress Bar */}
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between text-xs font-semibold">
+                      <span className="text-muted-foreground">
+                        Spent: {formatCurrency(b.spent_amount)}
+                      </span>
+                      <span className="text-foreground">
+                        Remaining: {formatCurrency(b.remaining_amount)}
+                      </span>
+                    </div>
+
+                    <div className="w-full h-3 rounded-full bg-secondary overflow-hidden">
+                      <div
+                        className={`h-full rounded-full transition-all duration-500 ${
+                          isOver
+                            ? "bg-rose-500"
+                            : isWarning
+                              ? "bg-amber-500"
+                              : "bg-primary"
+                        }`}
+                        style={{ width: `${Math.min(100, b.percentage)}%` }}
+                      />
+                    </div>
                   </div>
                 </div>
-
-                <div className="flex items-center gap-2">
-                  {isOver ? (
-                    <span className="px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-500 text-[10px] font-bold border border-rose-500/20 flex items-center gap-1">
-                      <AlertTriangle className="w-3 h-3" /> Exceeded (100%)
-                    </span>
-                  ) : isWarning ? (
-                    <span className="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-500 text-[10px] font-bold border border-amber-amber/20 flex items-center gap-1">
-                      <AlertTriangle className="w-3 h-3" /> Warning (
-                      {b.percentage}%)
-                    </span>
-                  ) : (
-                    <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] font-bold border border-emerald-500/20 flex items-center gap-1">
-                      <CheckCircle className="w-3 h-3" /> On Track
-                    </span>
-                  )}
-
-                  <button
-                    onClick={() => handleDelete(b._id)}
-                    className="p-1 rounded-lg text-muted-foreground hover:text-destructive transition-colors opacity-0 group-hover:opacity-100"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Progress Bar */}
-              <div className="space-y-1">
-                <div className="flex items-center justify-between text-xs font-semibold">
-                  <span className="text-muted-foreground">
-                    Spent: {formatCurrency(b.spent_amount)}
-                  </span>
-                  <span className="text-foreground">
-                    Remaining: {formatCurrency(b.remaining_amount)}
-                  </span>
-                </div>
-
-                <div className="w-full h-3 rounded-full bg-secondary overflow-hidden">
-                  <div
-                    className={`h-full rounded-full transition-all duration-500 ${
-                      isOver
-                        ? "bg-rose-500"
-                        : isWarning
-                          ? "bg-amber-500"
-                          : "bg-primary"
-                    }`}
-                    style={{ width: `${Math.min(100, b.percentage)}%` }}
-                  />
-                </div>
-              </div>
-            </div>
-          );
-        })}
+              );
+            })}
           </>
         )}
       </div>
@@ -252,7 +252,9 @@ export default function BudgetsPage() {
                   Monthly Budget Limit
                 </label>
                 <input
-                  {...register("amount", { setValueAs: (v) => v === "" ? undefined : Number(v) })}
+                  {...register("amount", {
+                    setValueAs: (v) => (v === "" ? undefined : Number(v)),
+                  })}
                   type="number"
                   step="0.01"
                   placeholder="0.00"

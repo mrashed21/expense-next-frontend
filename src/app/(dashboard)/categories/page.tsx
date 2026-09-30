@@ -200,7 +200,7 @@ export default function CategoriesPage() {
               ))}
               {expenseCategories.length === 0 && (
                 <div className="col-span-1 sm:col-span-2">
-                  <EmptyState 
+                  <EmptyState
                     title="No Expense Categories"
                     description="Create categories to track your spending."
                   />
@@ -235,7 +235,7 @@ export default function CategoriesPage() {
               ))}
               {incomeCategories.length === 0 && (
                 <div className="col-span-1 sm:col-span-2">
-                  <EmptyState 
+                  <EmptyState
                     title="No Income Categories"
                     description="Create categories to track your earnings."
                   />

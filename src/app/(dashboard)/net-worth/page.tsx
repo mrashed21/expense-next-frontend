@@ -12,7 +12,6 @@ import {
   CreditCard,
   HandCoins,
   Home,
-  Loader2,
   TrendingDown,
   TrendingUp,
   Wallet,
@@ -106,7 +105,7 @@ export default function NetWorthPage() {
             <p className="text-sm font-semibold text-muted-foreground uppercase tracking-widest">
               Total Net Worth
             </p>
-            <h2 className="text-3xl font-black text-foreground tracking-tighter break-words">
+            <h2 className="text-3xl font-black text-foreground tracking-tighter wrap-break-word">
               {formatCurrency(current.net_worth)}
             </h2>
 
@@ -137,7 +136,7 @@ export default function NetWorthPage() {
                   Total Assets
                 </span>
               </div>
-              <p className="text-xl font-bold text-foreground break-words">
+              <p className="text-xl font-bold text-foreground wrap-break-word">
                 {formatCurrency(current.total_assets)}
               </p>
             </div>
@@ -149,7 +148,7 @@ export default function NetWorthPage() {
                   Total Liabilities
                 </span>
               </div>
-              <p className="text-xl font-bold text-foreground break-words">
+              <p className="text-xl font-bold text-foreground wrap-break-word">
                 {formatCurrency(current.total_liabilities)}
               </p>
             </div>
@@ -261,7 +260,9 @@ export default function NetWorthPage() {
                 <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center shrink-0">
                   <Wallet className="w-4 h-4 text-emerald-500" />
                 </div>
-                <span className="text-xs sm:text-sm font-medium truncate">Cash Accounts</span>
+                <span className="text-xs sm:text-sm font-medium truncate">
+                  Cash Accounts
+                </span>
               </div>
               <span className="text-xs sm:text-sm font-bold shrink-0">
                 {formatCurrency(current.breakdown?.assets?.cash || 0)}
@@ -287,7 +288,9 @@ export default function NetWorthPage() {
                 <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center shrink-0">
                   <Home className="w-4 h-4 text-purple-500" />
                 </div>
-                <span className="text-xs sm:text-sm font-medium truncate">Physical Assets</span>
+                <span className="text-xs sm:text-sm font-medium truncate">
+                  Physical Assets
+                </span>
               </div>
               <span className="text-xs sm:text-sm font-bold shrink-0">
                 {formatCurrency(
@@ -329,7 +332,9 @@ export default function NetWorthPage() {
                 <div className="w-8 h-8 rounded-lg bg-destructive/10 flex items-center justify-center shrink-0">
                   <HandCoins className="w-4 h-4 text-destructive" />
                 </div>
-                <span className="text-xs sm:text-sm font-medium truncate">Money Borrowed</span>
+                <span className="text-xs sm:text-sm font-medium truncate">
+                  Money Borrowed
+                </span>
               </div>
               <span className="text-xs sm:text-sm font-bold shrink-0">
                 {formatCurrency(

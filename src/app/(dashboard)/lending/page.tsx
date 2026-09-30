@@ -1,9 +1,9 @@
 "use client";
 
 import { ConfirmDialog } from "@/components/custom/confirm-dialog";
+import DatePicker from "@/components/custom/date-picker";
 import { EmptyState } from "@/components/custom/empty-state";
 import PhonesInput from "@/components/custom/phone-input";
-import DatePicker from "@/components/custom/date-picker";
 import { SearchableSelect } from "@/components/custom/searchable-select";
 import { TablePagination } from "@/components/custom/table-pagination";
 import { TableSkeleton } from "@/components/custom/table-skeleton";
@@ -71,7 +71,7 @@ import {
   Users,
   X,
 } from "lucide-react";
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -138,7 +138,8 @@ export default function LendingPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [viewMode, setViewMode] = useState<"table" | "grid">("table");
-  const [selectedBorrowerFilter, setSelectedBorrowerFilter] = useState<string>("");
+  const [selectedBorrowerFilter, setSelectedBorrowerFilter] =
+    useState<string>("");
   const [loanPage, setLoanPage] = useState(1);
   const loanPageSize = 10;
 
@@ -197,10 +198,7 @@ export default function LendingPage() {
     () => (accountsData?.data || []).filter((a: any) => !a.is_deleted),
     [accountsData],
   );
-  const borrowers = useMemo(
-    () => borrowersData?.data || [],
-    [borrowersData],
-  );
+  const borrowers = useMemo(() => borrowersData?.data || [], [borrowersData]);
   const loans = loansData?.data || [];
   const totalLoanPages = Math.ceil(loans.length / loanPageSize);
   const paginatedLoans = loans.slice(
@@ -270,7 +268,8 @@ export default function LendingPage() {
 
   // Watched form values for live preview calculation
   const watchedSourceAccountId = createLoanForm.watch("source_account_id");
-  const watchedPrincipalAmount = Number(createLoanForm.watch("principal_amount")) || 0;
+  const watchedPrincipalAmount =
+    Number(createLoanForm.watch("principal_amount")) || 0;
   const selectedSourceAccount = accounts.find(
     (a: any) => a._id === watchedSourceAccountId,
   );
@@ -525,7 +524,8 @@ export default function LendingPage() {
                 Lending
               </h1>
               <p className="text-sm text-muted-foreground">
-                Track money lent, manage partial recoveries & monitor outstanding balances.
+                Track money lent, manage partial recoveries & monitor
+                outstanding balances.
               </p>
             </div>
           </div>
@@ -794,14 +794,16 @@ export default function LendingPage() {
                       ? Math.min(
                           100,
                           Math.round(
-                            (loan.recovered_amount / loan.principal_amount) * 100,
+                            (loan.recovered_amount / loan.principal_amount) *
+                              100,
                           ),
                         )
                       : 0;
 
                   const isOverdue =
                     loan.expected_return_date &&
-                    new Date(loan.expected_return_date).getTime() < Date.now() &&
+                    new Date(loan.expected_return_date).getTime() <
+                      Date.now() &&
                     loan.outstanding_amount > 0;
 
                   return (
@@ -818,14 +820,15 @@ export default function LendingPage() {
                       <td className="py-3.5 px-4">
                         <div className="flex items-center gap-2.5">
                           <div className="w-8 h-8 rounded-full bg-primary/10 text-primary font-semibold flex items-center justify-center text-xs shrink-0 border border-primary/20">
-                            {loan.borrower_name?.charAt(0)?.toUpperCase() || "B"}
+                            {loan.borrower_name?.charAt(0)?.toUpperCase() ||
+                              "B"}
                           </div>
                           <div>
                             <div className="font-semibold text-foreground">
                               {loan.borrower_name}
                             </div>
                             {loan.notes && (
-                              <div className="text-xs text-muted-foreground line-clamp-1 max-w-[180px]">
+                              <div className="text-xs text-muted-foreground line-clamp-1 scrollbar-none">
                                 {loan.notes}
                               </div>
                             )}
@@ -842,7 +845,9 @@ export default function LendingPage() {
                       <td className="py-3.5 px-4">
                         <div className="space-y-1">
                           <div className="flex justify-between text-xs text-muted-foreground">
-                            <span>Paid: {formatCurrency(loan.recovered_amount)}</span>
+                            <span>
+                              Paid: {formatCurrency(loan.recovered_amount)}
+                            </span>
                             <span className="font-medium">{progressPct}%</span>
                           </div>
                           <div className="w-full h-1.5 rounded-full bg-secondary overflow-hidden">
@@ -851,8 +856,8 @@ export default function LendingPage() {
                                 progressPct === 100
                                   ? "bg-emerald-500"
                                   : progressPct > 0
-                                  ? "bg-primary"
-                                  : "bg-muted"
+                                    ? "bg-primary"
+                                    : "bg-muted"
                               }`}
                               style={{ width: `${progressPct}%` }}
                             />
@@ -890,7 +895,7 @@ export default function LendingPage() {
                                 loan.source_account_id?.color || "#4F46E5",
                             }}
                           />
-                          <span className="text-xs text-foreground font-medium truncate max-w-[120px]">
+                          <span className="text-xs text-foreground font-medium truncate max-w-30">
                             {loan.source_account_name ||
                               loan.source_account_id?.name ||
                               "Account"}
@@ -911,7 +916,9 @@ export default function LendingPage() {
                                 : "text-muted-foreground"
                             }`}
                           >
-                            <span>Due: {formatDate(loan.expected_return_date)}</span>
+                            <span>
+                              Due: {formatDate(loan.expected_return_date)}
+                            </span>
                             {isOverdue && (
                               <span className="px-1 py-0.2 rounded bg-rose-500/10 text-rose-600 text-[10px]">
                                 Late
@@ -1079,12 +1086,16 @@ export default function LendingPage() {
                           <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                             <span>{formatDate(loan.lent_date)}</span>
                             <span>•</span>
-                            <span className="truncate">{loan.source_account_name}</span>
+                            <span className="truncate">
+                              {loan.source_account_name}
+                            </span>
                           </div>
                         </div>
                       </div>
 
-                      <div>{getStatusBadge(loan.display_status || loan.status)}</div>
+                      <div>
+                        {getStatusBadge(loan.display_status || loan.status)}
+                      </div>
                     </div>
 
                     {/* Amounts */}
@@ -1118,7 +1129,9 @@ export default function LendingPage() {
                     {/* Progress Bar */}
                     <div className="space-y-1">
                       <div className="flex justify-between text-[11px] text-muted-foreground">
-                        <span>Recovered: {formatCurrency(loan.recovered_amount)}</span>
+                        <span>
+                          Recovered: {formatCurrency(loan.recovered_amount)}
+                        </span>
                         <span className="font-medium text-foreground">
                           {progressPct}%
                         </span>
@@ -1129,8 +1142,8 @@ export default function LendingPage() {
                             progressPct === 100
                               ? "bg-emerald-500"
                               : progressPct > 0
-                              ? "bg-primary"
-                              : "bg-muted"
+                                ? "bg-primary"
+                                : "bg-muted"
                           }`}
                           style={{ width: `${progressPct}%` }}
                         />
@@ -1191,14 +1204,15 @@ export default function LendingPage() {
       {/* ── MODAL 1: Create Loan Dialog                             ── */}
       {/* ───────────────────────────────────────────────────────────── */}
       <Dialog open={isCreateLoanOpen} onOpenChange={setIsCreateLoanOpen}>
-        <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden">
+        <DialogContent className="sm:max-w-125 p-0 overflow-hidden">
           <DialogHeader className="p-5 pb-3 border-b border-border bg-secondary/30">
             <DialogTitle className="text-base font-bold text-foreground flex items-center gap-2">
               <Landmark className="w-5 h-5 text-primary" />
               Give Loan
             </DialogTitle>
             <DialogDescription className="text-xs text-muted-foreground">
-              Money lent reduces the source account balance immediately, tracked as loan receivable.
+              Money lent reduces the source account balance immediately, tracked
+              as loan receivable.
             </DialogDescription>
           </DialogHeader>
 
@@ -1232,7 +1246,8 @@ export default function LendingPage() {
                         value: b._id,
                       }))}
                       value={
-                        borrowers.find((b: any) => b.name === field.value)?._id ||
+                        borrowers.find((b: any) => b.name === field.value)
+                          ?._id ||
                         createLoanForm.watch("borrower_id") ||
                         ""
                       }
@@ -1318,26 +1333,33 @@ export default function LendingPage() {
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Current Account Balance:</span>
+                  <span className="text-muted-foreground">
+                    Current Account Balance:
+                  </span>
                   <span className="font-semibold">
                     {formatCurrency(selectedSourceAccount.current_balance)}
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">After Lending Balance:</span>
+                  <span className="text-muted-foreground">
+                    After Lending Balance:
+                  </span>
                   <span
                     className={`font-bold ${
-                      selectedSourceAccount.current_balance < watchedPrincipalAmount
+                      selectedSourceAccount.current_balance <
+                      watchedPrincipalAmount
                         ? "text-rose-600 font-bold"
                         : "text-foreground"
                     }`}
                   >
                     {formatCurrency(
-                      selectedSourceAccount.current_balance - watchedPrincipalAmount,
+                      selectedSourceAccount.current_balance -
+                        watchedPrincipalAmount,
                     )}
                   </span>
                 </div>
-                {selectedSourceAccount.current_balance < watchedPrincipalAmount && (
+                {selectedSourceAccount.current_balance <
+                  watchedPrincipalAmount && (
                   <div className="flex items-center gap-1 text-[11px] text-rose-600 font-medium pt-1 border-t border-rose-500/20">
                     <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
                     Insufficient balance in {selectedSourceAccount.name}!
@@ -1356,10 +1378,7 @@ export default function LendingPage() {
                   control={createLoanForm.control}
                   name="lent_date"
                   render={({ field }) => (
-                    <DatePicker
-                      value={field.value}
-                      onChange={field.onChange}
-                    />
+                    <DatePicker value={field.value} onChange={field.onChange} />
                   )}
                 />
               </div>
@@ -1383,7 +1402,9 @@ export default function LendingPage() {
 
             {/* Notes */}
             <div className="space-y-1.5">
-              <Label className="text-xs font-semibold">Notes / Purpose (Optional)</Label>
+              <Label className="text-xs font-semibold">
+                Notes / Purpose (Optional)
+              </Label>
               <Textarea
                 placeholder="Add any note or terms..."
                 rows={2}
@@ -1406,7 +1427,8 @@ export default function LendingPage() {
                   isCreatingLoan ||
                   !watchedSourceAccountId ||
                   (selectedSourceAccount &&
-                    selectedSourceAccount.current_balance < watchedPrincipalAmount)
+                    selectedSourceAccount.current_balance <
+                      watchedPrincipalAmount)
                 }
                 className="gap-2"
               >
@@ -1422,14 +1444,15 @@ export default function LendingPage() {
       {/* ── MODAL 2: Add Repayment Dialog                           ── */}
       {/* ───────────────────────────────────────────────────────────── */}
       <Dialog open={isAddRepaymentOpen} onOpenChange={setIsAddRepaymentOpen}>
-        <DialogContent className="sm:max-w-[460px] p-0 overflow-hidden">
+        <DialogContent className="sm:max-w-115 p-0 overflow-hidden">
           <DialogHeader className="p-5 pb-3 border-b border-border bg-secondary/30">
             <DialogTitle className="text-base font-bold text-foreground flex items-center gap-2">
               <RotateCcw className="w-5 h-5 text-emerald-500" />
               Add Loan Repayment
             </DialogTitle>
             <DialogDescription className="text-xs text-muted-foreground">
-              Receiving repayment will credit the selected account and reduce the outstanding balance.
+              Receiving repayment will credit the selected account and reduce
+              the outstanding balance.
             </DialogDescription>
           </DialogHeader>
 
@@ -1447,11 +1470,15 @@ export default function LendingPage() {
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Original Principal:</span>
+                  <span className="text-muted-foreground">
+                    Original Principal:
+                  </span>
                   <span>{formatCurrency(actionLoan.principal_amount)}</span>
                 </div>
                 <div className="flex justify-between font-medium">
-                  <span className="text-muted-foreground">Current Outstanding:</span>
+                  <span className="text-muted-foreground">
+                    Current Outstanding:
+                  </span>
                   <span className="text-amber-600 dark:text-amber-400 font-bold">
                     {formatCurrency(actionLoan.outstanding_amount)}
                   </span>
@@ -1467,11 +1494,15 @@ export default function LendingPage() {
                   <button
                     type="button"
                     onClick={() =>
-                      repaymentForm.setValue("amount", actionLoan.outstanding_amount)
+                      repaymentForm.setValue(
+                        "amount",
+                        actionLoan.outstanding_amount,
+                      )
                     }
                     className="text-[11px] text-primary hover:underline font-medium"
                   >
-                    Full Amount ({formatCurrency(actionLoan.outstanding_amount)})
+                    Full Amount ({formatCurrency(actionLoan.outstanding_amount)}
+                    )
                   </button>
                 </div>
                 <Input
@@ -1505,7 +1536,9 @@ export default function LendingPage() {
                       value={field.value}
                       onChange={(val) => {
                         field.onChange(val);
-                        const matched = accounts.find((a: any) => a._id === val);
+                        const matched = accounts.find(
+                          (a: any) => a._id === val,
+                        );
                         if (matched) {
                           repaymentForm.setValue(
                             "payment_method",
@@ -1522,7 +1555,9 @@ export default function LendingPage() {
               {/* Payment Method & Date */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold">Payment Method</Label>
+                  <Label className="text-xs font-semibold">
+                    Payment Method
+                  </Label>
                   <Input
                     placeholder="Cash, bKash, Bank..."
                     {...repaymentForm.register("payment_method")}
@@ -1555,7 +1590,8 @@ export default function LendingPage() {
                       {formatCurrency(
                         Math.max(
                           0,
-                          actionLoan.outstanding_amount - watchedRepaymentAmount,
+                          actionLoan.outstanding_amount -
+                            watchedRepaymentAmount,
                         ),
                       )}
                     </span>
@@ -1576,7 +1612,9 @@ export default function LendingPage() {
 
               {/* Notes */}
               <div className="space-y-1.5">
-                <Label className="text-xs font-semibold">Notes (Optional)</Label>
+                <Label className="text-xs font-semibold">
+                  Notes (Optional)
+                </Label>
                 <Input
                   placeholder="e.g. Received via bKash TrxID..."
                   {...repaymentForm.register("notes")}
@@ -1617,7 +1655,7 @@ export default function LendingPage() {
       {/* ── MODAL 3: Loan Details & Repayments History Modal        ── */}
       {/* ───────────────────────────────────────────────────────────── */}
       <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
-        <DialogContent className="sm:max-w-[650px] p-0 overflow-hidden max-h-[90vh] flex flex-col">
+        <DialogContent className="sm:max-w-162.5 p-0 overflow-hidden max-h-[90vh] flex flex-col">
           <DialogHeader className="p-5 pb-3 border-b border-border bg-secondary/30">
             <div className="flex items-center justify-between">
               <div>
@@ -1626,13 +1664,15 @@ export default function LendingPage() {
                   Loan Details & Repayment History
                 </DialogTitle>
                 <DialogDescription className="text-xs text-muted-foreground mt-0.5">
-                  Complete breakdown of money lent, progress, and payment records.
+                  Complete breakdown of money lent, progress, and payment
+                  records.
                 </DialogDescription>
               </div>
               {singleLoanData?.data && (
                 <div>
                   {getStatusBadge(
-                    singleLoanData.data.display_status || singleLoanData.data.status,
+                    singleLoanData.data.display_status ||
+                      singleLoanData.data.status,
                   )}
                 </div>
               )}
@@ -1683,21 +1723,27 @@ export default function LendingPage() {
                 </div>
 
                 <div>
-                  <span className="text-muted-foreground">Principal Amount</span>
+                  <span className="text-muted-foreground">
+                    Principal Amount
+                  </span>
                   <div className="font-bold text-sm text-foreground mt-0.5">
                     {formatCurrency(singleLoanData.data.principal_amount)}
                   </div>
                 </div>
 
                 <div>
-                  <span className="text-muted-foreground">Recovered Amount</span>
+                  <span className="text-muted-foreground">
+                    Recovered Amount
+                  </span>
                   <div className="font-bold text-sm text-emerald-600 dark:text-emerald-400 mt-0.5">
                     {formatCurrency(singleLoanData.data.recovered_amount)}
                   </div>
                 </div>
 
                 <div>
-                  <span className="text-muted-foreground">Outstanding Balance</span>
+                  <span className="text-muted-foreground">
+                    Outstanding Balance
+                  </span>
                   <div className="font-bold text-sm text-amber-600 dark:text-amber-400 mt-0.5">
                     {formatCurrency(singleLoanData.data.outstanding_amount)}
                   </div>
@@ -1768,7 +1814,8 @@ export default function LendingPage() {
                 <div className="flex items-center justify-between">
                   <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
                     <History className="w-3.5 h-3.5" />
-                    Repayment History ({singleLoanData.data.repayments?.length || 0})
+                    Repayment History (
+                    {singleLoanData.data.repayments?.length || 0})
                   </h4>
 
                   {singleLoanData.data.outstanding_amount > 0 &&
@@ -1790,20 +1837,21 @@ export default function LendingPage() {
                     No repayment received yet.
                   </div>
                 ) : (
-                    <div className="rounded-xl border border-border/80 bg-card overflow-hidden">
-                      <table className="w-full text-xs text-left">
-                        <thead className="bg-secondary/40 text-muted-foreground border-b border-border font-semibold">
-                          <tr>
-                            <th className="py-2.5 px-3 w-10 text-center">#</th>
-                            <th className="py-2.5 px-3">Date</th>
-                            <th className="py-2.5 px-3">Amount</th>
-                            <th className="py-2.5 px-3">Method & Account</th>
-                            <th className="py-2.5 px-3">Note</th>
-                            <th className="py-2.5 px-3 text-right">Action</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-border/60">
-                          {singleLoanData.data.repayments.map((rep: any, rIdx: number) => (
+                  <div className="rounded-xl border border-border/80 bg-card overflow-hidden">
+                    <table className="w-full text-xs text-left">
+                      <thead className="bg-secondary/40 text-muted-foreground border-b border-border font-semibold">
+                        <tr>
+                          <th className="py-2.5 px-3 w-10 text-center">#</th>
+                          <th className="py-2.5 px-3">Date</th>
+                          <th className="py-2.5 px-3">Amount</th>
+                          <th className="py-2.5 px-3">Method & Account</th>
+                          <th className="py-2.5 px-3">Note</th>
+                          <th className="py-2.5 px-3 text-right">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border/60">
+                        {singleLoanData.data.repayments.map(
+                          (rep: any, rIdx: number) => (
                             <tr key={rep._id} className="hover:bg-secondary/20">
                               <td className="py-2.5 px-3 text-center text-muted-foreground font-semibold">
                                 {rIdx + 1}
@@ -1822,7 +1870,7 @@ export default function LendingPage() {
                                   {rep.account_id?.name || "Account"}
                                 </div>
                               </td>
-                              <td className="py-2.5 px-3 text-muted-foreground max-w-[150px] truncate">
+                              <td className="py-2.5 px-3 text-muted-foreground max-w-37.5 truncate">
                                 {rep.notes || "-"}
                               </td>
                               <td className="py-2.5 px-3 text-right">
@@ -1843,10 +1891,11 @@ export default function LendingPage() {
                                 </Button>
                               </td>
                             </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
+                          ),
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
                 )}
               </div>
             </div>
@@ -1898,7 +1947,7 @@ export default function LendingPage() {
       {/* ── MODAL 4: Edit Loan Dialog                               ── */}
       {/* ───────────────────────────────────────────────────────────── */}
       <Dialog open={isEditLoanOpen} onOpenChange={setIsEditLoanOpen}>
-        <DialogContent className="sm:max-w-[420px] p-0 overflow-hidden">
+        <DialogContent className="sm:max-w-105 p-0 overflow-hidden">
           <DialogHeader className="p-5 pb-3 border-b border-border bg-secondary/30">
             <DialogTitle className="text-base font-bold text-foreground">
               Edit Loan Details
@@ -1910,7 +1959,9 @@ export default function LendingPage() {
             className="p-5 space-y-4"
           >
             <div className="space-y-1.5">
-              <Label className="text-xs font-semibold">Expected Return Date</Label>
+              <Label className="text-xs font-semibold">
+                Expected Return Date
+              </Label>
               <Controller
                 control={editLoanForm.control}
                 name="expected_return_date"
@@ -1950,14 +2001,15 @@ export default function LendingPage() {
       {/* ── MODAL 5: Write Off Dialog                               ── */}
       {/* ───────────────────────────────────────────────────────────── */}
       <Dialog open={isWriteOffOpen} onOpenChange={setIsWriteOffOpen}>
-        <DialogContent className="sm:max-w-[440px] p-0 overflow-hidden">
+        <DialogContent className="sm:max-w-110 p-0 overflow-hidden">
           <DialogHeader className="p-5 pb-3 border-b border-border bg-amber-500/10">
             <DialogTitle className="text-base font-bold text-amber-700 dark:text-amber-400 flex items-center gap-2">
               <AlertTriangle className="w-5 h-5" />
               Write Off Loan
             </DialogTitle>
             <DialogDescription className="text-xs text-muted-foreground">
-              This will forgive the remaining receivable and mark the loan as written off. History will be retained.
+              This will forgive the remaining receivable and mark the loan as
+              written off. History will be retained.
             </DialogDescription>
           </DialogHeader>
 
@@ -1985,7 +2037,8 @@ export default function LendingPage() {
 
               <div className="space-y-1.5">
                 <Label className="text-xs font-semibold">
-                  Reason for write-off <span className="text-destructive">*</span>
+                  Reason for write-off{" "}
+                  <span className="text-destructive">*</span>
                 </Label>
                 <Textarea
                   placeholder="e.g. Borrower unable to pay, settlement reached..."
@@ -2026,7 +2079,7 @@ export default function LendingPage() {
       {/* ── MODAL 6: Borrowers Directory Modal                      ── */}
       {/* ───────────────────────────────────────────────────────────── */}
       <Dialog open={isBorrowersListOpen} onOpenChange={setIsBorrowersListOpen}>
-        <DialogContent className="sm:max-w-[620px] p-0 overflow-hidden max-h-[85vh] flex flex-col">
+        <DialogContent className="sm:max-w-155 p-0 overflow-hidden max-h-[85vh] flex flex-col">
           <DialogHeader className="p-5 pb-3 border-b border-border bg-secondary/30">
             <div className="flex items-center justify-between">
               <div>
@@ -2035,7 +2088,8 @@ export default function LendingPage() {
                   Borrowers Directory
                 </DialogTitle>
                 <DialogDescription className="text-xs text-muted-foreground mt-0.5">
-                  Manage all recurring borrowers and view lifetime borrowing totals.
+                  Manage all recurring borrowers and view lifetime borrowing
+                  totals.
                 </DialogDescription>
               </div>
               <Button
@@ -2072,7 +2126,9 @@ export default function LendingPage() {
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                           {b.phone && <span>{b.phone}</span>}
                           {b.phone && b.email && <span>•</span>}
-                          {b.email && <span className="truncate">{b.email}</span>}
+                          {b.email && (
+                            <span className="truncate">{b.email}</span>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -2110,8 +2166,11 @@ export default function LendingPage() {
       {/* ───────────────────────────────────────────────────────────── */}
       {/* ── MODAL 7: Create Borrower Dialog                         ── */}
       {/* ───────────────────────────────────────────────────────────── */}
-      <Dialog open={isCreateBorrowerOpen} onOpenChange={setIsCreateBorrowerOpen}>
-        <DialogContent className="sm:max-w-[420px] p-0 overflow-hidden">
+      <Dialog
+        open={isCreateBorrowerOpen}
+        onOpenChange={setIsCreateBorrowerOpen}
+      >
+        <DialogContent className="sm:max-w-105 p-0 overflow-hidden">
           <DialogHeader className="p-5 pb-3 border-b border-border bg-secondary/30">
             <DialogTitle className="text-base font-bold text-foreground flex items-center gap-2">
               <UserPlus className="w-5 h-5 text-primary" />
