@@ -156,7 +156,7 @@ export default function TransfersPage() {
             <TableSkeleton columns={6} rows={5} />
           ) : transfers.length === 0 ? (
             <div className="py-12">
-              <EmptyState 
+              <EmptyState
                 title="No Transfers Found"
                 description="Move funds between your accounts to log transfers."
                 actionLabel="New Transfer"
@@ -168,23 +168,44 @@ export default function TransfersPage() {
               {/* ── Mobile Card View (< md) ── */}
               <div className="md:hidden divide-y divide-border">
                 {paginatedTransfers.map((t: any, idx: number) => (
-                  <div key={t._id} className="p-4 hover:bg-secondary/20 transition-colors">
+                  <div
+                    key={t._id}
+                    className="p-4 hover:bg-secondary/20 transition-colors"
+                  >
                     <div className="flex items-start justify-between gap-3">
                       <span className="text-xs font-bold text-muted-foreground w-6 shrink-0 mt-0.5">
                         #{(page - 1) * pageSize + idx + 1}
                       </span>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-xs font-bold text-foreground truncate">{t.from_account_id?.name || "Account"}</span>
-                          <span className="text-[10px] text-muted-foreground">→</span>
-                          <span className="text-xs font-bold text-foreground truncate">{t.to_account_id?.name || "Account"}</span>
+                          <span className="text-xs font-bold text-foreground truncate">
+                            {t.from_account_id?.name || "Account"}
+                          </span>
+                          <span className="text-[10px] text-muted-foreground">
+                            →
+                          </span>
+                          <span className="text-xs font-bold text-foreground truncate">
+                            {t.to_account_id?.name || "Account"}
+                          </span>
                         </div>
-                        <p className="text-[11px] text-muted-foreground mt-1">{formatDate(t.date)}</p>
-                        {t.notes && <p className="text-[11px] text-muted-foreground mt-0.5 truncate">{t.notes}</p>}
+                        <p className="text-[11px] text-muted-foreground mt-1">
+                          {formatDate(t.date)}
+                        </p>
+                        {t.notes && (
+                          <p className="text-[11px] text-muted-foreground mt-0.5 truncate">
+                            {t.notes}
+                          </p>
+                        )}
                       </div>
                       <div className="text-right shrink-0">
-                        <p className="text-sm font-bold text-foreground">{formatCurrency(t.amount)}</p>
-                        {t.fee > 0 && <p className="text-[11px] text-rose-500 font-medium">Fee: {formatCurrency(t.fee)}</p>}
+                        <p className="text-sm font-bold text-foreground">
+                          {formatCurrency(t.amount)}
+                        </p>
+                        {t.fee > 0 && (
+                          <p className="text-[11px] text-rose-500 font-medium">
+                            Fee: {formatCurrency(t.fee)}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -217,7 +238,9 @@ export default function TransfersPage() {
                         <TableCell>
                           {t.from_account_id?.name || "Account"}
                         </TableCell>
-                        <TableCell>{t.to_account_id?.name || "Account"}</TableCell>
+                        <TableCell>
+                          {t.to_account_id?.name || "Account"}
+                        </TableCell>
                         <TableCell className="text-muted-foreground">
                           {t.notes || "-"}
                         </TableCell>
@@ -306,7 +329,9 @@ export default function TransfersPage() {
                     Transfer Amount
                   </label>
                   <input
-                    {...register("amount", { setValueAs: (v) => v === "" ? undefined : Number(v) })}
+                    {...register("amount", {
+                      setValueAs: (v) => (v === "" ? undefined : Number(v)),
+                    })}
                     type="number"
                     step="0.01"
                     placeholder="0.00"
@@ -324,7 +349,8 @@ export default function TransfersPage() {
                   </label>
                   <input
                     {...register("fee", {
-                      setValueAs: (v) => (v === "" || v === undefined ? 0 : Number(v)),
+                      setValueAs: (v) =>
+                        v === "" || v === undefined ? 0 : Number(v),
                     })}
                     type="number"
                     step="0.01"

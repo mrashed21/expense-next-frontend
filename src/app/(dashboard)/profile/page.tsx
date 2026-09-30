@@ -1,7 +1,6 @@
 "use client";
 
 import AvatarCropper from "@/components/custom/avatar-cropper";
-import FormSelect from "@/components/custom/form-select";
 import PhonesInput from "@/components/custom/phone-input";
 import { SearchableSelect } from "@/components/custom/searchable-select";
 import { TablePagination } from "@/components/custom/table-pagination";
@@ -49,7 +48,8 @@ function parseDeviceInfo(ua: string): string {
   if (!ua) return "Unknown Device";
 
   // Device type
-  const isMobile = /android|iphone|ipad|ipod|mobile|blackberry|windows phone/i.test(ua);
+  const isMobile =
+    /android|iphone|ipad|ipod|mobile|blackberry|windows phone/i.test(ua);
   const isTablet = /ipad|tablet/i.test(ua);
   const deviceType = isTablet ? "Tablet" : isMobile ? "Mobile" : "Desktop";
 
@@ -73,7 +73,6 @@ function parseDeviceInfo(ua: string): string {
   const parts = [deviceType, os, browser].filter(Boolean);
   return parts.join(" · ");
 }
-
 
 const profileSchema = z.object({
   user_name: z.string().min(2, "Name must be at least 2 characters"),
@@ -102,7 +101,8 @@ export default function ProfilePage() {
     {},
     { skip: !!authUser?.isAdmin },
   );
-  const { data: historyData, isLoading: isHistoryLoading } = useGetLoginHistoryQuery({});
+  const { data: historyData, isLoading: isHistoryLoading } =
+    useGetLoginHistoryQuery({});
   const [updateProfileApi, { isLoading: isUpdatingUserProfile }] =
     useUpdateProfileMutation();
   const [updateProfileImageApi, { isLoading: isUploadingUserImage }] =
@@ -121,7 +121,9 @@ export default function ProfilePage() {
     useDeleteAccountMutation();
   const [logoutAllApi] = useLogoutAllDevicesMutation();
 
-  const { data: devicesData, isLoading: isDevicesLoading } = useGetDevicesQuery({});
+  const { data: devicesData, isLoading: isDevicesLoading } = useGetDevicesQuery(
+    {},
+  );
   const [generate2FA] = useGenerate2FAMutation();
   const [verify2FA, { isLoading: isVerifying2FA }] = useVerify2FAMutation();
   const [disable2FA, { isLoading: isDisabling2FA }] = useDisable2FAMutation();
@@ -323,9 +325,7 @@ export default function ProfilePage() {
     }
   };
 
-  const handleProfileImageChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-  ) => {
+  const handleProfileImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     // Reset the input so re-picking the same file still fires onChange.
     e.target.value = "";
@@ -414,16 +414,16 @@ export default function ProfilePage() {
               <div className="h-10 bg-secondary rounded-xl"></div>
             </div>
             <div className="flex justify-end mt-4">
-               <div className="h-10 w-32 bg-secondary rounded-xl"></div>
+              <div className="h-10 w-32 bg-secondary rounded-xl"></div>
             </div>
           </div>
         </div>
         <div className="glass-card p-6 rounded-3xl space-y-6 border border-border">
-            <div className="h-6 w-48 bg-secondary rounded-lg mb-6"></div>
-            <div className="space-y-4">
-              <div className="h-16 w-full bg-secondary rounded-xl"></div>
-              <div className="h-16 w-full bg-secondary rounded-xl"></div>
-            </div>
+          <div className="h-6 w-48 bg-secondary rounded-lg mb-6"></div>
+          <div className="space-y-4">
+            <div className="h-16 w-full bg-secondary rounded-xl"></div>
+            <div className="h-16 w-full bg-secondary rounded-xl"></div>
+          </div>
         </div>
       </div>
     );
@@ -941,11 +941,14 @@ export default function ProfilePage() {
           Devices that have securely logged into your account. You can revoke
           access to any unrecognized device.
         </p>
-        <div className="overflow-x-auto scrollbar-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <div className="overflow-x-auto  [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] scrollbar-none">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
               <tr className="bg-secondary/60 text-muted-foreground uppercase text-[10px] font-bold border-b border-border">
-                <th scope="col" className="p-3 w-10 text-center whitespace-nowrap">
+                <th
+                  scope="col"
+                  className="p-3 w-10 text-center whitespace-nowrap"
+                >
                   #
                 </th>
                 <th scope="col" className="p-3 whitespace-nowrap">
@@ -1012,11 +1015,14 @@ export default function ProfilePage() {
         <h2 className="text-base font-bold text-foreground">
           Recent Security Login History
         </h2>
-        <div className="overflow-x-auto scrollbar-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <div className="overflow-x-auto scrollbar-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] ">
           <table className="w-full text-left text-xs border-collapse">
             <thead>
               <tr className="bg-secondary/60 text-muted-foreground uppercase text-[10px] font-bold border-b border-border">
-                <th scope="col" className="p-3 w-10 text-center whitespace-nowrap">
+                <th
+                  scope="col"
+                  className="p-3 w-10 text-center whitespace-nowrap"
+                >
                   #
                 </th>
                 <th scope="col" className="p-3 whitespace-nowrap">

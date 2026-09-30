@@ -40,8 +40,6 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Bookmark,
-  ChevronLeft,
-  ChevronRight,
   Loader2,
   Plus,
   Receipt,
@@ -126,7 +124,11 @@ export default function TransactionsPage() {
     formState: { errors },
   } = useForm<TransactionFormValues>({
     resolver: zodResolver(transactionSchema),
-    defaultValues: { type: "expense", payment_method: "Cash", amount: "" as any },
+    defaultValues: {
+      type: "expense",
+      payment_method: "Cash",
+      amount: "" as any,
+    },
   });
 
   const selectedType = watch("type");
@@ -184,8 +186,6 @@ export default function TransactionsPage() {
       setDeleteId(null);
     }
   };
-
-
 
   const handleSaveFilter = () => {
     setShowSaveFilterPrompt(true);
@@ -257,7 +257,7 @@ export default function TransactionsPage() {
         </div>
 
         {/* Date & Type Filters */}
-        <div className="flex items-center gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0 scrollbar-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <div className="flex items-center gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0 scrollbar-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] ">
           <Select value={dateRange} onValueChange={setDateRange}>
             <SelectTrigger className="w-35 px-3 py-2.5 sm:py-2 rounded-xl bg-secondary border border-border text-sm sm:text-xs text-foreground font-medium outline-none shrink-0">
               <SelectValue placeholder="Date Range" />
@@ -365,7 +365,8 @@ export default function TransactionsPage() {
                             : "text-rose-500"
                         }`}
                       >
-                        {tx.type === "income" ? "+" : "-"}{formatCurrency(tx.amount)}
+                        {tx.type === "income" ? "+" : "-"}
+                        {formatCurrency(tx.amount)}
                       </span>
                       <button
                         onClick={() => handleDelete(tx._id)}
@@ -531,7 +532,8 @@ export default function TransactionsPage() {
                   </label>
                   <input
                     {...register("amount", {
-                      setValueAs: (v) => (v === "" || v === undefined ? undefined : Number(v)),
+                      setValueAs: (v) =>
+                        v === "" || v === undefined ? undefined : Number(v),
                     })}
                     type="number"
                     step="0.01"
@@ -539,7 +541,9 @@ export default function TransactionsPage() {
                     className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                   />
                   {errors.amount && (
-                    <p className="text-[10px] text-destructive mt-0.5">{errors.amount.message}</p>
+                    <p className="text-[10px] text-destructive mt-0.5">
+                      {errors.amount.message}
+                    </p>
                   )}
                 </div>
               </div>

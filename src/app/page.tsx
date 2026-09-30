@@ -46,7 +46,7 @@ import {
   TrendingDown,
   TrendingUp,
   Wallet,
-  Zap
+  Zap,
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -176,7 +176,7 @@ const socialLinks = {
   facebook: "https://www.facebook.com/mrasheed21",
   instagram: "https://www.instagram.com/mrashed21/",
   whatsapp: "https://wa.me/@mrashed21",
-  email: "rashedjaman768@gmail.com"
+  email: "rashedjaman768@gmail.com",
 };
 
 const faqs = [
@@ -209,9 +209,10 @@ export default function HomePage() {
   >("dashboard");
 
   // Dynamic Reviews
-  const { data: reviewsResponse, isLoading: reviewsLoading } = useGetReviewsQuery({});
+  const { data: reviewsResponse, isLoading: reviewsLoading } =
+    useGetReviewsQuery({});
   const reviews = reviewsResponse?.data || [];
-  
+
   const [currentReviewIndex, setCurrentReviewIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
 
@@ -305,30 +306,52 @@ export default function HomePage() {
               <ThemeToggle />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl border border-border/50">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-9 w-9 rounded-xl border border-border/50"
+                  >
                     <Menu className="h-5 w-5" />
                     <span className="sr-only">Toggle menu</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56 rounded-xl">
-                  <DropdownMenuItem asChild className="rounded-lg cursor-pointer">
+                  <DropdownMenuItem
+                    asChild
+                    className="rounded-lg cursor-pointer"
+                  >
                     <a href="#features">Features</a>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild className="rounded-lg cursor-pointer">
+                  <DropdownMenuItem
+                    asChild
+                    className="rounded-lg cursor-pointer"
+                  >
                     <a href="#preview">Preview</a>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild className="rounded-lg cursor-pointer">
+                  <DropdownMenuItem
+                    asChild
+                    className="rounded-lg cursor-pointer"
+                  >
                     <a href="#why-us">Why Choose Us</a>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild className="rounded-lg cursor-pointer">
+                  <DropdownMenuItem
+                    asChild
+                    className="rounded-lg cursor-pointer"
+                  >
                     <a href="#how-it-works">How It Works</a>
                   </DropdownMenuItem>
-                  <DropdownMenuItem asChild className="rounded-lg cursor-pointer">
+                  <DropdownMenuItem
+                    asChild
+                    className="rounded-lg cursor-pointer"
+                  >
                     <a href="#faq">FAQ</a>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   {user ? (
-                    <DropdownMenuItem asChild className="rounded-lg cursor-pointer bg-primary text-primary-foreground focus:bg-primary/90 focus:text-primary-foreground mt-2 justify-center">
+                    <DropdownMenuItem
+                      asChild
+                      className="rounded-lg cursor-pointer bg-primary text-primary-foreground focus:bg-primary/90 focus:text-primary-foreground mt-2 justify-center"
+                    >
                       <Link href="/dashboard" className="font-semibold">
                         Go to Dashboard
                         <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
@@ -336,10 +359,18 @@ export default function HomePage() {
                     </DropdownMenuItem>
                   ) : (
                     <div className="flex flex-col gap-2 mt-2">
-                      <DropdownMenuItem asChild className="rounded-lg cursor-pointer justify-center border border-border">
-                        <Link href="/login" className="font-semibold">Sign In</Link>
+                      <DropdownMenuItem
+                        asChild
+                        className="rounded-lg cursor-pointer justify-center border border-border"
+                      >
+                        <Link href="/login" className="font-semibold">
+                          Sign In
+                        </Link>
                       </DropdownMenuItem>
-                      <DropdownMenuItem asChild className="rounded-lg cursor-pointer bg-primary text-primary-foreground focus:bg-primary/90 focus:text-primary-foreground justify-center">
+                      <DropdownMenuItem
+                        asChild
+                        className="rounded-lg cursor-pointer bg-primary text-primary-foreground focus:bg-primary/90 focus:text-primary-foreground justify-center"
+                      >
                         <Link href="/register" className="font-semibold">
                           Get Started
                           <ChevronRight className="w-3.5 h-3.5 ml-1.5" />
@@ -994,7 +1025,7 @@ export default function HomePage() {
         </section>
 
         {/* 9. Testimonials Section */}
-        <section 
+        <section
           className="py-20 bg-secondary/30 border-y border-border/60"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
@@ -1035,7 +1066,10 @@ export default function HomePage() {
                       <div>
                         <div className="flex items-center gap-1 text-amber-400 mb-3">
                           {[...Array(5)].map((_, i) => (
-                            <Star key={i} className={`w-4 h-4 ${i < (t.rating || 5) ? 'fill-amber-400' : 'text-muted-foreground/30'}`} />
+                            <Star
+                              key={i}
+                              className={`w-4 h-4 ${i < (t.rating || 5) ? "fill-amber-400" : "text-muted-foreground/30"}`}
+                            />
                           ))}
                         </div>
                         <p className="text-xs text-muted-foreground leading-relaxed italic line-clamp-4">
@@ -1060,16 +1094,18 @@ export default function HomePage() {
                 })}
               </div>
             )}
-            
+
             {/* Pagination Dots */}
             {reviews.length > 3 && (
               <div className="flex justify-center gap-2 pt-4">
-                {reviews.map((_:any, idx:any) => (
+                {reviews.map((_: any, idx: any) => (
                   <button
                     key={idx}
                     onClick={() => setCurrentReviewIndex(idx)}
                     className={`w-2 h-2 rounded-full transition-all ${
-                      idx === currentReviewIndex ? "bg-primary w-6" : "bg-primary/20 hover:bg-primary/40"
+                      idx === currentReviewIndex
+                        ? "bg-primary w-6"
+                        : "bg-primary/20 hover:bg-primary/40"
                     }`}
                   />
                 ))}
@@ -1079,10 +1115,13 @@ export default function HomePage() {
         </section>
 
         {/* 10. Developer Section */}
-        <section id="developer" className="py-20 md:py-28 relative overflow-hidden">
+        <section
+          id="developer"
+          className="py-20 md:py-28 relative overflow-hidden"
+        >
           {/* Background Elements */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-3xl -z-10 pointer-events-none" />
-          
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-200 h-200 bg-primary/5 rounded-full blur-3xl -z-10 pointer-events-none" />
+
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12 relative z-10">
             <div className="text-center space-y-4">
               <h2 className="text-xs font-extrabold uppercase tracking-widest text-primary">
@@ -1117,28 +1156,61 @@ export default function HomePage() {
                       Full-Stack Software Developer
                     </p>
                   </div>
-                  
+
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    I built Expense Tracker to provide a seamless, premium-grade financial tracking experience completely free of charge. My goal is to empower individuals and small businesses to take control of their finances without worrying about subscription fees.
+                    I built Expense Tracker to provide a seamless, premium-grade
+                    financial tracking experience completely free of charge. My
+                    goal is to empower individuals and small businesses to take
+                    control of their finances without worrying about
+                    subscription fees.
                   </p>
 
                   <div className="flex flex-wrap gap-3 justify-center md:justify-start pt-2">
-                    <a href={socialLinks.portfolio} target="_blank" rel="noreferrer" className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-full text-xs font-bold hover:bg-primary/90 transition-transform hover:-translate-y-0.5">
+                    <a
+                      href={socialLinks.portfolio}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-full text-xs font-bold hover:bg-primary/90 transition-transform hover:-translate-y-0.5"
+                    >
                       <Zap className="w-3.5 h-3.5" /> Portfolio
                     </a>
-                    <a href={socialLinks.github} target="_blank" rel="noreferrer" className="flex items-center gap-2 px-4 py-2 bg-secondary text-foreground rounded-full text-xs font-bold hover:bg-secondary/80 transition-transform hover:-translate-y-0.5 border border-border">
+                    <a
+                      href={socialLinks.github}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex items-center gap-2 px-4 py-2 bg-secondary text-foreground rounded-full text-xs font-bold hover:bg-secondary/80 transition-transform hover:-translate-y-0.5 border border-border"
+                    >
                       <Github className="w-3.5 h-3.5" /> GitHub
                     </a>
-                    <a href={socialLinks.linkedin} target="_blank" rel="noreferrer" className="flex items-center gap-2 px-4 py-2 bg-secondary text-foreground rounded-full text-xs font-bold hover:bg-secondary/80 transition-transform hover:-translate-y-0.5 border border-border">
-                      <Linkedin className="w-3.5 h-3.5 text-[#0A66C2]" /> LinkedIn
+                    <a
+                      href={socialLinks.linkedin}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex items-center gap-2 px-4 py-2 bg-secondary text-foreground rounded-full text-xs font-bold hover:bg-secondary/80 transition-transform hover:-translate-y-0.5 border border-border"
+                    >
+                      <Linkedin className="w-3.5 h-3.5 text-[#0A66C2]" />{" "}
+                      LinkedIn
                     </a>
-                    <a href={socialLinks.facebook} target="_blank" rel="noreferrer" className="flex items-center justify-center w-9 h-9 bg-secondary text-foreground rounded-full hover:bg-secondary/80 transition-transform hover:-translate-y-0.5 border border-border">
+                    <a
+                      href={socialLinks.facebook}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex items-center justify-center w-9 h-9 bg-secondary text-foreground rounded-full hover:bg-secondary/80 transition-transform hover:-translate-y-0.5 border border-border"
+                    >
                       <Facebook className="w-4 h-4 text-[#1877F2]" />
                     </a>
-                    <a href={socialLinks.instagram} target="_blank" rel="noreferrer" className="flex items-center justify-center w-9 h-9 bg-secondary text-foreground rounded-full hover:bg-secondary/80 transition-transform hover:-translate-y-0.5 border border-border">
+                    <a
+                      href={socialLinks.instagram}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex items-center justify-center w-9 h-9 bg-secondary text-foreground rounded-full hover:bg-secondary/80 transition-transform hover:-translate-y-0.5 border border-border"
+                    >
                       <Instagram className="w-4 h-4 text-[#E4405F]" />
                     </a>
-                    <a href={`mailto:${socialLinks.email}`} className="flex items-center justify-center w-9 h-9 bg-secondary text-foreground rounded-full hover:bg-secondary/80 transition-transform hover:-translate-y-0.5 border border-border">
+                    <a
+                      href={`mailto:${socialLinks.email}`}
+                      className="flex items-center justify-center w-9 h-9 bg-secondary text-foreground rounded-full hover:bg-secondary/80 transition-transform hover:-translate-y-0.5 border border-border"
+                    >
                       <Mail className="w-4 h-4" />
                     </a>
                   </div>
@@ -1247,7 +1319,10 @@ export default function HomePage() {
                   </a>
                 </li>
                 <li>
-                  <a href="#developer" className="hover:text-foreground text-primary font-semibold">
+                  <a
+                    href="#developer"
+                    className="hover:text-foreground text-primary font-semibold"
+                  >
                     About Developer
                   </a>
                 </li>
@@ -1307,9 +1382,30 @@ export default function HomePage() {
           <div className="pt-8 border-t border-border/60 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
             <div className="flex flex-col sm:flex-row items-center gap-4 text-xs text-muted-foreground">
               <div className="flex gap-4">
-                <a href={socialLinks.github} target="_blank" rel="noreferrer" className="hover:text-foreground transition-colors"><Github className="w-4 h-4"/></a>
-                <a href={socialLinks.linkedin} target="_blank" rel="noreferrer" className="hover:text-foreground transition-colors"><Linkedin className="w-4 h-4"/></a>
-                <a href={socialLinks.facebook} target="_blank" rel="noreferrer" className="hover:text-foreground transition-colors"><Facebook className="w-4 h-4"/></a>
+                <a
+                  href={socialLinks.github}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="hover:text-foreground transition-colors"
+                >
+                  <Github className="w-4 h-4" />
+                </a>
+                <a
+                  href={socialLinks.linkedin}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="hover:text-foreground transition-colors"
+                >
+                  <Linkedin className="w-4 h-4" />
+                </a>
+                <a
+                  href={socialLinks.facebook}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="hover:text-foreground transition-colors"
+                >
+                  <Facebook className="w-4 h-4" />
+                </a>
               </div>
               <p>© 2026 Expense Tracker. Free and Open to Use.</p>
             </div>

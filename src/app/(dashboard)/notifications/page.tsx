@@ -18,7 +18,6 @@ import {
   BellOff,
   Check,
   CheckCircle2,
-  ChevronRight,
   Loader2,
   Trash2,
 } from "lucide-react";
@@ -311,7 +310,7 @@ export default function NotificationsPage() {
                       </button>
                     </div>
                   </div>
-                  
+
                   {/* Metadata Row */}
                   <div className="flex items-center gap-1.5 mt-0.5 mb-1.5 flex-wrap">
                     {n.category && (
@@ -319,7 +318,9 @@ export default function NotificationsPage() {
                         {n.category}
                       </span>
                     )}
-                    {n.category && <span className="w-1 h-1 rounded-full bg-border" />}
+                    {n.category && (
+                      <span className="w-1 h-1 rounded-full bg-border" />
+                    )}
                     <span className="text-[10px] font-medium text-muted-foreground">
                       {getRelativeTime(n.createdAt)}
                     </span>
@@ -341,7 +342,7 @@ export default function NotificationsPage() {
           </div>
         ) : (
           <div className="py-12">
-            <EmptyState 
+            <EmptyState
               title={
                 activeFilter === "unread"
                   ? "You're all caught up!"
@@ -363,8 +364,14 @@ export default function NotificationsPage() {
                   <CheckCircle2 className="w-8 h-8" />
                 )
               }
-              actionLabel={activeFilter !== "all" ? "View all notifications" : undefined}
-              onAction={activeFilter !== "all" ? () => setActiveFilter("all") : undefined}
+              actionLabel={
+                activeFilter !== "all" ? "View all notifications" : undefined
+              }
+              onAction={
+                activeFilter !== "all"
+                  ? () => setActiveFilter("all")
+                  : undefined
+              }
             />
           </div>
         )}

@@ -13,7 +13,6 @@ import {
 import {
   CalendarClock,
   Clock,
-  Loader2,
   PauseCircle,
   PlayCircle,
   Plus,
@@ -92,7 +91,7 @@ export default function RecurringPage() {
             <CardSkeleton count={3} />
           </div>
         ) : items.length === 0 ? (
-          <EmptyState 
+          <EmptyState
             title="No Automations Found"
             description="Set up recurring transactions to automate your finances."
             actionLabel="New Automation"

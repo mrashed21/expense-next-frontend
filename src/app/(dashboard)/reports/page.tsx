@@ -19,7 +19,6 @@ import {
   Download,
   FileSpreadsheet,
   Landmark,
-  Loader2,
   PieChart as PieIcon,
   Receipt,
 } from "lucide-react";
@@ -466,7 +465,10 @@ export default function ReportsPage() {
                       <div className="space-y-2 text-sm">
                         {cfData.data.cashFlow.operatingActivities.inflows.map(
                           (inf: any, i: number) => (
-                            <div key={i} className="flex items-center justify-between gap-4 py-1">
+                            <div
+                              key={i}
+                              className="flex items-center justify-between gap-4 py-1"
+                            >
                               <span className="text-muted-foreground truncate">
                                 {inf.category}
                               </span>
@@ -499,7 +501,10 @@ export default function ReportsPage() {
                       <div className="space-y-2 text-sm">
                         {cfData.data.cashFlow.operatingActivities.outflows.map(
                           (out: any, i: number) => (
-                            <div key={i} className="flex items-center justify-between gap-4 py-1">
+                            <div
+                              key={i}
+                              className="flex items-center justify-between gap-4 py-1"
+                            >
                               <span className="text-muted-foreground truncate">
                                 {out.category}
                               </span>

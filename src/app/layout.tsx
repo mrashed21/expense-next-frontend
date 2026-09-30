@@ -11,7 +11,8 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://expense-trecker-bd.vercel.app";
+const baseUrl =
+  process.env.NEXT_PUBLIC_APP_URL || "https://expense-trecker-bd.vercel.app";
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
@@ -41,9 +42,7 @@ export const metadata: Metadata = {
       { url: "/192-icon.png", sizes: "192x192", type: "image/png" },
       { url: "/512-icon.png", sizes: "512x512", type: "image/png" },
     ],
-    apple: [
-      { url: "/192-icon.png", sizes: "192x192", type: "image/png" },
-    ],
+    apple: [{ url: "/192-icon.png", sizes: "192x192", type: "image/png" }],
     shortcut: "/192-icon.png",
   },
   robots: {
@@ -118,8 +117,8 @@ export default function RootLayout({
         "https://www.linkedin.com/in/mrashed21/",
         "https://www.facebook.com/mrasheed21",
         "https://www.instagram.com/mrashed21/",
-      ]
-    }
+      ],
+    },
   ];
 
   return (
