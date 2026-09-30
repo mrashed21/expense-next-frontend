@@ -87,7 +87,11 @@ export const adminNavGroups: NavGroup[] = [
       { name: "User Management", href: "/admin/users", icon: Users },
       { name: "Activity", href: "/admin/activity", icon: Activity },
       { name: "Notifications", href: "/admin/notifications", icon: Bell },
-      { name: "System Health", href: "/admin/system-health", icon: ShieldAlert },
+      {
+        name: "System Health",
+        href: "/admin/system-health",
+        icon: ShieldAlert,
+      },
     ],
   },
 ];

@@ -75,4 +75,3 @@ export const {
   useRejectReviewMutation,
   useAdminDeleteReviewMutation,
 } = reviewApi;
-

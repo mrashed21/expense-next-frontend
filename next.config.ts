@@ -17,7 +17,9 @@ const nextConfig: NextConfig = {
   },
   async rewrites() {
     // Allows Docker to override the internal network proxy destination
-    const backendUrl = process.env.BACKEND_URL || "https://expense-tracker-bb-backend.vercel.app";
+    const backendUrl =
+      process.env.BACKEND_URL ||
+      "https://expense-tracker-bb-backend.vercel.app";
     return [
       {
         // Proxy all /api/* requests to the backend

@@ -48,12 +48,16 @@ export const useRealtime = () => {
       adminChannel = ablyClient.channels.get("admin_room");
 
       const onAdminFeedback = (msg: Ably.Message) => {
-        toast.info("New Feedback Received", { description: "A user just submitted feedback." });
+        toast.info("New Feedback Received", {
+          description: "A user just submitted feedback.",
+        });
         dispatch(apiSlice.util.invalidateTags(["Feedbacks"] as any));
       };
 
       const onAdminReview = (msg: Ably.Message) => {
-        toast.info("New Review Received", { description: "A user just submitted a review." });
+        toast.info("New Review Received", {
+          description: "A user just submitted a review.",
+        });
         dispatch(apiSlice.util.invalidateTags(["Reviews"] as any));
       };
 

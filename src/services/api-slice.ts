@@ -16,7 +16,7 @@ let csrfPromise: Promise<string | null> | null = null;
 
 const baseQuery = fetchBaseQuery({
   baseUrl: API_BASE_URL,
-  credentials: "include", 
+  credentials: "include",
   prepareHeaders: async (headers) => {
     const getCsrfFromCookie = () => {
       if (typeof document === "undefined") return null;

@@ -4,18 +4,18 @@ A free, mobile-first personal & business finance tracker. Track income, expenses
 
 ## Tech Stack
 
-| Concern | Technology |
-|---|---|
-| Framework | Next.js 16 (App Router, standalone output) |
-| UI | React 19, Tailwind CSS 4, shadcn/ui (Radix primitives), lucide-react |
-| State / data fetching | Redux Toolkit + RTK Query |
-| Forms & validation | react-hook-form + Zod |
-| Realtime | Ably |
-| Charts | Recharts |
-| Exports | jsPDF / jsPDF-AutoTable, @react-pdf/renderer, xlsx |
-| Theming | next-themes (light/dark) |
-| Testing | Playwright (E2E) |
-| Package manager | pnpm |
+| Concern               | Technology                                                           |
+| --------------------- | -------------------------------------------------------------------- |
+| Framework             | Next.js 16 (App Router, standalone output)                           |
+| UI                    | React 19, Tailwind CSS 4, shadcn/ui (Radix primitives), lucide-react |
+| State / data fetching | Redux Toolkit + RTK Query                                            |
+| Forms & validation    | react-hook-form + Zod                                                |
+| Realtime              | Ably                                                                 |
+| Charts                | Recharts                                                             |
+| Exports               | jsPDF / jsPDF-AutoTable, @react-pdf/renderer, xlsx                   |
+| Theming               | next-themes (light/dark)                                             |
+| Testing               | Playwright (E2E)                                                     |
+| Package manager       | pnpm                                                                 |
 
 ## Project Structure
 
