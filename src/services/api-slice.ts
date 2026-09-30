@@ -14,39 +14,39 @@ const API_BASE_URL =
 
 let csrfPromise: Promise<string | null> | null = null;
 
+const getCsrfFromCookie = () => {
+  if (typeof document === "undefined") return null;
+  const match = document.cookie.match(new RegExp("(^| )csrfToken=([^;]+)"));
+  return match?.[2] || null;
+};
+
+const ensureCsrfToken = async () => {
+  const token = getCsrfFromCookie();
+  if (token || typeof window === "undefined") return token;
+
+  if (!csrfPromise) {
+    csrfPromise = fetch(`${API_BASE_URL}/auth/csrf-token`, {
+      credentials: "include",
+    })
+      .then((res) => res.json())
+      .then((data) => data?.data?.csrfToken || null)
+      .catch((error) => {
+        console.error("Failed to fetch CSRF token", error);
+        return null;
+      })
+      .finally(() => {
+        csrfPromise = null;
+      });
+  }
+
+  return csrfPromise;
+};
+
 const baseQuery = fetchBaseQuery({
   baseUrl: API_BASE_URL,
   credentials: "include",
-  prepareHeaders: async (headers) => {
-    const getCsrfFromCookie = () => {
-      if (typeof document === "undefined") return null;
-      const match = document.cookie.match(new RegExp("(^| )csrfToken=([^;]+)"));
-      if (match) return match[2];
-      return null;
-    };
-
-    let token = getCsrfFromCookie();
-
-    // Fetch if missing
-    if (!token && typeof window !== "undefined") {
-      if (!csrfPromise) {
-        csrfPromise = fetch(`${API_BASE_URL}/auth/csrf-token`, {
-          credentials: "include",
-        })
-          .then((res) => res.json())
-          .then((data) => {
-            csrfPromise = null;
-            return data?.data?.csrfToken || null;
-          })
-          .catch((e) => {
-            console.error("Failed to fetch CSRF token", e);
-            csrfPromise = null;
-            return null;
-          });
-      }
-      token = await csrfPromise;
-    }
-
+  prepareHeaders: (headers) => {
+    const token = getCsrfFromCookie();
     if (token) {
       headers.set("x-csrf-token", token);
     }
@@ -62,13 +62,22 @@ const baseQueryWithReauth: BaseQueryFn<
   unknown,
   FetchBaseQueryError
 > = async (args, api, extraOptions) => {
-  let result = await baseQuery(args, api, extraOptions);
+  const runBaseQuery = async (request: string | FetchArgs) => {
+    const method =
+      typeof request === "string" ? "GET" : request.method || "GET";
+    if (!["GET", "HEAD", "OPTIONS"].includes(method.toUpperCase())) {
+      await ensureCsrfToken();
+    }
+    return baseQuery(request, api, extraOptions);
+  };
+
+  let result = await runBaseQuery(args);
 
   if (result.error && result.error.status === 401) {
     if (isRefreshing) {
       if (refreshPromise) {
         await refreshPromise;
-        result = await baseQuery(args, api, extraOptions);
+        result = await runBaseQuery(args);
       }
       return result;
     }
@@ -85,14 +94,10 @@ const baseQueryWithReauth: BaseQueryFn<
       : "/auth/refresh-token";
 
     refreshPromise = Promise.resolve(
-      baseQuery(
-        {
-          url: refreshUrl,
-          method: "POST",
-        },
-        api,
-        extraOptions,
-      ),
+      runBaseQuery({
+        url: refreshUrl,
+        method: "POST",
+      }),
     );
 
     const refreshResult: any = await refreshPromise;
@@ -116,7 +121,7 @@ const baseQueryWithReauth: BaseQueryFn<
       if (user) {
         api.dispatch(setCredentials({ user }));
       }
-      result = await baseQuery(args, api, extraOptions);
+      result = await runBaseQuery(args);
     } else {
       api.dispatch(logout());
     }
