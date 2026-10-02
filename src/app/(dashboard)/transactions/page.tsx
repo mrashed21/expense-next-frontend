@@ -62,6 +62,7 @@ const transactionSchema = z.object({
     "refund",
     "adjustment",
     "opening_balance",
+    "loan",
   ]),
   amount: z.coerce.number().positive("Amount must be positive"),
   date: z.string().optional(),
@@ -341,7 +342,7 @@ export default function TransactionsPage() {
                           </span>
                           <span
                             className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold uppercase border ${
-                              tx.type === "income"
+                              ["income", "refund", "opening_balance", "loan"].includes(tx.type)
                                 ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
                                 : "bg-rose-500/10 text-rose-500 border-rose-500/20"
                             }`}
@@ -360,12 +361,12 @@ export default function TransactionsPage() {
                     <div className="flex flex-col items-end gap-2 shrink-0">
                       <span
                         className={`font-black text-sm ${
-                          tx.type === "income"
+                          ["income", "refund", "opening_balance", "loan"].includes(tx.type)
                             ? "text-emerald-500"
                             : "text-rose-500"
                         }`}
                       >
-                        {tx.type === "income" ? "+" : "-"}
+                        {["income", "refund", "opening_balance", "loan"].includes(tx.type) ? "+" : "-"}
                         {formatCurrency(tx.amount)}
                       </span>
                       <button
@@ -427,7 +428,7 @@ export default function TransactionsPage() {
                       <TableCell className="p-4 whitespace-nowrap">
                         <span
                           className={`px-2 py-0.5 rounded-full text-[10px] uppercase font-bold ${
-                            tx.type === "income"
+                            ["income", "refund", "opening_balance", "loan"].includes(tx.type)
                               ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
                               : "bg-rose-500/10 text-rose-500 border border-rose-500/20"
                           }`}
@@ -437,12 +438,12 @@ export default function TransactionsPage() {
                       </TableCell>
                       <TableCell
                         className={`p-4 text-right whitespace-nowrap font-black text-sm ${
-                          tx.type === "income"
+                          ["income", "refund", "opening_balance", "loan"].includes(tx.type)
                             ? "text-emerald-500"
                             : "text-rose-500"
                         }`}
                       >
-                        {tx.type === "income" ? "+" : "-"}
+                        {["income", "refund", "opening_balance", "loan"].includes(tx.type) ? "+" : "-"}
                         {formatCurrency(tx.amount)}
                       </TableCell>
                       <TableCell className="p-4 text-center whitespace-nowrap">
@@ -520,6 +521,7 @@ export default function TransactionsPage() {
                       { label: "Expense", value: "expense" },
                       { label: "Income", value: "income" },
                       { label: "Refund", value: "refund" },
+                      { label: "Loan", value: "loan" },
                     ]}
                     searchable={false}
                     clearErrors={clearErrors}

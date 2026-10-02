@@ -208,12 +208,12 @@ export const PdfReportDocument = ({
             <View style={styles.tableCol}>
               <Text
                 style={
-                  tx.type === "income" || tx.type === "refund"
+                  ["income", "refund", "opening_balance", "loan"].includes(tx.type)
                     ? styles.amountIncome
                     : styles.amountExpense
                 }
               >
-                {tx.type === "income" || tx.type === "refund"
+                {["income", "refund", "opening_balance", "loan"].includes(tx.type)
                   ? `+${formatCurrency(tx.amount || 0)}`
                   : `-${formatCurrency(tx.amount || 0)}`}
               </Text>

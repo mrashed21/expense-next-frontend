@@ -116,7 +116,7 @@ export default function DashboardPage() {
   const monthlyIncome = useMemo(
     () =>
       allTransactions
-        .filter((tx: any) => tx.type === "income" || tx.type === "refund")
+        .filter((tx: any) => ["income", "refund", "opening_balance", "loan"].includes(tx.type))
         .reduce((sum: number, tx: any) => sum + (tx.amount || 0), 0),
     [allTransactions],
   );
@@ -568,12 +568,12 @@ export default function DashboardPage() {
                 >
                   <div
                     className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                      tx.type === "income"
+                      ["income", "refund", "opening_balance", "loan"].includes(tx.type)
                         ? "bg-emerald-500/10"
                         : "bg-rose-500/10"
                     }`}
                   >
-                    {tx.type === "income" ? (
+                    {["income", "refund", "opening_balance", "loan"].includes(tx.type) ? (
                       <TrendingUp className="w-3.5 h-3.5 text-emerald-500" />
                     ) : (
                       <TrendingDown className="w-3.5 h-3.5 text-rose-500" />
@@ -590,12 +590,12 @@ export default function DashboardPage() {
                   </div>
                   <span
                     className={`text-sm font-semibold shrink-0 ${
-                      tx.type === "income"
+                      ["income", "refund", "opening_balance", "loan"].includes(tx.type)
                         ? "text-emerald-500"
                         : "text-foreground"
                     }`}
                   >
-                    {tx.type === "income" ? "+" : "-"}
+                    {["income", "refund", "opening_balance", "loan"].includes(tx.type) ? "+" : "-"}
                     {formatCurrency(tx.amount)}
                   </span>
                 </div>
