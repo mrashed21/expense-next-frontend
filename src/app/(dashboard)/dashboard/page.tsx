@@ -402,9 +402,9 @@ export default function DashboardPage() {
                   tickFormatter={currencyFormatter}
                 />
                 <Tooltip
-                  formatter={(value: any, name: string) => [
+                  formatter={(value: any, name: any) => [
                     formatCurrency(value),
-                    name.charAt(0).toUpperCase() + name.slice(1),
+                    name ? String(name).charAt(0).toUpperCase() + String(name).slice(1) : "",
                   ]}
                   contentStyle={{
                     background: "var(--card)",
@@ -477,7 +477,7 @@ export default function DashboardPage() {
                     ))}
                   </Pie>
                   <Tooltip
-                    formatter={(value: any, name: string) => [
+                    formatter={(value: any, name: any) => [
                       formatCurrency(value),
                       name,
                     ]}
