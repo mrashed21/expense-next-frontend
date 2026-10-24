@@ -222,8 +222,8 @@ export default function NetWorthPage() {
                     fontSize: "12px",
                     boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
                   }}
-                  formatter={(value: number) => [
-                    formatCurrencyRaw(value, "USD"),
+                  formatter={(value: any) => [
+                    formatCurrencyRaw(Number(value) || 0, "USD"),
                     "Net Worth",
                   ]}
                 />
