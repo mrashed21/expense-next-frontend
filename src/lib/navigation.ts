@@ -63,6 +63,7 @@ export const userNavGroups: NavGroup[] = [
       { name: "Bills", href: "/bills", icon: FileCheck },
       { name: "Recurring", href: "/recurring", icon: RefreshCw },
       { name: "Installments", href: "/installments", icon: CalendarDays },
+      { name: "DPS & FDR", href: "/dps-fdr", icon: Landmark },
     ],
   },
   {

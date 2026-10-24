@@ -156,6 +156,7 @@ export const apiSlice = createApi({
     "Installments",
     "NetWorth",
     "Recurring",
+    "DpsFdr",
     "AdminSystemHealth",
     "AdminUsers",
     "AdminDashboard",
