@@ -535,7 +535,7 @@ export default function TransactionsPage() {
                   <input
                     {...register("amount", {
                       setValueAs: (v) =>
-                        v === "" || v === undefined ? undefined : Number(v),
+                        v === "" || v === undefined ? 0 : Number(v),
                     })}
                     type="number"
                     step="0.01"

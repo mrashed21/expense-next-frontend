@@ -46,6 +46,8 @@ const FormDatePicker = <T extends FieldValues>({
   rules,
   clearErrors,
 }: FormDatePickerProps<T>) => {
+  const today = format(new Date(), "yyyy-MM-dd");
+
   return (
     <div className="flex flex-col w-full">
       <label className="mb-1 text-xs font-semibold text-foreground leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
@@ -66,31 +68,31 @@ const FormDatePicker = <T extends FieldValues>({
       <Controller
         name={name}
         control={control}
+        defaultValue={today as never}
         rules={rules}
         render={({ field }) => (
+          (() => {
+            const selectedValue = field.value || today;
+
+            return (
           <Popover>
             <PopoverTrigger asChild>
               <Button
                 variant={"outline"}
                 className={cn(
                   "w-full justify-start text-left font-normal bg-secondary border-border text-xs text-foreground px-3 py-2 rounded-xl h-auto",
-                  !field.value && "text-muted-foreground",
                   error && "border-destructive",
                 )}
                 disabled={disabled}
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
-                {field.value ? (
-                  format(new Date(field.value), "PPP")
-                ) : (
-                  <span>Pick a date</span>
-                )}
+                {format(new Date(selectedValue), "PPP")}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
               <Calendar
                 mode="single"
-                selected={field.value ? new Date(field.value) : undefined}
+                selected={new Date(selectedValue)}
                 onSelect={(date) => {
                   field.onChange(date ? format(date, "yyyy-MM-dd") : "");
                   clearErrors?.(name);
@@ -99,6 +101,8 @@ const FormDatePicker = <T extends FieldValues>({
               />
             </PopoverContent>
           </Popover>
+            );
+          })()
         )}
       />
       <div className="min-h-5">

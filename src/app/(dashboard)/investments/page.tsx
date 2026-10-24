@@ -547,7 +547,7 @@ export default function InvestmentsPage() {
                     Quantity
                   </label>
                   <input
-                    {...registerForm("quantity", { setValueAs: (v) => v === "" ? undefined : Number(v) })}
+                    {...registerForm("quantity", {                     setValueAs: (v) => v === "" ? 0 : Number(v) })}
                     type="number"
                     step="0.00000001"
                     placeholder="0"
@@ -564,7 +564,7 @@ export default function InvestmentsPage() {
                     Avg Buy Price
                   </label>
                   <input
-                    {...registerForm("purchase_price", { setValueAs: (v) => v === "" ? undefined : Number(v) })}
+                    {...registerForm("purchase_price", {                     setValueAs: (v) => v === "" ? 0 : Number(v) })}
                     type="number"
                     step="0.01"
                     placeholder="0.00"
@@ -581,7 +581,7 @@ export default function InvestmentsPage() {
                     Market Price
                   </label>
                   <input
-                    {...registerForm("current_price", { setValueAs: (v) => v === "" ? undefined : Number(v) })}
+                    {...registerForm("current_price", {                     setValueAs: (v) => v === "" ? 0 : Number(v) })}
                     type="number"
                     step="0.01"
                     placeholder="0.00"

@@ -354,7 +354,7 @@ export default function AssetsPage() {
                   </label>
                   <input
                     {...registerAsset("value", {
-                      setValueAs: (v) => (v === "" ? undefined : Number(v)),
+                      setValueAs: (v) => (v === "" ? 0 : Number(v)),
                     })}
                     type="number"
                     step="0.01"
@@ -473,7 +473,7 @@ export default function AssetsPage() {
                   </label>
                   <input
                     {...registerEdit("value", {
-                      setValueAs: (v) => (v === "" ? undefined : Number(v)),
+                      setValueAs: (v) => (v === "" ? 0 : Number(v)),
                     })}
                     type="number"
                     step="0.01"

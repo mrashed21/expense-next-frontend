@@ -256,7 +256,7 @@ export default function GoalsPage() {
                   Target Amount
                 </label>
                 <input
-                  {...register("target_amount", { setValueAs: (v) => v === "" ? undefined : Number(v) })}
+                  {...register("target_amount", {                   setValueAs: (v) => v === "" ? 0 : Number(v) })}
                   type="number"
                   step="0.01"
                   placeholder="0.00"

@@ -654,7 +654,7 @@ export default function AccountsPage() {
                   </label>
                   <input
                     {...registerTransfer("amount", {
-                      setValueAs: (v) => (v === "" ? undefined : Number(v)),
+                      setValueAs: (v) => (v === "" ? 0 : Number(v)),
                     })}
                     type="number"
                     step="0.01"

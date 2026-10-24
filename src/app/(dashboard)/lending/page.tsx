@@ -1287,7 +1287,9 @@ export default function LendingPage() {
                 type="number"
                 step="any"
                 placeholder="0.00"
-                {...createLoanForm.register("principal_amount")}
+                {...createLoanForm.register("principal_amount", {
+                  setValueAs: (value) => (value === "" ? 0 : Number(value)),
+                })}
               />
               {createLoanForm.formState.errors.principal_amount && (
                 <p className="text-xs text-destructive">
@@ -1510,7 +1512,9 @@ export default function LendingPage() {
                   step="any"
                   max={actionLoan.outstanding_amount}
                   placeholder="0.00"
-                  {...repaymentForm.register("amount")}
+                  {...repaymentForm.register("amount", {
+                    setValueAs: (value) => (value === "" ? 0 : Number(value)),
+                  })}
                 />
                 {repaymentForm.formState.errors.amount && (
                   <p className="text-xs text-destructive">

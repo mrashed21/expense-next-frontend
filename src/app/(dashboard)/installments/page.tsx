@@ -717,7 +717,7 @@ export default function InstallmentsPage() {
                   </label>
                   <input
                     {...registerForm("total_amount", {
-                      setValueAs: (v) => (v === "" ? undefined : Number(v)),
+                      setValueAs: (v) => (v === "" ? 0 : Number(v)),
                     })}
                     type="number"
                     step="0.01"
@@ -736,7 +736,7 @@ export default function InstallmentsPage() {
                   </label>
                   <input
                     {...registerForm("total_months", {
-                      setValueAs: (v) => (v === "" ? undefined : Number(v)),
+                      setValueAs: (v) => (v === "" ? 0 : Number(v)),
                     })}
                     type="number"
                     step="1"
@@ -849,7 +849,7 @@ export default function InstallmentsPage() {
                 </label>
                 <input
                   {...registerPayment("amount", {
-                    setValueAs: (v) => (v === "" ? undefined : Number(v)),
+                    setValueAs: (v) => (v === "" ? 0 : Number(v)),
                   })}
                   type="number"
                   step="0.01"

@@ -577,7 +577,7 @@ export default function DebtsPage() {
                   </label>
                   <input
                     {...registerForm("amount", {
-                      setValueAs: (v) => (v === "" ? undefined : Number(v)),
+                      setValueAs: (v) => (v === "" ? 0 : Number(v)),
                     })}
                     type="number"
                     step="0.01"
@@ -684,7 +684,7 @@ export default function DebtsPage() {
                 </label>
                 <input
                   {...registerPayment("amount", {
-                    setValueAs: (v) => (v === "" ? undefined : Number(v)),
+                    setValueAs: (v) => (v === "" ? 0 : Number(v)),
                   })}
                   type="number"
                   step="0.01"
