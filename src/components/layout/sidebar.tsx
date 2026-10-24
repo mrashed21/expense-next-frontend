@@ -231,7 +231,7 @@ export function Sidebar() {
     <TooltipProvider>
       <aside
         className={cn(
-          "hidden md:flex flex-col border-r border-border bg-card transition-all duration-300 z-30 sticky top-0 self-start h-screen",
+          "hidden md:flex flex-col border-r border-border bg-card transition-all duration-300 z-30 sticky top-0 self-start h-screen shadow-[1px_0_4px_hsl(214_25%_20%/0.04)]",
           sidebarCollapsed ? "w-15" : "w-60",
         )}
       >

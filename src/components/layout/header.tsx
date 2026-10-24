@@ -90,7 +90,7 @@ export function Header() {
   const displayImage = user?.user_profile_image;
 
   return (
-    <header className="sticky top-0 z-20 h-14 bg-card border-b border-border px-4 md:px-5 flex items-center justify-between gap-3">
+    <header className="sticky top-0 z-20 h-16 bg-card/95 backdrop-blur-md border-b border-border px-4 md:px-6 flex items-center justify-between gap-3 shadow-[0_1px_3px_hsl(214_25%_20%/0.05)]">
       {/* Left: Mobile Brand */}
       <div className="flex items-center gap-3 min-w-0">
         {/* Mobile brand */}
@@ -98,7 +98,7 @@ export function Header() {
           <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
             <TrendingUp className="w-3.5 h-3.5 text-primary-foreground" />
           </div>
-          <span className="font-semibold text-sm">Expense Tracker</span>
+          <span className="font-bold text-sm tracking-tight">Expense Tracker</span>
         </div>
       </div>
 
