@@ -2,7 +2,13 @@ import { apiSlice } from "./api-slice";
 
 export const dpsFdrApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getDpsFdr: builder.query({ query: () => "/dps-fdr", providesTags: ["DpsFdr"] }),
+    getDpsFdr: builder.query({
+      query: ({ type }: { type?: "dps" | "fdr" } = {}) => ({
+        url: "/dps-fdr",
+        params: type ? { type } : undefined,
+      }),
+      providesTags: ["DpsFdr"],
+    }),
     createDpsFdr: builder.mutation({
       query: (body) => ({ url: "/dps-fdr", method: "POST", body }),
       invalidatesTags: ["DpsFdr", "Accounts", "Transactions"],
