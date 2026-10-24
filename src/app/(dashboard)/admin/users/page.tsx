@@ -38,6 +38,7 @@ import { formatDate } from "@/lib/utils";
 import { RootState } from "@/redux/store";
 import {
   useGetUsersQuery,
+  useDeleteUserMutation,
   useSendUserNotificationMutation,
   useUpdateUserStatusMutation,
 } from "@/services/admin-api";
@@ -100,6 +101,7 @@ export default function AdminUsersPage() {
 
   const [updateUserStatus, { isLoading: updatingStatus }] =
     useUpdateUserStatusMutation();
+  const [deleteUser, { isLoading: deletingUser }] = useDeleteUserMutation();
   const [sendUserNotification, { isLoading: isSendingNotification }] =
     useSendUserNotificationMutation();
 
@@ -127,7 +129,8 @@ export default function AdminUsersPage() {
 
     try {
       if (actionType === "delete") {
-        toast.info("Delete user API not implemented here yet.");
+        await deleteUser(selectedUserId).unwrap();
+        toast.success("User and all transactions deleted successfully");
       } else {
         await updateUserStatus({
           id: selectedUserId,
@@ -348,12 +351,14 @@ export default function AdminUsersPage() {
                               Ban User
                             </DropdownMenuItem>
                           )}
-                          <DropdownMenuItem
-                            onClick={() => openActionDialog(u._id, "delete")}
-                            className="text-destructive focus:text-destructive"
-                          >
-                            <Trash2 className="h-4 w-4 mr-2" /> Delete User
-                          </DropdownMenuItem>
+                          {user.user_role === "super_admin" && (
+                            <DropdownMenuItem
+                              onClick={() => openActionDialog(u._id, "delete")}
+                              className="text-destructive focus:text-destructive"
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" /> Delete User
+                            </DropdownMenuItem>
+                          )}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
@@ -392,7 +397,7 @@ export default function AdminUsersPage() {
             <Button
               variant="outline"
               onClick={() => setIsDialogOpen(false)}
-              disabled={updatingStatus}
+              disabled={updatingStatus || deletingUser}
             >
               Cancel
             </Button>
@@ -403,9 +408,9 @@ export default function AdminUsersPage() {
                   : "default"
               }
               onClick={handleActionConfirm}
-              disabled={updatingStatus}
+              disabled={updatingStatus || deletingUser}
             >
-              {updatingStatus ? (
+              {updatingStatus || deletingUser ? (
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
               ) : null}
               Confirm
