@@ -61,10 +61,12 @@ const NavItem = React.memo(
     item,
     pathname,
     sidebarCollapsed,
+    isSubItem = false,
   }: {
     item: { name: string; href: string; icon: React.ElementType };
     pathname: string;
     sidebarCollapsed: boolean;
+    isSubItem?: boolean;
   }) => {
     const isActive =
       item.href === "/admin" || item.href === "/dashboard"
@@ -76,7 +78,8 @@ const NavItem = React.memo(
       <Link
         href={item.href}
         className={cn(
-          "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 group",
+          "flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-all duration-150 group",
+          isSubItem && !sidebarCollapsed ? "ml-3 text-xs" : "text-sm",
           isActive
             ? "bg-primary text-primary-foreground"
             : "text-muted-foreground hover:text-foreground hover:bg-secondary",
@@ -153,6 +156,7 @@ export function Sidebar() {
               item={item}
               pathname={pathname}
               sidebarCollapsed={sidebarCollapsed}
+              isSubItem
             />
           ))}
           {user?.user_role === "super_admin" &&
