@@ -1,6 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import { accountNavItems, userNavGroups } from "@/lib/navigation";
 import { RootState } from "@/redux/store";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import {
@@ -8,26 +9,15 @@ import {
   ArrowRightLeft,
   BarChart3,
   Bell,
-  Calendar,
-  FileCheck,
-  FileText,
-  Grid,
-  HandCoins,
-  Home,
-  Landmark,
   LayoutDashboard,
   MessageSquare,
   MoreHorizontal,
-  PiggyBank,
   Receipt,
-  RefreshCw,
   ScrollText,
   SendHorizonal,
   Settings,
   ShieldAlert,
   Star,
-  Target,
-  TrendingUp,
   User,
   Users,
   Wallet,
@@ -56,25 +46,19 @@ const adminMobileItems = [
 ];
 
 /* ─── "More" Drawer Items ──────────────────────────────── */
-const moreItems = [
-  { name: "Categories", href: "/categories", icon: Grid },
-  { name: "Transfers", href: "/transfers", icon: ArrowRightLeft },
-  { name: "Budgets", href: "/budgets", icon: PiggyBank },
-  { name: "Goals", href: "/goals", icon: Target },
-  { name: "Bills", href: "/bills", icon: FileCheck },
-  { name: "Recurring", href: "/recurring", icon: RefreshCw },
-  { name: "Installments", href: "/installments", icon: Calendar },
-  { name: "Lending", href: "/lending", icon: Landmark },
-  { name: "Debts", href: "/debts", icon: HandCoins },
-  { name: "Investments", href: "/investments", icon: TrendingUp },
-  { name: "Assets", href: "/assets", icon: Home },
-  { name: "Net Worth", href: "/net-worth", icon: TrendingUp },
-  { name: "Reports", href: "/reports", icon: FileText },
-  { name: "Calendar", href: "/calendar", icon: Calendar },
-  { name: "Notifications", href: "/notifications", icon: Bell },
+const moreItems = userNavGroups
+  .flatMap((group) => group.items)
+  .filter(
+    (item) =>
+      !["/dashboard", "/transactions", "/accounts", "/analytics"].includes(
+        item.href,
+      ),
+  );
+
+moreItems.push(
+  ...accountNavItems.filter((item) => item.href !== "/profile"),
   { name: "Feedback", href: "/feedback", icon: MessageSquare },
-  { name: "Settings", href: "/settings", icon: Settings },
-];
+);
 
 const adminMoreItems = [
   {

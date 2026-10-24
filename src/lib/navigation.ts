@@ -44,7 +44,6 @@ export const userNavGroups: NavGroup[] = [
       { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
       { name: "Analytics", href: "/analytics", icon: BarChart3 },
       { name: "Reports", href: "/reports", icon: FileText },
-      { name: "Calendar", href: "/calendar", icon: CalendarDays },
     ],
   },
   {
@@ -64,16 +63,22 @@ export const userNavGroups: NavGroup[] = [
       { name: "Bills", href: "/bills", icon: FileCheck },
       { name: "Recurring", href: "/recurring", icon: RefreshCw },
       { name: "Installments", href: "/installments", icon: CalendarDays },
-      { name: "Lending", href: "/lending", icon: Landmark },
     ],
   },
   {
-    label: "Portfolio",
+    label: "Loans & Debt",
     items: [
+      { name: "Lending", href: "/lending", icon: Landmark },
       { name: "Debts", href: "/debts", icon: HandCoins },
+    ],
+  },
+  {
+    label: "Wealth",
+    items: [
       { name: "Investments", href: "/investments", icon: TrendingUp },
       { name: "Assets", href: "/assets", icon: Home },
       { name: "Net Worth", href: "/net-worth", icon: TrendingUp },
+      { name: "Calendar", href: "/calendar", icon: CalendarDays },
     ],
   },
 ];

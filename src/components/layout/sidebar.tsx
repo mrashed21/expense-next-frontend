@@ -9,16 +9,10 @@ import {
 } from "@/components/ui/tooltip";
 import {
   Activity,
-  ArrowRightLeft,
-  BarChart3,
   Bell,
-  Calendar,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
-  FileCheck,
-  FileText,
-  HandCoins,
   Folder,
   LayoutDashboard,
   MessageSquare,
@@ -29,13 +23,12 @@ import {
   Star,
   User,
   Users,
-  Wallet,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { cn } from "../../lib/utils";
-import { userNavGroups } from "../../lib/navigation";
+import { accountNavItems, userNavGroups } from "../../lib/navigation";
 import { toggleSidebar } from "../../redux/slices/layout-slice";
 import { RootState } from "../../redux/store";
 
@@ -220,7 +213,10 @@ export function Sidebar() {
   const renderBottomItems = useMemo(() => {
     const items = user?.isAdmin
       ? bottomItems.filter((item) => item.href !== "/feedback")
-      : bottomItems;
+      : [
+          accountNavItems.find((item) => item.href === "/notifications")!,
+          ...bottomItems,
+        ];
     return items.map((item) => (
       <NavItem
         key={item.name}
