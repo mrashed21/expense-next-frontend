@@ -50,11 +50,10 @@ export const userNavGroups: NavGroup[] = [
   {
     label: "Money",
     items: [
-      { name: "Transactions", href: "/transactions", icon: Receipt },
       { name: "Accounts", href: "/accounts", icon: Wallet },
-      { name: "Transfers", href: "/transfers", icon: ArrowRightLeft },
-      { name: "Lending", href: "/lending", icon: Landmark },
+      { name: "Transactions", href: "/transactions", icon: Receipt },
       { name: "Categories", href: "/categories", icon: Grid },
+      { name: "Transfers", href: "/transfers", icon: ArrowRightLeft },
     ],
   },
   {
@@ -65,15 +64,16 @@ export const userNavGroups: NavGroup[] = [
       { name: "Bills", href: "/bills", icon: FileCheck },
       { name: "Recurring", href: "/recurring", icon: RefreshCw },
       { name: "Installments", href: "/installments", icon: CalendarDays },
+      { name: "Lending", href: "/lending", icon: Landmark },
     ],
   },
   {
     label: "Portfolio",
     items: [
-      { name: "Net Worth", href: "/net-worth", icon: TrendingUp },
+      { name: "Debts", href: "/debts", icon: HandCoins },
       { name: "Investments", href: "/investments", icon: TrendingUp },
       { name: "Assets", href: "/assets", icon: Home },
-      { name: "Debts", href: "/debts", icon: HandCoins },
+      { name: "Net Worth", href: "/net-worth", icon: TrendingUp },
     ],
   },
 ];

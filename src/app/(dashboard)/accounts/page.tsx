@@ -43,6 +43,7 @@ const accountSchema = z.object({
   name: z.string().min(1, "Account name is required"),
   type: z.string().min(1, "Account type is required"),
   opening_balance: z.coerce.number(),
+  current_balance: z.coerce.number().optional(),
   color: z.string(),
   description: z.string().optional(),
 });
@@ -148,6 +149,7 @@ export default function AccountsPage() {
       name: acc.name,
       type: acc.type,
       opening_balance: acc.opening_balance,
+      current_balance: acc.current_balance,
       color: acc.color || "#4F46E5",
       description: acc.description || "",
     });
@@ -543,14 +545,30 @@ export default function AccountsPage() {
                 </div>
                 <div className="space-y-1">
                   <label className="text-xs font-semibold text-foreground">
-                    Color
+                    Current Balance
                   </label>
                   <input
-                    {...registerEdit("color")}
-                    type="color"
-                    className="w-full h-9 px-1 py-1 rounded-xl bg-secondary border border-border cursor-pointer"
+                    {...registerEdit("current_balance", {
+                      setValueAs: (v) =>
+                        v === "" || v === undefined ? 0 : Number(v),
+                    })}
+                    type="number"
+                    step="0.01"
+                    placeholder="0.00"
+                    className="w-full px-3 py-2 rounded-xl bg-secondary border border-border text-xs text-foreground focus:outline-none focus:border-primary"
                   />
                 </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-foreground">
+                  Color
+                </label>
+                <input
+                  {...registerEdit("color")}
+                  type="color"
+                  className="w-full h-9 px-1 py-1 rounded-xl bg-secondary border border-border cursor-pointer"
+                />
               </div>
 
               <div className="space-y-1">
