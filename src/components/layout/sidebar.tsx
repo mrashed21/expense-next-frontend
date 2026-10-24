@@ -13,58 +13,31 @@ import {
   BarChart3,
   Bell,
   Calendar,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
   FileCheck,
   FileText,
-  Grid,
   HandCoins,
-  Home,
-  Landmark,
+  Folder,
   LayoutDashboard,
   MessageSquare,
-  PiggyBank,
-  Receipt,
-  RefreshCw,
   ScrollText,
   SendHorizonal,
   Settings,
   ShieldAlert,
   Star,
-  Target,
-  TrendingUp,
   User,
   Users,
-  Wallet
+  Wallet,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { cn } from "../../lib/utils";
+import { userNavGroups } from "../../lib/navigation";
 import { toggleSidebar } from "../../redux/slices/layout-slice";
 import { RootState } from "../../redux/store";
-
-const navigationItems = [
-  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Accounts", href: "/accounts", icon: Wallet },
-  { name: "Transactions", href: "/transactions", icon: Receipt },
-  { name: "Categories", href: "/categories", icon: Grid },
-  { name: "Transfers", href: "/transfers", icon: ArrowRightLeft },
-  { name: "Budgets", href: "/budgets", icon: PiggyBank },
-  { name: "Goals", href: "/goals", icon: Target },
-  { name: "Bills", href: "/bills", icon: FileCheck },
-  { name: "Recurring", href: "/recurring", icon: RefreshCw },
-  { name: "Installments", href: "/installments", icon: Calendar },
-  { name: "Lending", href: "/lending", icon: Landmark },
-  { name: "Debts", href: "/debts", icon: HandCoins },
-  { name: "Investments", href: "/investments", icon: TrendingUp },
-  { name: "Assets", href: "/assets", icon: Home },
-  { name: "Net Worth", href: "/net-worth", icon: TrendingUp },
-  { name: "Analytics", href: "/analytics", icon: BarChart3 },
-  { name: "Reports", href: "/reports", icon: FileText },
-  { name: "Calendar", href: "/calendar", icon: Calendar },
-  { name: "Notifications", href: "/notifications", icon: Bell },
-];
 
 const adminItems = [
   { name: "Admin Dashboard", href: "/admin", icon: LayoutDashboard },
@@ -149,6 +122,30 @@ export function Sidebar() {
   const dispatch = useDispatch();
   const { sidebarCollapsed } = useSelector((state: RootState) => state.layout);
   const { user } = useSelector((state: RootState) => state.auth);
+  const [openGroups, setOpenGroups] = React.useState<Record<string, boolean>>(
+    () =>
+      Object.fromEntries(
+        userNavGroups.map((group) => [
+          group.label,
+          group.items.some(
+            (item) =>
+              pathname === item.href || pathname.startsWith(`${item.href}/`),
+          ),
+        ]),
+      ),
+  );
+
+  React.useEffect(() => {
+    const activeGroup = userNavGroups.find((group) =>
+      group.items.some(
+        (item) =>
+          pathname === item.href || pathname.startsWith(`${item.href}/`),
+      ),
+    );
+    if (activeGroup && !openGroups[activeGroup.label]) {
+      setOpenGroups((current) => ({ ...current, [activeGroup.label]: true }));
+    }
+  }, [pathname, openGroups]);
 
   const renderNavItems = useMemo(() => {
     if (user?.isAdmin) {
@@ -177,19 +174,48 @@ export function Sidebar() {
         </>
       );
     }
-    return (
-      <>
-        {navigationItems.map((item) => (
-          <NavItem
-            key={item.name}
-            item={item}
-            pathname={pathname}
-            sidebarCollapsed={sidebarCollapsed}
-          />
-        ))}
-      </>
-    );
-  }, [user, pathname, sidebarCollapsed]);
+    return userNavGroups.map((group) => {
+      const isOpen = openGroups[group.label] ?? true;
+      return (
+        <div key={group.label} className="space-y-1">
+          <button
+            type="button"
+            onClick={() =>
+              setOpenGroups((current) => ({
+                ...current,
+                [group.label]: !isOpen,
+              }))
+            }
+            className={cn(
+              "flex w-full items-center gap-2 px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground hover:text-foreground",
+              sidebarCollapsed && "justify-center px-0",
+            )}
+            title={sidebarCollapsed ? group.label : undefined}
+          >
+            <Folder className="h-3.5 w-3.5 shrink-0" />
+            {!sidebarCollapsed && <span>{group.label}</span>}
+            {!sidebarCollapsed && (
+              <ChevronDown
+                className={cn(
+                  "ml-auto h-3.5 w-3.5 transition-transform",
+                  !isOpen && "-rotate-90",
+                )}
+              />
+            )}
+          </button>
+          {isOpen &&
+            group.items.map((item) => (
+              <NavItem
+                key={item.name}
+                item={item}
+                pathname={pathname}
+                sidebarCollapsed={sidebarCollapsed}
+              />
+            ))}
+        </div>
+      );
+    });
+  }, [user, pathname, sidebarCollapsed, openGroups]);
 
   const renderBottomItems = useMemo(() => {
     const items = user?.isAdmin
